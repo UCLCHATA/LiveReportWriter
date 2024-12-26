@@ -1,0 +1,311 @@
+/* Main container */
+.milestone-tracker {
+  position: fixed;
+  left: 20px;
+  top: 80px;
+  width: 40%;
+  height: calc(100vh - 140px);
+  background: #fff;
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  z-index: 10;
+}
+
+/* Header section */
+.milestone-header {
+  padding: 12px 16px;
+  border-bottom: 1px solid #ddd;
+  background: #fff;
+  z-index: 20;
+}
+
+.milestone-header h2 {
+  font-size: 16px;
+  margin: 0;
+}
+
+/* Controls section - make it more compact */
+.controls {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  padding: 8px 16px;
+  background: #fff;
+  border-bottom: 1px solid #ddd;
+  z-index: 15;
+}
+
+.controls select,
+.milestone-info select {
+  flex: 1;
+  padding: 6px 10px;
+  border-radius: 4px;
+  border: 1px solid #ddd;
+  font-size: 13px;
+  background-color: white;
+  min-width: 120px;
+}
+
+.controls button {
+  padding: 6px 12px;
+  background: #4a90e2;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 13px;
+  transition: all 0.2s;
+  white-space: nowrap;
+}
+
+.controls button:hover {
+  background: #357abd;
+  transform: translateY(-1px);
+}
+
+.controls button:last-child {
+  background: #6c757d;
+}
+
+/* Timeline section - adjust height */
+.timeline-section {
+  flex: 1;
+  min-height: 0;
+  position: relative;
+  overflow: hidden;
+  height: calc(100% - 200px); /* Account for header, controls, and details panel */
+}
+
+.timeline-container {
+  height: 100%;
+  border: none;
+  background: #fff;
+}
+
+/* Collapsible sections */
+.collapsible-section {
+  border-top: 1px solid #ddd;
+  background: #fff;
+}
+
+.collapsible-header {
+  padding: 12px 16px;
+  background: #f8f9fa;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  user-select: none;
+}
+
+.collapsible-header:hover {
+  background: #f1f3f5;
+}
+
+.collapsible-content {
+  max-height: 0;
+  overflow: hidden;
+  transition: max-height 0.3s ease-out;
+}
+
+.collapsible-content.expanded {
+  max-height: 500px;
+}
+
+/* Details panel */
+.milestone-details {
+  background: #f8f9fa;
+  border-top: 1px solid #ddd;
+  padding: 12px;
+  max-height: 30vh;
+  overflow-y: auto;
+}
+
+.milestone-details.collapsed {
+  max-height: 40px;
+  overflow: hidden;
+}
+
+.milestone-info {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 8px;
+  margin-bottom: 8px;
+}
+
+.milestone-info > div {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.milestone-info label {
+  font-size: 11px;
+  color: #666;
+  font-weight: 500;
+}
+
+.milestone-details textarea {
+  width: 100%;
+  min-height: 60px;
+  max-height: 120px;
+  padding: 6px;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  font-size: 13px;
+  resize: vertical;
+}
+
+/* Timeline item styles */
+.milestone-achieved {
+  background-color: #4caf50 !important;
+  border-color: #388e3c !important;
+  color: white !important;
+  z-index: 5;
+}
+
+.milestone-partial {
+  background-color: #ff9800 !important;
+  border-color: #f57c00 !important;
+  color: white !important;
+  z-index: 5;
+}
+
+.milestone-not_achieved {
+  background-color: #f44336 !important;
+  border-color: #dc2626 !important;
+  color: white !important;
+  z-index: 5;
+}
+
+/* Tooltip styles */
+.milestone-tooltip {
+  padding: 8px;
+  max-width: 250px;
+  background: white;
+  border-radius: 4px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+  z-index: 1000;
+}
+
+.milestone-tooltip h4 {
+  margin: 0 0 6px 0;
+  color: #333;
+  font-size: 14px;
+  font-weight: 500;
+}
+
+.milestone-tooltip p {
+  margin: 3px 0;
+  color: #666;
+  font-size: 12px;
+}
+
+/* Vis-timeline customizations */
+.vis-timeline {
+  border: none !important;
+  font-family: inherit !important;
+}
+
+.vis-item {
+  border-radius: 4px !important;
+  font-size: 12px !important;
+}
+
+.vis-item.vis-selected {
+  box-shadow: 0 0 0 2px #4a90e2 !important;
+  z-index: 10 !important;
+}
+
+.vis-panel.vis-center,
+.vis-panel.vis-left,
+.vis-panel.vis-right {
+  border: none !important;
+}
+
+.vis-grid.vis-minor {
+  border-color: #f0f0f0 !important;
+}
+
+.vis-grid.vis-major {
+  border-color: #e0e0e0 !important;
+}
+
+/* Loading and error states */
+.milestone-tracker-loading,
+.milestone-tracker-error {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  text-align: center;
+  padding: 20px;
+  background: #fff;
+  border-radius: 8px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  z-index: 100;
+}
+
+.spinner {
+  width: 32px;
+  height: 32px;
+  border: 3px solid #f3f3f3;
+  border-top: 3px solid #4a90e2;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+  margin: 0 auto 12px;
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+/* Responsive adjustments */
+@media (max-width: 1400px) {
+  .milestone-tracker {
+    width: 45%;
+  }
+}
+
+@media (max-width: 1200px) {
+  .milestone-tracker {
+    width: 50%;
+  }
+}
+
+/* Toggle button for collapsing the entire tracker */
+.milestone-collapse-toggle {
+  position: absolute;
+  right: -24px;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 20px;
+  height: 50px;
+  background: #4a90e2;
+  border: none;
+  border-radius: 0 4px 4px 0;
+  color: white;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 11;
+  font-size: 12px;
+}
+
+.milestone-collapse-toggle:hover {
+  background: #357abd;
+}
+
+/* Collapsed state */
+.milestone-tracker.collapsed {
+  width: 30px;
+}
+
+.milestone-tracker.collapsed .milestone-collapse-toggle {
+  right: 0;
+} 

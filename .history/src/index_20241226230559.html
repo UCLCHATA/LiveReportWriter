@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CHATA Autism Report Generator</title>
+    <link rel="stylesheet" href="styles/main.css">
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+</head>
+<body>
+    <header class="site-header">
+        <div class="header-content">
+            <img class="header-logo" src="https://upload.wikimedia.org/wikipedia/sco/thumb/d/d1/University_College_London_logo.svg/300px-University_College_London_logo.svg.png" alt="UCL Logo">
+            <h1>CHATA Autism Report Generator</h1>
+            <div class="header-right">
+                <span class="chata-id"></span>
+                <img class="header-logo" src="https://upload.wikimedia.org/wikipedia/commons/thumb/d/d3/National_Health_Service_%28England%29_logo.svg/371px-National_Health_Service_%28England%29_logo.svg.png" alt="NHS Logo">
+            </div>
+        </div>
+    </header>
+
+    <main class="main-container">
+        <!-- Left side - React Assessment -->
+        <div id="react-root" class="assessment-container">
+            <!-- React components will be mounted here -->
+        </div>
+
+        <!-- Right side - Form -->
+        <div class="form-container">
+            <button class="create-report-button">
+                <i class="material-icons">add</i>
+                Create New Report
+            </button>
+            
+            <div class="form-content">
+                <!-- Status Section -->
+                <div class="status-section">
+                    <h4><i class="material-icons">check_circle_outline</i>Status</h4>
+                    <div class="status-group">
+                        <div class="status-item">
+                            <h4>ASC Status</h4>
+                            <select name="asc_status">
+                                <option value="">--</option>
+                                <option>ASC confirmed</option>
+                                <option>ASC not confirmed</option>
+                            </select>
+                        </div>
+                        
+                        <div class="status-item">
+                            <h4>ADHD Status</h4>
+                            <select name="adhd_status">
+                                <option value="">--</option>
+                                <option>No concerns identified</option>
+                                <option>Assessment recommended</option>
+                                <option>Previously confirmed</option>
+                                <option>Confirmed during diagnosis</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Professional Referrals -->
+                <div class="referrals-section">
+                    <h4><i class="material-icons">share</i>Professional Referrals</h4>
+                    <div class="referrals-grid">
+                        <label><input type="checkbox" value="Speech & Language"> Speech & Language</label>
+                        <label><input type="checkbox" value="Educational Psychology"> Educational Psychology</label>
+                        <label><input type="checkbox" value="Sleep Support"> Sleep Support</label>
+                        <div class="referral-other-row">
+                            <label><input type="checkbox" value="Other"> Other </label>
+                            <input type="text" name="other_referrals" class="referral-other-input" placeholder="Specific Remarks">
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Text Areas Grid -->
+                <div class="middle-sections-grid">
+                    <div class="text-box-container clinical">
+                        <div class="text-box-header">
+                            <i class="material-icons">description</i>
+                            <h4>Key Clinical Observations</h4>
+                        </div>
+                        <textarea class="text-area" placeholder="Enter clinical observations..."></textarea>
+                    </div>
+
+                    <div class="text-box-container strengths">
+                        <div class="text-box-header">
+                            <i class="material-icons">star</i>
+                            <h4>Strengths & Abilities</h4>
+                        </div>
+                        <textarea class="text-area" placeholder="Enter strengths and abilities..."></textarea>
+                    </div>
+
+                    <div class="text-box-container priority">
+                        <div class="text-box-header">
+                            <i class="material-icons">priority_high</i>
+                            <h4>Priority Support Areas</h4>
+                        </div>
+                        <textarea class="text-area" placeholder="Enter priority support areas..."></textarea>
+                    </div>
+
+                    <div class="text-box-container support">
+                        <div class="text-box-header">
+                            <i class="material-icons">support</i>
+                            <h4>Support Recommendations</h4>
+                        </div>
+                        <textarea class="text-area" placeholder="Enter support recommendations..."></textarea>
+                    </div>
+                </div>
+
+                <!-- Button Group -->
+                <div class="button-group">
+                    <button class="clear-button">Clear Form</button>
+                    <button class="submit-button">Submit Assessment</button>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Clinician Modal -->
+    <div id="clinician-modal" class="clinician-modal">
+        <h3>Enter Clinician Details</h3>
+        <form class="clinician-form">
+            <div>
+                <label for="clinician-name">Clinician's Name</label>
+                <input type="text" id="clinician-name" required>
+            </div>
+            <div>
+                <label for="clinician-email">Clinician's Email</label>
+                <input type="email" id="clinician-email" required>
+            </div>
+            <div class="button-group">
+                <button type="button" class="cancel-button">Cancel</button>
+                <button type="submit" class="submit-button" id="start-report">Start Report</button>
+            </div>
+        </form>
+    </div>
+    <div class="modal-backdrop"></div>
+
+    <!-- React initialization -->
+    <script type="module" src="/src/main.tsx"></script>
+    <!-- Vanilla JS for right side -->
+    <script src="/src/app.js"></script>
+</body>
+</html> 

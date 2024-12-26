@@ -1,0 +1,1215 @@
+/* Global Styles */
+body {
+  margin: 0;
+  padding: 0;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+  background-color: #f5f5f5;
+}
+
+.app {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+/* Header Styles */
+header {
+  background-color: #fff;
+  padding: 0.75rem;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  position: relative;
+  z-index: 20;
+}
+
+.logo-container {
+  width: 120px;
+  height: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.ucl-logo, .nhs-logo {
+  height: 35px;
+  width: auto;
+  object-fit: contain;
+}
+
+.title-container {
+  text-align: center;
+  flex-grow: 1;
+  margin: 0 1rem;
+}
+
+h1 {
+  margin: 0;
+  font-size: 1.5rem;
+  color: #333;
+}
+
+.chata-id {
+  margin-top: 0.25rem;
+  font-size: 0.9rem;
+  color: #666;
+}
+
+/* Main Content */
+main {
+  flex: 1;
+  display: flex;
+  padding: 1rem;
+  gap: 1rem;
+  position: relative;
+  min-height: 0;
+  max-width: 1400px;
+  margin: 0 auto;
+  width: 100%;
+  box-sizing: border-box;
+  height: calc(100vh - 120px);
+  overflow: hidden;
+}
+
+/* Left Panel */
+.left-panel {
+  flex: 1;
+  width: 50%;
+  background: #fff;
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  padding: 1rem;
+  height: calc(100vh - 180px);
+  overflow: hidden;
+  position: relative;
+  display: none;
+}
+
+.left-panel.active {
+  display: block;
+}
+
+/* Milestone Tracker */
+.milestone-tracker {
+  width: 100%;
+  height: 100%;
+  position: absolute;
+  top: 0;
+  left: 0;
+  background: #fff;
+  transition: transform 0.3s ease;
+  overflow-y: auto;
+  padding: 0.5rem;
+  box-sizing: border-box;
+}
+
+.milestone-tracker.collapsed {
+  transform: translateX(-100%);
+}
+
+/* Toggle Button for Milestone Tracker */
+.milestone-toggle {
+  position: absolute;
+  right: -20px;
+  top: 50%;
+  transform: translateY(-50%);
+  background: #007bff;
+  color: white;
+  border: none;
+  border-radius: 0 4px 4px 0;
+  padding: 0.5rem;
+  cursor: pointer;
+  z-index: 1;
+}
+
+/* Right Panel */
+.right-panel {
+  flex: 1;
+  width: 50%;
+  background: #fff;
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  padding: 1rem;
+  height: calc(100vh - 180px);
+  overflow-y: auto;
+  display: none;
+  position: relative;
+}
+
+.right-panel.active {
+  display: block;
+}
+
+/* Form Container */
+.form-container {
+  height: 100%;
+  overflow-y: auto;
+  padding-right: 0.5rem;
+}
+
+/* Overlay */
+.overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(255, 255, 255, 0.8);
+  backdrop-filter: blur(5px);
+  -webkit-backdrop-filter: blur(5px);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 10;
+}
+
+/* Form Styles */
+.form-container {
+  display: none;
+}
+
+.form-container.active {
+  display: block;
+}
+
+.create-report-button {
+  padding: 1rem 2rem;
+  font-size: 1.2rem;
+  background-color: #007bff;
+  color: #fff;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+.create-report-button:hover {
+  background-color: #0056b3;
+}
+
+/* Modal Styles */
+.modal-backdrop {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.5);
+  display: none;
+  z-index: 100;
+}
+
+.modal-backdrop.active {
+  display: block;
+}
+
+.modal-container {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  background: #fff;
+  padding: 2rem;
+  border-radius: 8px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  display: none;
+  z-index: 1000;
+  max-width: 90%;
+  width: 400px;
+}
+
+.modal-container.active {
+  display: block;
+}
+
+/* Form Elements */
+.form-group {
+  margin: 0;
+  padding: 0;
+}
+
+label {
+  margin: 0;
+  padding: 0;
+  line-height: 1.2;
+}
+
+input[type="text"],
+input[type="email"],
+select,
+textarea {
+  width: 100%;
+  padding: 0.5rem;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  font-size: 1rem;
+  box-sizing: border-box;
+}
+
+.button-group {
+  display: flex;
+  justify-content: center;
+  gap: 1rem;
+  margin-top: 0.25rem;
+  padding: 0.5rem;
+  background: #f8f9fa;
+  border-radius: 4px;
+}
+
+.submit-button,
+.clear-button {
+  padding: 0.5rem 1.5rem;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 0.9rem;
+  transition: background-color 0.2s;
+  min-width: 140px;
+}
+
+.submit-button {
+  background-color: #4a90e2;
+  color: #fff;
+}
+
+.submit-button:hover {
+  background-color: #357abd;
+}
+
+.clear-button {
+  background-color: #6c757d;
+  color: #fff;
+}
+
+.clear-button:hover {
+  background-color: #5a6268;
+}
+
+.cancel-button {
+  background-color: #6c757d;
+  color: #fff;
+  padding: 0.5rem 1rem;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 1rem;
+}
+
+.cancel-button:hover {
+  background-color: #5a6268;
+}
+
+/* Footer */
+footer {
+  background-color: #333;
+  color: #fff;
+  padding: 0.5rem;
+  text-align: center;
+  position: relative;
+  z-index: 20;
+}
+
+.footer-content {
+  max-width: 1200px;
+  margin: 0 auto;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 2rem;
+}
+
+.footer-logos {
+  display: flex;
+  gap: 2rem;
+  align-items: center;
+}
+
+/* Use the same logo styles as header */
+.footer-logos img {
+  height: 35px;
+  width: auto;
+  object-fit: contain;
+}
+
+/* UCL logo needs to be inverted to white */
+.footer-logos .ucl-logo {
+  filter: brightness(0) invert(1);
+}
+
+/* Helper Text Styles */
+textarea.text-area {
+  width: 100%;
+  min-height: 80px;
+  padding: 0.25rem;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  font-size: 0.9rem;
+  resize: vertical;
+  margin-top: 0.125rem;
+  box-sizing: border-box;
+}
+
+textarea.text-area:focus {
+  color: #333;
+}
+
+/* Status and Referrals Sections */
+.status-section {
+  margin-bottom: 0.25rem;
+  padding: 0.25rem;
+  background: #f8f9fa;
+  border-radius: 4px;
+}
+
+/* Section Headers - Tighter spacing */
+.section-header {
+  display: flex;
+  align-items: center;
+  margin: 0 0 0.125rem 0; /* Reduced bottom margin */
+  padding: 0;
+  font-size: 0.9rem;
+  line-height: 1;
+  font-weight: 500;
+}
+
+.section-header .material-icons {
+  font-size: 1rem;
+  margin-right: 0.25rem;
+  line-height: 1;
+}
+
+/* Status Group - Tighter spacing */
+.status-group {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 0.25rem;
+  margin: 0;
+}
+
+.form-group {
+  margin: 0;
+}
+
+.form-group label {
+  font-size: 0.8rem;
+  margin: 0 0 0.125rem 0;
+  display: block;
+  color: #666;
+}
+
+/* Dropdown Styles - More Compact */
+select {
+  width: 100%;
+  padding: 0.125rem 0.25rem;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  font-size: 0.9rem;
+  height: 1.75rem;
+  line-height: 1;
+  background-color: white;
+}
+
+/* Professional Referrals - Tighter spacing */
+.referrals-section {
+  margin-top: 0.25rem;
+  padding: 0.25rem;
+  background: #f8f9fa;
+  border-radius: 4px;
+}
+
+.referrals-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 0.5rem;
+  margin: 0.5rem 0;
+}
+
+.referral-checkbox {
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+}
+
+.referral-checkbox input[type="checkbox"] {
+  margin: 0;
+  width: 0.9rem;
+  height: 0.9rem;
+}
+
+.referral-checkbox label {
+  font-size: 0.8rem;
+  color: #333;
+  margin: 0;
+}
+
+/* Remarks Input */
+.remarks-row {
+  margin-top: 0.5rem;
+  width: 100%;
+}
+
+.remarks-input {
+  width: 100%;
+  height: 1.75rem;
+  padding: 0.25rem 0.5rem;
+  font-size: 0.8rem;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  background-color: white;
+}
+
+/* Text Areas Grid */
+.middle-sections-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 0.25rem;
+  margin: 0.25rem 0;
+}
+
+.text-box-container {
+  background: #f8f9fa;
+  padding: 0.25rem;
+  border-radius: 4px;
+  margin: 0;
+}
+
+.text-box-header {
+  margin: 0;
+  padding: 0;
+  font-size: 0.9rem;
+  font-weight: bold;
+}
+
+/* Material Icons */
+.material-icons {
+  vertical-align: middle;
+  margin-right: 0.5rem;
+}
+
+/* Prevent horizontal scrolling */
+.form-container {
+  max-width: 100%;
+  box-sizing: border-box;
+  padding-right: 0.25rem;
+}
+
+.form-content {
+  max-width: 100%;
+  box-sizing: border-box;
+}
+
+/* Adjust spacing for combined sections */
+.combined-section {
+  background: #f8f9fa;
+  border-radius: 4px;
+  padding: 0.5rem;
+  margin-bottom: 0.5rem;
+}
+
+.combined-section .section-header {
+  display: flex;
+  align-items: center;
+  margin: 0 0 0.5rem 0;
+  padding: 0;
+}
+
+.combined-section .section-header h3 {
+  margin: 0;
+  font-size: 0.9rem;
+  font-weight: 500;
+  line-height: 1;
+}
+
+.combined-section .section-header .material-icons {
+  font-size: 1rem;
+  margin-right: 0.25rem;
+}
+
+.combined-section .status-group {
+  margin-bottom: 0.5rem;
+}
+
+.combined-section .form-group {
+  margin: 0;
+}
+
+.combined-section .form-group label {
+  font-size: 0.8rem;
+  margin: 0 0 0.125rem 0;
+  color: #666;
+}
+
+.combined-section select {
+  height: 1.75rem;
+  padding: 0.125rem 0.25rem;
+  font-size: 0.9rem;
+}
+
+.combined-section .referrals-grid {
+  margin-top: 0.5rem;
+}
+
+.combined-section > div {
+  margin-bottom: 0.125rem;
+}
+
+.combined-section > div:last-child {
+  margin-bottom: 0;
+}
+
+.form-section {
+  background: #f8f9fa;
+  border-radius: 4px;
+  padding: 0.5rem;
+  margin-bottom: 0.5rem;
+}
+
+.form-section .section-header {
+  display: flex;
+  align-items: center;
+  margin: 0 0 0.5rem 0;
+  padding: 0;
+}
+
+.form-section .section-header h3 {
+  margin: 0;
+  font-size: 0.9rem;
+  font-weight: 500;
+  line-height: 1;
+}
+
+.form-section .section-header .material-icons {
+  font-size: 1rem;
+  margin-right: 0.25rem;
+}
+
+/* Text Areas */
+.text-area {
+  width: 100%;
+  min-height: 120px;
+  padding: 0.5rem;
+  font-size: 0.8rem;
+  line-height: 1.4;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  resize: vertical;
+  background-color: white;
+}
+
+.text-area::placeholder {
+  color: #666;
+  opacity: 0.8;
+}
+
+/* Text Areas Grid Layout */
+.text-areas-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 1rem;
+  margin-bottom: 0.25rem;
+}
+
+.grid-column {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+/* Form Section Adjustments */
+.form-section {
+  background: #f8f9fa;
+  border-radius: 4px;
+  padding: 0.5rem;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+}
+
+.form-section .text-area {
+  flex: 1;
+  min-height: 150px;
+}
+
+/* Button Group */
+.button-group {
+  display: flex;
+  justify-content: center;
+  gap: 1rem;
+  margin-top: 0.25rem;
+  padding: 0.5rem;
+  background: #f8f9fa;
+  border-radius: 4px;
+}
+
+.submit-button,
+.clear-button {
+  padding: 0.5rem 1.5rem;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 0.9rem;
+  transition: background-color 0.2s;
+  min-width: 140px;
+}
+
+.submit-button {
+  background-color: #4a90e2;
+  color: #fff;
+}
+
+.submit-button:hover {
+  background-color: #357abd;
+}
+
+.clear-button {
+  background-color: #6c757d;
+  color: #fff;
+}
+
+.clear-button:hover {
+  background-color: #5a6268;
+}
+
+/* Footer Logo Fix */
+.footer-logo {
+  height: 30px;
+  width: auto;
+}
+
+.footer-logo.nhs-logo {
+  height: 30px;
+  filter: brightness(0) invert(1) !important;
+}
+
+/* Left Panel Components */
+.left-panel-components {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+/* Component Navigation */
+.component-nav {
+  display: flex;
+  gap: 0.5rem;
+  padding: 0.5rem;
+  background: #f8f9fa;
+  border-radius: 4px;
+}
+
+.component-nav-button {
+  padding: 0.5rem 1rem;
+  background: #fff;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 0.9rem;
+  flex: 1;
+  transition: all 0.2s;
+}
+
+.component-nav-button.active {
+  background: #4a90e2;
+  color: #fff;
+  border-color: #4a90e2;
+}
+
+/* Component Container */
+.component-container {
+  flex: 1;
+  background: #fff;
+  border-radius: 4px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+  overflow: hidden;
+  position: relative;
+}
+
+/* Individual Component Styles */
+.component-section {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  padding: 1rem;
+  overflow-y: auto;
+  background: #fff;
+  transition: transform 0.3s ease;
+}
+
+.component-section.hidden {
+  transform: translateX(-100%);
+}
+
+/* Collapsible Section */
+.collapsible-section {
+  background: #fff;
+  border-radius: 4px;
+  margin-bottom: 0.5rem;
+  overflow: hidden;
+}
+
+.collapsible-header {
+  padding: 0.75rem;
+  background: #f8f9fa;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  cursor: pointer;
+}
+
+.collapsible-content {
+  padding: 0.75rem;
+  border-top: 1px solid #eee;
+}
+
+/* Timeline Styles */
+.timeline-container {
+  padding: 1rem;
+}
+
+.timeline-row {
+  display: flex;
+  margin-bottom: 1rem;
+  gap: 1rem;
+}
+
+.timeline-label {
+  width: 120px;
+  font-weight: 500;
+}
+
+.timeline-track {
+  flex: 1;
+  height: 30px;
+  background: #f8f9fa;
+  border-radius: 15px;
+  position: relative;
+}
+
+/* Sensory Profile Styles */
+.sensory-slider {
+  width: 100%;
+  margin: 1rem 0;
+}
+
+.sensory-slider-label {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 0.25rem;
+}
+
+.sensory-notes {
+  margin-top: 0.5rem;
+}
+
+/* Behavioral Assessment Styles */
+.behavior-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 1rem;
+  padding: 1rem;
+}
+
+/* Assessment Carousel Styles */
+.assessment-carousel {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.carousel-container {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  position: relative;
+}
+
+.carousel-button {
+  background: #fff;
+  border: 1px solid #ddd;
+  border-radius: 50%;
+  width: 40px;
+  height: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.2s;
+  z-index: 2;
+}
+
+.carousel-button:hover {
+  background: #f8f9fa;
+  border-color: #ccc;
+}
+
+.carousel-content {
+  flex: 1;
+  position: relative;
+  overflow: hidden;
+}
+
+.carousel-indicators {
+  display: flex;
+  justify-content: center;
+  gap: 0.5rem;
+  padding: 0.5rem;
+}
+
+.indicator {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: #ddd;
+  border: none;
+  cursor: pointer;
+  padding: 0;
+}
+
+.indicator.active {
+  background: #4a90e2;
+}
+
+/* Assessment Card Styles */
+.assessment-card {
+  background: #fff;
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  padding: 1.5rem;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.assessment-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 1rem;
+}
+
+.header-content {
+  flex: 1;
+}
+
+.assessment-header h3 {
+  margin: 0;
+  font-size: 1.25rem;
+  font-weight: 600;
+  color: #1a365d;
+}
+
+.header-description {
+  margin: 0.5rem 0 0;
+  font-size: 0.9rem;
+  color: #666;
+}
+
+.info-icon {
+  color: #4a90e2;
+  cursor: help;
+}
+
+.assessment-content {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 2rem;
+}
+
+/* Chart Container */
+.chart-container {
+  background: #f8f9fa;
+  border-radius: 8px;
+  padding: 1rem;
+  min-height: 300px;
+}
+
+/* Metrics Controls */
+.metrics-controls {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.metric-control {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.metric-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.metric-header label {
+  font-size: 0.95rem;
+  font-weight: 500;
+  color: #2d3748;
+  cursor: help;
+}
+
+.value-display {
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: #4a90e2;
+}
+
+.slider-group {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+.metric-slider {
+  width: 100%;
+  height: 6px;
+  -webkit-appearance: none;
+  background: #e2e8f0;
+  border-radius: 3px;
+  outline: none;
+}
+
+.metric-slider::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  background: #4a90e2;
+  cursor: pointer;
+  border: 2px solid #fff;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
+}
+
+.slider-labels {
+  display: flex;
+  justify-content: space-between;
+  font-size: 0.75rem;
+  color: #666;
+}
+
+/* Tooltip Styles */
+.custom-tooltip {
+  background: #fff;
+  border-radius: 4px;
+  padding: 1rem;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  border: 1px solid #e2e8f0;
+  max-width: 250px;
+}
+
+.tooltip-label {
+  font-weight: 600;
+  color: #2d3748;
+  margin: 0 0 0.25rem;
+}
+
+.tooltip-value {
+  color: #4a90e2;
+  font-weight: 500;
+  margin: 0 0 0.5rem;
+}
+
+.tooltip-desc {
+  font-size: 0.9rem;
+  color: #666;
+  margin: 0;
+  line-height: 1.4;
+}
+
+/* Developmental Timeline Styles */
+.developmental-timeline {
+  background: #fff;
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  padding: 1.5rem;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+  overflow-y: auto;
+}
+
+.timeline-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding-bottom: 1rem;
+  border-bottom: 1px solid #eee;
+}
+
+.timeline-content {
+  display: flex;
+  flex-direction: column;
+  gap: 2rem;
+}
+
+.category-section {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.category-header {
+  font-size: 1rem;
+  font-weight: 600;
+  color: #2d3748;
+}
+
+.milestones-container {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.milestone-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
+.milestone-tag {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.5rem 0.75rem;
+  border-radius: 16px;
+  font-size: 0.875rem;
+  cursor: move;
+  user-select: none;
+  transition: all 0.2s;
+}
+
+.milestone-tag.pending {
+  background: #f7fafc;
+  border: 1px dashed #cbd5e0;
+  color: #4a5568;
+}
+
+.milestone-tag.typical {
+  background: #c6f6d5;
+  border: 1px solid #9ae6b4;
+  color: #22543d;
+}
+
+.milestone-tag.monitor {
+  background: #fefcbf;
+  border: 1px solid #f6e05e;
+  color: #744210;
+}
+
+.milestone-tag.delayed {
+  background: #fed7d7;
+  border: 1px solid #feb2b2;
+  color: #822727;
+}
+
+.milestone-tag:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.milestone-name {
+  font-weight: 500;
+}
+
+.milestone-age {
+  font-size: 0.75rem;
+  padding: 0.125rem 0.375rem;
+  background: rgba(255, 255, 255, 0.5);
+  border-radius: 10px;
+}
+
+.milestone-details-modal {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  background: white;
+  padding: 1.5rem;
+  border-radius: 8px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  max-width: 90%;
+  width: 400px;
+  z-index: 1000;
+}
+
+.milestone-details {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.close-button {
+  position: absolute;
+  top: 0.5rem;
+  right: 0.5rem;
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: #666;
+}
+
+.close-button:hover {
+  color: #000;
+}
+
+/* Timeline Grid Styles */
+.timeline-grid {
+  position: relative;
+  height: 4rem;
+  background: #f7fafc;
+  border-radius: 8px;
+  margin-top: 0.5rem;
+}
+
+.timeline-grid .month-marker {
+  position: absolute;
+  bottom: -1.5rem;
+  transform: translateX(-50%);
+  font-size: 0.75rem;
+  color: #4a5568;
+}
+
+.timeline-grid .month-line {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  width: 1px;
+  background: #e2e8f0;
+}
+
+.timeline-grid .year-marker {
+  color: #2d3748;
+  font-weight: 500;
+}
+
+/* Clinical Summary Button */
+.generate-summary-button {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.5rem 1rem;
+  background: #ebf8ff;
+  color: #2b6cb0;
+  border: 1px solid #bee3f8;
+  border-radius: 4px;
+  font-size: 0.875rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.generate-summary-button:hover {
+  background: #bee3f8;
+  border-color: #90cdf4;
+} 

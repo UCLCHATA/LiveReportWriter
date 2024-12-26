@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    <title>CHATA Autism Report Generator</title>
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined" rel="stylesheet">
+    <link rel="stylesheet" href="src/styles/main.css">
+    <script type="module" src="src/app.js" defer></script>
+</head>
+<body>
+    <header class="site-header">
+        <div class="header-content">
+            <h1>CHATA Autism Report Generator</h1>
+        </div>
+    </header>
+
+    <main class="main-container">
+        <!-- Left side - Assessment Timeline -->
+        <div class="assessment-container">
+            <div id="react-root"></div>
+            <button class="create-report-button">
+                <i class="material-icons">add</i>
+                Create New Report
+            </button>
+        </div>
+
+        <!-- Right side - Form -->
+        <div class="form-container">
+            <div class="form-content">
+                <!-- Status Section -->
+                <div class="section status-section">
+                    <h4><i class="material-icons">check_circle_outline</i>Status</h4>
+                    <div class="status-group">
+                        <div class="status-item">
+                            <h4>ASC Status</h4>
+                            <select name="asc_status">
+                                <option value="">--</option>
+                                <option>ASC confirmed</option>
+                                <option>ASC not confirmed</option>
+                            </select>
+                        </div>
+                        
+                        <div class="status-item">
+                            <h4>ADHD Status</h4>
+                            <select name="adhd_status">
+                                <option value="">--</option>
+                                <option>No concerns identified</option>
+                                <option>Assessment recommended</option>
+                                <option>Previously confirmed</option>
+                                <option>Confirmed during diagnosis</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Professional Referrals -->
+                <div class="section referrals-section">
+                    <h4><i class="material-icons">share</i>Professional Referrals</h4>
+                    <div class="referrals-grid">
+                        <label><input type="checkbox" value="Speech & Language"> Speech & Language</label>
+                        <label><input type="checkbox" value="Educational Psychology"> Educational Psychology</label>
+                        <label><input type="checkbox" value="Sleep Support"> Sleep Support</label>
+                        <div class="referral-other-row">
+                            <label><input type="checkbox" value="Other"> Other </label>
+                            <input type="text" name="other_referrals" class="referral-other-input" placeholder="Specific Remarks">
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Middle Sections Grid -->
+                <div class="middle-sections-grid">
+                    <!-- Clinical Observations -->
+                    <div class="text-box-container clinical" data-default-text="• Social engagement patterns
+• Communication style
+• Response to activities
+• Behavioral patterns
+• Notable strengths/challenges">
+                        <div class="text-box-header">
+                            <i class="material-icons">visibility</i>
+                            <h4>Key Clinical Observations</h4>
+                        </div>
+                        <div class="text-box-content">
+                            <textarea class="text-area" spellcheck="true"></textarea>
+                        </div>
+                    </div>
+
+                    <!-- Strengths & Abilities -->
+                    <div class="text-box-container strengths" data-default-text="• Memory (e.g., Strong recall of sequences)
+• Visual (e.g., Pattern recognition)
+• Physical (e.g., Fine motor skills)
+• Creative (e.g., Problem-solving abilities)
+• Focus (e.g., Sustained attention)
+• Problem-solving (e.g., Logical approach)">
+                        <div class="text-box-header">
+                            <i class="material-icons">stars</i>
+                            <h4>Strengths & Abilities</h4>
+                        </div>
+                        <div class="text-box-content">
+                            <textarea class="text-area" spellcheck="true"></textarea>
+                        </div>
+                    </div>
+
+                    <!-- Priority Support Areas -->
+                    <div class="text-box-container priority" data-default-text="• Assessment data patterns
+• Family priorities
+• School observations
+• Clinical judgment">
+                        <div class="text-box-header">
+                            <i class="material-icons">priority_high</i>
+                            <h4>Priority Support Areas</h4>
+                        </div>
+                        <div class="text-box-content">
+                            <textarea class="text-area" spellcheck="true"></textarea>
+                        </div>
+                    </div>
+
+                    <!-- Support Recommendations -->
+                    <div class="text-box-container support" data-default-text="• Strength-based strategies
+• Practical implementation
+• Home/school alignment
+• Family resources">
+                        <div class="text-box-header">
+                            <i class="material-icons">lightbulb</i>
+                            <h4>Support Recommendations</h4>
+                        </div>
+                        <div class="text-box-content">
+                            <textarea class="text-area" spellcheck="true"></textarea>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Button Group -->
+            <div class="button-group">
+                <button class="submit-button">Submit Assessment</button>
+                <button class="clear-button">Clear Form</button>
+            </div>
+        </div>
+    </main>
+
+    <!-- Modal for Clinician Details -->
+    <div class="modal-container" id="clinician-modal">
+        <div class="modal-content">
+            <h3>Enter Clinician Details</h3>
+            <div class="form-group">
+                <label for="clinician-name">Clinician's Name</label>
+                <input type="text" id="clinician-name" required>
+            </div>
+            <div class="form-group">
+                <label for="clinician-email">Clinician's Email</label>
+                <input type="email" id="clinician-email" required>
+            </div>
+            <div class="button-group">
+                <button class="submit-button" id="start-report">Start Report</button>
+                <button class="cancel-button">Cancel</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal-backdrop"></div>
+
+    <footer class="site-footer">
+        <img class="footer-logo" src="src/assets/ucl-logo.png" alt="UCL Logo">
+        <div class="footer-content">
+            <p>&copy; 2024 CHATA Report Writing Form System</p>
+            <p class="contact-text">Need help? Contact uclchata@gmail.com</p>
+        </div>
+        <img class="footer-logo" src="src/assets/nhs-logo.png" alt="NHS Logo">
+    </footer>
+
+    <!-- React for left side -->
+    <script type="module">
+        import React from 'react';
+        import ReactDOM from 'react-dom';
+        import { MilestoneTracker } from './src/components/MilestoneTracker';
+
+        ReactDOM.render(
+            React.createElement(MilestoneTracker),
+            document.getElementById('react-root')
+        );
+    </script>
+</body>
+</html>

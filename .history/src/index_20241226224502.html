@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CHATA Autism Report Generator</title>
+    <link rel="stylesheet" href="styles/main.css">
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+</head>
+<body>
+    <header class="site-header">
+        <div class="header-content">
+            <img class="header-logo" src="https://upload.wikimedia.org/wikipedia/sco/thumb/d/d1/University_College_London_logo.svg/300px-University_College_London_logo.svg.png" alt="UCL Logo">
+            <h1>CHATA Autism Report Generator</h1>
+            <img class="header-logo" src="https://upload.wikimedia.org/wikipedia/commons/thumb/d/d3/National_Health_Service_%28England%29_logo.svg/371px-National_Health_Service_%28England%29_logo.svg.png" alt="NHS Logo">
+        </div>
+    </header>
+
+    <main class="main-container">
+        <!-- Left side - Assessment -->
+        <div class="assessment-container" id="react-root">
+            <!-- React components will be mounted here -->
+        </div>
+
+        <!-- Right side - Form -->
+        <div class="form-container">
+            <div class="form-content">
+                <button class="create-report-button">
+                    <i class="material-icons">add</i>
+                    Create New Report
+                </button>
+
+                <!-- Status Section -->
+                <div class="status-section">
+                    <h4><i class="material-icons">check_circle_outline</i>Status</h4>
+                    <div class="status-group">
+                        <div class="status-item">
+                            <h4>ASC Status</h4>
+                            <select name="asc_status">
+                                <option value="">--</option>
+                                <option>ASC confirmed</option>
+                                <option>ASC not confirmed</option>
+                            </select>
+                        </div>
+                        
+                        <div class="status-item">
+                            <h4>ADHD Status</h4>
+                            <select name="adhd_status">
+                                <option value="">--</option>
+                                <option>No concerns identified</option>
+                                <option>Assessment recommended</option>
+                                <option>Previously confirmed</option>
+                                <option>Confirmed during diagnosis</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Professional Referrals -->
+                <div class="referrals-section">
+                    <h4><i class="material-icons">share</i>Professional Referrals</h4>
+                    <div class="referrals-grid">
+                        <label><input type="checkbox" value="Speech & Language"> Speech & Language</label>
+                        <label><input type="checkbox" value="Educational Psychology"> Educational Psychology</label>
+                        <label><input type="checkbox" value="Sleep Support"> Sleep Support</label>
+                        <div class="referral-other-row">
+                            <label><input type="checkbox" value="Other"> Other </label>
+                            <input type="text" name="other_referrals" class="referral-other-input" placeholder="Specific Remarks">
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Text Areas Grid -->
+                <div class="middle-sections-grid">
+                    <div class="text-box-container clinical">
+                        <div class="text-box-header">
+                            <i class="material-icons">description</i>
+                            <h4>Key Clinical Observations</h4>
+                        </div>
+                        <textarea class="text-area" placeholder="Enter clinical observations..."></textarea>
+                    </div>
+
+                    <div class="text-box-container strengths">
+                        <div class="text-box-header">
+                            <i class="material-icons">star</i>
+                            <h4>Strengths & Abilities</h4>
+                        </div>
+                        <textarea class="text-area" placeholder="Enter strengths and abilities..."></textarea>
+                    </div>
+
+                    <div class="text-box-container priority">
+                        <div class="text-box-header">
+                            <i class="material-icons">priority_high</i>
+                            <h4>Priority Support Areas</h4>
+                        </div>
+                        <textarea class="text-area" placeholder="Enter priority support areas..."></textarea>
+                    </div>
+
+                    <div class="text-box-container support">
+                        <div class="text-box-header">
+                            <i class="material-icons">support</i>
+                            <h4>Support Recommendations</h4>
+                        </div>
+                        <textarea class="text-area" placeholder="Enter support recommendations..."></textarea>
+                    </div>
+                </div>
+
+                <!-- Button Group -->
+                <div class="button-group">
+                    <button class="clear-button">Clear Form</button>
+                    <button class="submit-button">Submit Assessment</button>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <footer class="site-footer">
+        <div class="footer-content">
+            <p>&copy; 2024 CHATA Report Writing Form System</p>
+            <p class="contact-text">Need help? Contact uclchata@gmail.com</p>
+        </div>
+    </footer>
+</body>
+</html> 

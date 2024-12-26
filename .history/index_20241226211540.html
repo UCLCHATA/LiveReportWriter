@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CHATA Autism Report Generator</title>
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <header class="site-header">
+        <div class="header-content">
+            <div class="header-left">
+                <img src="assets/logo1.png" alt="Logo 1" class="header-logo">
+                <img src="assets/logo2.png" alt="Logo 2" class="header-logo">
+            </div>
+            <h1>CHATA Autism Report Generator</h1>
+            <div class="header-right">
+                <img src="assets/logo3.png" alt="Logo 3" class="header-logo">
+                <img src="assets/logo4.png" alt="Logo 4" class="header-logo">
+            </div>
+        </div>
+    </header>
+
+    <div class="main-container">
+        <div class="assessment-container">
+            <div class="overlay">
+                <button class="create-report-button">
+                    <i class="material-icons">add_circle</i>
+                    Create New Report
+                </button>
+            </div>
+        </div>
+
+        <div class="form-container">
+            <div class="form-content">
+                <div class="status-section">
+                    <div class="status-group">
+                        <div class="status-item">
+                            <h4>ASC Status</h4>
+                            <select id="asc-status">
+                                <option value="">Select status</option>
+                                <option value="ASC confirmed">ASC confirmed</option>
+                                <option value="ASC not confirmed">ASC not confirmed</option>
+                                <option value="Unclear">Unclear</option>
+                            </select>
+                        </div>
+                        <div class="status-item">
+                            <h4>ADHD Status</h4>
+                            <select id="adhd-status">
+                                <option value="">Select status</option>
+                                <option value="No concerns identified">No concerns identified</option>
+                                <option value="Assessment recommended">Assessment recommended</option>
+                                <option value="Previously confirmed">Previously confirmed</option>
+                                <option value="Confirmed during diagnosis">Confirmed during diagnosis</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="referrals-section">
+                    <h4>Professional Referrals</h4>
+                    <div class="referrals-grid">
+                        <label><input type="checkbox" name="referral" value="speech"> Speech Pathology</label>
+                        <label><input type="checkbox" name="referral" value="ot"> Occupational Therapy</label>
+                        <label><input type="checkbox" name="referral" value="psychology"> Psychology</label>
+                        <label><input type="checkbox" name="referral" value="psychiatry"> Psychiatry</label>
+                        <label><input type="checkbox" name="referral" value="pediatrician"> Pediatrician</label>
+                        <label><input type="checkbox" name="referral" value="genetics"> Genetics</label>
+                        <div class="referral-other-row">
+                            <label><input type="checkbox" name="referral" value="other"> Other:</label>
+                            <input type="text" class="referral-other-input" placeholder="Specify other referrals">
+                        </div>
+                    </div>
+                </div>
+
+                <div class="middle-sections-grid">
+                    <div class="text-box-container clinical">
+                        <h4>
+                            <i class="material-icons">description</i>
+                            Clinical Observations
+                        </h4>
+                        <div class="expandable-field" data-field-id="clinical-observations">
+                            <textarea class="field-preview" placeholder="Enter clinical observations"></textarea>
+                            <div class="expand-button">Double-click to expand</div>
+                        </div>
+                    </div>
+
+                    <div class="text-box-container strengths">
+                        <h4>
+                            <i class="material-icons">star</i>
+                            Strengths and Abilities
+                        </h4>
+                        <div class="expandable-field" data-field-id="strengths-abilities">
+                            <textarea class="field-preview" placeholder="Enter strengths and abilities"></textarea>
+                            <div class="expand-button">Double-click to expand</div>
+                        </div>
+                    </div>
+
+                    <div class="text-box-container priority">
+                        <h4>
+                            <i class="material-icons">priority_high</i>
+                            Priority Areas for Support
+                        </h4>
+                        <div class="expandable-field" data-field-id="priority-support">
+                            <textarea class="field-preview" placeholder="Enter priority areas for support"></textarea>
+                            <div class="expand-button">Double-click to expand</div>
+                        </div>
+                    </div>
+
+                    <div class="text-box-container support">
+                        <h4>
+                            <i class="material-icons">support</i>
+                            Support Recommendations
+                        </h4>
+                        <div class="expandable-field" data-field-id="support-recommendations">
+                            <textarea class="field-preview" placeholder="Enter support recommendations"></textarea>
+                            <div class="expand-button">Double-click to expand</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="button-group">
+                <button class="submit-button">Submit Assessment</button>
+                <button class="clear-button">Clear Form</button>
+            </div>
+        </div>
+    </div>
+
+    <footer class="site-footer">
+        <div class="footer-content">
+            <div class="footer-logos">
+                <img src="assets/logo1.png" alt="Logo 1" class="footer-logo">
+                <img src="assets/logo2.png" alt="Logo 2" class="footer-logo">
+                <img src="assets/logo3.png" alt="Logo 3" class="footer-logo">
+                <img src="assets/logo4.png" alt="Logo 4" class="footer-logo">
+            </div>
+            <p>CHATA Autism Report Generator</p>
+            <p class="contact-text">For technical support, please contact uclchata@gmail.com</p>
+        </div>
+    </footer>
+
+    <div class="modal-backdrop"></div>
+    <div class="modal-container">
+        <div class="modal-header">
+            <h4></h4>
+        </div>
+        <div class="modal-content">
+            <textarea class="expandable-text"></textarea>
+        </div>
+    </div>
+
+    <script src="app.js"></script>
+</body>
+</html>
