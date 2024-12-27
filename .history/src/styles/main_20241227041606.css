@@ -1,0 +1,490 @@
+/* Global Styles */
+body {
+  margin: 0;
+  padding: 0;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+  background-color: #1a1a1a;
+}
+
+.app {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+/* Header Styles */
+header {
+  background-color: #1a1a1a;
+  padding: 0.75rem;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  position: relative;
+  z-index: 20;
+}
+
+.logo-container {
+  width: 120px;
+  height: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.ucl-logo, .nhs-logo {
+  height: 35px;
+  width: auto;
+  object-fit: contain;
+}
+
+/* Invert UCL logo in header */
+header .ucl-logo {
+  filter: invert(1);
+}
+
+.title-container {
+  text-align: center;
+  flex-grow: 1;
+  margin: 0 1rem;
+}
+
+h1 {
+  margin: 0;
+  font-size: 1.5rem;
+  color: #fff;
+}
+
+.chata-id {
+  margin-top: 0.25rem;
+  font-size: 0.9rem;
+  color: #aaa;
+}
+
+/* Main Content */
+main {
+  flex: 1;
+  display: flex;
+  padding: 1rem;
+  gap: 1rem;
+  position: relative;
+  min-height: 0;
+  max-width: 1400px;
+  margin: 0 auto;
+  width: 100%;
+  box-sizing: border-box;
+  height: calc(100vh - 120px);
+  overflow: hidden;
+}
+
+/* Left Panel */
+.left-panel {
+  flex: 1;
+  width: 50%;
+  background: #1a1a1a;
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+  padding: 1rem;
+  height: calc(100vh - 180px);
+  overflow: hidden;
+  position: relative;
+}
+
+.left-panel.active {
+  display: block;
+}
+
+/* Right Panel */
+.right-panel {
+  flex: 1;
+  width: 50%;
+  background: #1a1a1a;
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+  padding: 1rem;
+  height: calc(100vh - 180px);
+  overflow-y: auto;
+  position: relative;
+}
+
+.right-panel.active {
+  display: block;
+}
+
+/* Form Container */
+.form-container {
+  height: 100%;
+  overflow-y: auto;
+  padding-right: 0.5rem;
+}
+
+/* Footer */
+footer {
+  background-color: #1a1a1a;
+  color: #fff;
+  padding: 0.5rem;
+  text-align: center;
+  position: relative;
+  z-index: 20;
+  border-top: 1px solid #333;
+}
+
+.footer-content {
+  max-width: 1200px;
+  margin: 0 auto;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 2rem;
+}
+
+.footer-logos {
+  display: flex;
+  gap: 2rem;
+  align-items: center;
+}
+
+.footer-logos img {
+  height: 35px;
+  width: auto;
+  object-fit: contain;
+}
+
+.footer-logos .ucl-logo {
+  filter: brightness(0) invert(1);
+}
+
+/* Assessment Carousel */
+.assessment-carousel {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  background: #1a1a1a;
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+.carousel-navigation {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 1rem;
+  background: #1a1a1a;
+  border-bottom: 1px solid #333;
+  position: relative;
+}
+
+.title-container {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  position: absolute;
+  left: 50%;
+  transform: translateX(-50%);
+  color: #fff;
+}
+
+.help-tooltip {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+}
+
+.help-icon {
+  color: #aaa;
+  cursor: help;
+}
+
+.tooltip-text {
+  visibility: hidden;
+  position: absolute;
+  top: 100%;
+  left: 50%;
+  transform: translateX(-50%);
+  background: #333;
+  color: white;
+  padding: 0.75rem;
+  border-radius: 4px;
+  font-size: 0.875rem;
+  width: max-content;
+  max-width: 300px;
+  white-space: pre-line;
+  z-index: 10;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+  margin-top: 0.5rem;
+}
+
+.tooltip-text::before {
+  content: '';
+  position: absolute;
+  top: -6px;
+  left: 50%;
+  transform: translateX(-50%);
+  border-width: 0 6px 6px 6px;
+  border-style: solid;
+  border-color: transparent transparent #333 transparent;
+}
+
+.help-tooltip:hover .tooltip-text {
+  visibility: visible;
+}
+
+.nav-button {
+  padding: 0.5rem 1rem;
+  background: #333;
+  border: 1px solid #444;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: all 0.2s;
+  z-index: 1;
+  color: #fff;
+}
+
+.nav-button:hover {
+  background: #444;
+}
+
+.tool-title {
+  font-size: 1.1rem;
+  font-weight: 500;
+  color: #fff;
+  margin: 0 0.5rem;
+}
+
+.carousel-position {
+  font-size: 0.875rem;
+  color: #aaa;
+  margin-left: auto;
+  padding: 0 1rem;
+  z-index: 1;
+}
+
+/* Carousel Indicators */
+.carousel-indicators {
+  display: flex;
+  justify-content: center;
+  gap: 0.5rem;
+  padding: 0.5rem;
+  background: #1a1a1a;
+  border-top: 1px solid #333;
+}
+
+.carousel-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: #333;
+  transition: all 0.2s;
+  cursor: pointer;
+  border: none;
+  padding: 0;
+}
+
+.carousel-dot.active {
+  background: #4f46e5;
+  transform: scale(1.2);
+}
+
+/* Form Elements */
+.form-group {
+  margin-bottom: 1rem;
+}
+
+input[type="text"],
+input[type="email"],
+select,
+textarea {
+  width: 100%;
+  padding: 0.5rem;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  font-size: 1rem;
+  background: #333;
+  color: #fff;
+}
+
+.button-group {
+  display: flex;
+  justify-content: center;
+  gap: 1rem;
+  margin-top: 1rem;
+}
+
+.submit-button,
+.clear-button {
+  padding: 0.75rem 1.5rem;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 1rem;
+  min-width: 120px;
+}
+
+.submit-button {
+  background-color: #4f46e5;
+  color: white;
+}
+
+.clear-button {
+  background-color: #6c757d;
+  color: white;
+}
+
+/* Sensory Profile */
+.sensory-profile {
+  padding: 1rem;
+  color: #fff;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+}
+
+.profile-content {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 2rem;
+  height: 100%;
+}
+
+.sliders-container {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+  overflow-y: auto;
+}
+
+.domain-slider {
+  margin-bottom: 1.5rem;
+  background: #1a1a1a;
+  padding: 1rem;
+  border-radius: 8px;
+}
+
+.slider-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 0.5rem;
+}
+
+.domain-name {
+  font-weight: 500;
+  color: #fff;
+}
+
+.sensitivity-label {
+  font-size: 0.875rem;
+  color: #aaa;
+}
+
+.sensitivity-slider {
+  width: 100%;
+  margin: 0.5rem 0;
+  -webkit-appearance: none;
+  height: 4px;
+  background: #333;
+  border-radius: 2px;
+  outline: none;
+}
+
+.sensitivity-slider::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  background: #4f46e5;
+  cursor: pointer;
+  border: 2px solid #1a1a1a;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.3);
+}
+
+.sensitivity-slider::-moz-range-thumb {
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  background: #4f46e5;
+  cursor: pointer;
+  border: 2px solid #1a1a1a;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.3);
+}
+
+.slider-labels {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 0.25rem;
+  font-size: 0.75rem;
+  color: #aaa;
+}
+
+.observations {
+  margin-top: 1rem;
+}
+
+.observation-item {
+  background: #333;
+  padding: 0.5rem;
+  border-radius: 4px;
+  margin-bottom: 0.5rem;
+  font-size: 0.875rem;
+  color: #fff;
+}
+
+.add-observation {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.add-observation input {
+  flex: 1;
+  padding: 0.5rem;
+  border: 1px solid #333;
+  border-radius: 4px;
+  font-size: 0.875rem;
+  background: #333;
+  color: #fff;
+}
+
+.add-observation input::placeholder {
+  color: #aaa;
+}
+
+.add-observation button {
+  padding: 0.5rem 1rem;
+  background: #4f46e5;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+.add-observation button:hover {
+  background: #4338ca;
+}
+
+.radar-container {
+  background: #1a1a1a;
+  padding: 1rem;
+  border-radius: 8px;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.3);
+  height: 100%;
+  min-height: 400px;
+}
+
+.recharts-polar-grid-concentric {
+  stroke: #333;
+}
+
+.recharts-polar-grid-line {
+  stroke: #333;
+}
+
+.recharts-polar-angle-axis-tick-value {
+  font-size: 12px;
+  fill: #aaa;
+}
+
+.recharts-polar-radius-axis-tick-value {
+  font-size: 10px;
+  fill: #aaa;
+} 

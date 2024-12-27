@@ -1,0 +1,44 @@
+/* Global Styles */
+[Previous content remains exactly the same until the new styles...]
+
+/* Slider Row Styles */
+.slider-row {
+  display: flex;
+  gap: 0.5rem;
+  align-items: center;
+  margin-bottom: 0.25rem;
+}
+
+.slider-row .sensitivity-slider {
+  width: 120px;
+  min-width: 120px;
+}
+
+.slider-row .add-observation {
+  flex: 1;
+  margin: 0;
+}
+
+.domain-slider {
+  background: #f8f9fa;
+  padding: 0.5rem;
+  border-radius: 6px;
+  margin-bottom: 0.25rem;
+}
+
+.domain-slider:last-child {
+  margin-bottom: 0;
+}
+
+/* Hide scrollbar for Chrome, Safari and Opera */
+.sliders-container::-webkit-scrollbar {
+  display: none;
+}
+
+/* Hide scrollbar for IE, Edge and Firefox */
+.sliders-container {
+  -ms-overflow-style: none;  /* IE and Edge */
+  scrollbar-width: none;  /* Firefox */
+}
+
+[Rest of the file remains exactly the same...] 

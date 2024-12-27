@@ -1,0 +1,44 @@
+/* Global Styles */
+[Previous content remains exactly the same until the .observation-item section...]
+
+.observation-item {
+  background: white;
+  padding: 0.25rem 0.5rem;
+  border-radius: 4px;
+  font-size: 0.8rem;
+  word-break: break-word;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 0.5rem;
+  margin-bottom: 0.25rem;
+}
+
+.observation-item:last-child {
+  margin-bottom: 0;
+}
+
+.delete-observation {
+  background: none;
+  border: none;
+  color: #666;
+  cursor: pointer;
+  padding: 0 0.25rem;
+  font-size: 1.2rem;
+  line-height: 1;
+  border-radius: 3px;
+  opacity: 0.7;
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s ease;
+}
+
+.delete-observation:hover {
+  opacity: 1;
+  color: #ef4444;
+  background: rgba(239, 68, 68, 0.1);
+}
+
+[Rest of the file remains exactly the same...] 

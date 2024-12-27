@@ -1,0 +1,230 @@
+.container {
+  display: flex;
+  flex-direction: column;
+  gap: 2rem;
+  padding: 1rem;
+  height: 100%;
+  overflow-y: auto;
+}
+
+.categoriesContainer {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 1rem;
+  min-height: 0;
+}
+
+.categoryColumn {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  background: #f9fafb;
+  border: 1px solid #e5e7eb;
+  border-radius: 6px;
+  padding: 1rem;
+  height: fit-content;
+}
+
+.categoryHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding-bottom: 0.5rem;
+  border-bottom: 1px solid #e5e7eb;
+}
+
+.categoryHeader h3 {
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: #111827;
+  margin: 0;
+}
+
+.tooltipWrapper {
+  position: relative;
+  display: inline-flex;
+}
+
+.helpIcon {
+  color: #6b7280;
+  cursor: help;
+  transition: color 0.2s;
+}
+
+.helpIcon:hover {
+  color: #4b5563;
+}
+
+.tooltipContent {
+  position: absolute;
+  visibility: hidden;
+  opacity: 0;
+  background: #1f2937;
+  color: white;
+  padding: 0.5rem 0.75rem;
+  border-radius: 0.375rem;
+  font-size: 0.75rem;
+  width: max-content;
+  max-width: 200px;
+  top: 100%;
+  right: 0;
+  transform: translateY(0.5rem);
+  transition: all 0.2s;
+  z-index: 30;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.tooltipContent::before {
+  content: '';
+  position: absolute;
+  top: -0.25rem;
+  right: 0.5rem;
+  transform: rotate(45deg);
+  width: 0.5rem;
+  height: 0.5rem;
+  background: #1f2937;
+}
+
+.tooltipWrapper:hover .tooltipContent {
+  visibility: visible;
+  opacity: 1;
+  transform: translateY(0.25rem);
+}
+
+.milestoneList {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  overflow-y: auto;
+  padding-right: 0.25rem;
+  min-height: 100px;
+}
+
+.milestone {
+  background-color: white;
+  border: 1px solid;
+  border-radius: 4px;
+  cursor: grab;
+  transition: all 0.2s;
+  user-select: none;
+}
+
+.milestone:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+}
+
+.milestone.dragging {
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  opacity: 0.9;
+  transform: scale(1.02);
+}
+
+.milestoneContent {
+  padding: 0.75rem;
+}
+
+.milestoneHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 0.5rem;
+}
+
+.milestoneHeader span {
+  font-weight: 500;
+  color: #111827;
+}
+
+.milestoneHeader small {
+  color: #6b7280;
+}
+
+.milestoneDetails {
+  font-size: 0.75rem;
+}
+
+.milestoneDetails p {
+  color: #4b5563;
+  margin: 0 0 0.5rem 0;
+}
+
+.clinicalNotes {
+  display: block;
+  color: #6b7280;
+  font-style: italic;
+  margin-top: 0.25rem;
+}
+
+.timelineContainer {
+  position: relative;
+  padding: 2rem 1rem;
+  background: white;
+  border: 1px solid #e5e7eb;
+  border-radius: 6px;
+}
+
+.expectedTimeline {
+  position: absolute;
+  top: 1.5rem;
+  left: 1rem;
+  right: 1rem;
+  height: 4px;
+  background: #e5e7eb;
+  border-radius: 2px;
+}
+
+.expectedMarker {
+  position: absolute;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  transform: translate(-50%, -2px);
+  z-index: 5;
+}
+
+.timeline {
+  position: relative;
+  height: 4px;
+  background: transparent;
+  margin-top: 2rem;
+  min-height: 60px;
+}
+
+.monthMarker {
+  position: absolute;
+  transform: translateX(-50%);
+}
+
+.markerLine {
+  height: 8px;
+  width: 2px;
+  background: #9ca3af;
+  margin-bottom: 0.25rem;
+}
+
+.markerLabel {
+  position: absolute;
+  transform: translateX(-50%);
+  font-size: 0.75rem;
+  color: #6b7280;
+  white-space: nowrap;
+  top: 12px;
+}
+
+.timelineMilestone {
+  position: absolute;
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  transform: translate(-50%, -4px);
+  cursor: pointer;
+  transition: transform 0.2s;
+  z-index: 10;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.timelineMilestone:hover {
+  transform: translate(-50%, -4px) scale(1.2);
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.15);
+} 
