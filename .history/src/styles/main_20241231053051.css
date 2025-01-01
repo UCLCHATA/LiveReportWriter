@@ -1,0 +1,53 @@
+/* Global Styles */
+[Previous content remains exactly the same until the text-area section...]
+
+/* Text Areas */
+.text-area {
+  width: 100%;
+  min-height: 80px;
+  max-height: 240px; /* 3x the min-height */
+  padding: 0.5rem;
+  font-size: 0.875rem;
+  resize: vertical;
+  border: 1px solid #d1d5db;
+  border-radius: 4px;
+  background-color: white;
+  transition: all 0.2s ease;
+}
+
+/* Text Areas Grid Layout */
+.text-areas-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 0.75rem;
+  margin-bottom: 3rem; /* Space for buttons */
+}
+
+/* Button Group */
+.button-group {
+  display: flex;
+  justify-content: center;
+  gap: 0.75rem;
+  padding: 0.75rem;
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  background: white;
+  border-top: 1px solid #e5e7eb;
+}
+
+/* Form Container - Add padding at bottom for buttons */
+.form-container {
+  position: relative;
+  padding-bottom: 4rem;
+}
+
+/* Form Content - Ensure it doesn't overlap with buttons */
+.form-content {
+  height: calc(100% - 4rem);
+  overflow-y: auto;
+  padding-right: 0.25rem;
+}
+
+[Rest of the file remains exactly the same...]
