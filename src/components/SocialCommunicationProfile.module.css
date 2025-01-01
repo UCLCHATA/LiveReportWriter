@@ -4,7 +4,8 @@
   height: 100%;
   padding: 0.25rem;
   gap: 0.5rem;
-  overflow: visible;
+  overflow: hidden;
+  position: relative;
 }
 
 .radarContainer {
@@ -15,16 +16,21 @@
   height: 260px;
   min-height: 260px;
   flex-shrink: 0;
+  position: relative;
+  z-index: 2;
 }
 
 .slidersGrid {
   display: grid;
   grid-template-columns: repeat(2, 1fr);
   gap: 0.5rem;
-  overflow: visible;
+  overflow-y: auto;
   padding-right: 0.25rem;
   flex: 1;
   align-content: start;
+  max-height: calc(100% - 280px);
+  position: relative;
+  z-index: 1;
 }
 
 .domainSlider {
@@ -187,6 +193,9 @@
   border: 1px solid #dee2e6;
   border-radius: 4px;
   font-size: 0.8rem;
+  height: 32px;
+  min-height: 32px;
+  resize: none;
 }
 
 .addObservation button {
@@ -229,5 +238,14 @@
 }
 
 .profileContent, .slidersGrid, .domainSlider, .sliderHeader {
-  overflow: visible !important;
+  position: relative;
+}
+
+/* Update font sizes for radar chart */
+:global(.recharts-polar-angle-axis-tick text) {
+  font-size: 14px !important;
+}
+
+:global(.recharts-polar-radius-axis-tick text) {
+  font-size: 12px !important;
 } 
