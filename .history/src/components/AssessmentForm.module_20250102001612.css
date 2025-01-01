@@ -139,11 +139,9 @@
   position: relative;
   transition: all 0.2s ease;
   cursor: pointer;
-  overflow: visible;
 }
 
-/* Double click message text */
-.formSection:hover::before {
+.formSection:hover::after {
   content: 'Double click to expand';
   position: absolute;
   top: 50%;
@@ -155,9 +153,9 @@
   border-radius: 4px;
   font-size: 0.75rem;
   pointer-events: none;
+  z-index: 2;
   white-space: nowrap;
   animation: fadeInOut 4s forwards;
-  z-index: 2;
 }
 
 @keyframes fadeInOut {
@@ -175,7 +173,7 @@
   border-width: 2.5px;
 }
 
-/* Section Headers with higher z-index */
+/* Section Headers */
 .sectionHeader {
   display: flex;
   align-items: center;
@@ -183,8 +181,6 @@
   margin-bottom: 0.5rem;
   padding-bottom: 0.25rem;
   border-bottom: 1px solid #e5e7eb;
-  position: relative;
-  z-index: 100;  /* Higher z-index to ensure tooltip shows above everything */
 }
 
 .sectionHeader h3 {
@@ -224,7 +220,7 @@
   min-height: 96px;
   max-height: none;
   position: relative;
-  z-index: 1;  /* Above the hover message but below tooltips */
+  z-index: 0;
   color: #374151;
   transition: all 0.2s ease;
 }
@@ -324,88 +320,72 @@
   color: #6366f1;
 }
 
-/* Tooltip Container */
-.tooltipContainer {
-  position: relative;
-  display: inline-flex;
-}
-
 /* Tooltip */
 .tooltip {
   display: none;
   position: absolute;
-  background: rgba(17, 24, 39, 0.95);
+  background: rgba(0, 0, 0, 0.9);
   color: white;
-  padding: 0.75rem 1rem;
-  border-radius: 8px;
+  padding: 0.75rem;
+  border-radius: 6px;
   font-size: 0.8rem;
   width: max-content;
-  max-width: 280px;
+  max-width: 300px;
   white-space: pre-line;
-  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
-  line-height: 1.6;
-  top: 100%;
-  left: 50%;
-  transform: translateX(-50%) translateY(8px);
-  z-index: 101;  /* One level above section header */
-}
-
-/* Bullet point styling */
-.tooltip ul {
-  list-style-type: none;
-  margin: 0;
-  padding: 0;
-}
-
-.tooltip li {
-  position: relative;
-  padding-left: 1rem;
-}
-
-.tooltip li::before {
-  content: '•';
-  position: absolute;
-  left: 0;
-  color: #9ca3af;
-}
-
-/* Tooltip arrow */
-.tooltip::before {
-  content: '';
-  position: absolute;
-  top: -6px;
-  left: 50%;
-  transform: translateX(-50%);
-  border: 6px solid transparent;
-  border-bottom-color: rgba(17, 24, 39, 0.95);
+  z-index: 9999;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.3);
+  backdrop-filter: blur(4px);
+  line-height: 1.5;
 }
 
 .helpIcon:hover + .tooltip {
   display: block;
 }
 
-/* Ensure tooltip stays within form section */
-.formSection {
-  position: relative;
-  overflow: visible;
+/* Left side tooltips */
+.gridColumn:first-child .tooltip {
+  right: -8px;
+  top: 50%;
+  transform: translateY(-50%) translateX(100%);
 }
 
-.sectionHeader {
-  position: relative;
-  z-index: 2;
+.gridColumn:first-child .tooltip::before {
+  content: '';
+  position: absolute;
+  left: -6px;
+  top: 50%;
+  transform: translateY(-50%);
+  border: 6px solid transparent;
+  border-right-color: rgba(0, 0, 0, 0.9);
 }
 
-/* Remove old tooltip positioning */
-.gridColumn:first-child .tooltip,
-.gridColumn:last-child .tooltip,
-.gridColumn:first-child .tooltip::before,
+/* Right side tooltips */
+.gridColumn:last-child .tooltip {
+  left: -8px;
+  top: 50%;
+  transform: translateY(-50%) translateX(-100%);
+}
+
 .gridColumn:last-child .tooltip::before {
-  left: 50%;
-  right: auto;
-  transform: translateX(-50%) translateY(8px);
+  content: '';
+  position: absolute;
+  right: -6px;
+  top: 50%;
+  transform: translateY(-50%);
+  border: 6px solid transparent;
+  border-left-color: rgba(0, 0, 0, 0.9);
 }
 
-/* Form Container */
+.helpIcon {
+  color: #6c757d;
+  cursor: help;
+  margin-left: 0.5rem;
+}
+
+.helpIcon:hover + .tooltip {
+  display: block;
+}
+
 .formContainer, .formContent, .formSection, .sectionHeader {
   overflow: visible !important;
   position: relative;
@@ -418,8 +398,7 @@
   left: 0;
   right: 0;
   bottom: 0;
-  background: rgba(0, 0, 0, 0.2);
-  backdrop-filter: blur(4px);
+  background: rgba(0, 0, 0, 0.5);
   display: flex;
   justify-content: flex-end;
   align-items: stretch;
@@ -428,43 +407,40 @@
 
 .modalContent {
   width: 50%;
-  height: calc(100vh - 200px); /* Reduced height by 4 lines (80px) */
-  margin: 100px 0; /* Increased margin to center the shorter modal */
+  height: calc(100vh - 120px); /* Adjust based on your header/footer height */
+  margin: 60px 0; /* Half of the remaining space (120px) */
   background: white;
   display: flex;
   flex-direction: column;
   position: relative;
   border-left: 2px solid;
-  border-radius: 16px 0 0 16px;
-  box-shadow: -4px 0 20px rgba(0, 0, 0, 0.15);
+  box-shadow: -4px 0 16px rgba(0, 0, 0, 0.1);
 }
 
 .modalHeader {
   display: flex;
   align-items: center;
   gap: 0.5rem;
-  padding: 1.25rem;
+  padding: 1rem;
   border-bottom: 1px solid #e5e7eb;
   background: white;
-  border-radius: 16px 0 0 0;
 }
 
 .modalHeader h3 {
-  font-size: 1rem;
-  font-weight: 600;
-  color: #111827;
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: #374151;
   margin: 0;
 }
 
 .modalHeader .sectionIcon {
   color: inherit;
-  stroke-width: 2;
 }
 
 .modalTextArea {
   flex: 1;
   width: 100%;
-  padding: 1.25rem;
+  padding: 1rem;
   border: none;
   resize: none;
   font-size: 0.875rem;
@@ -482,13 +458,13 @@
 
 .closeButton {
   position: absolute;
-  top: 1rem;
-  right: 1rem;
-  width: 32px;
-  height: 32px;
+  top: 0.75rem;
+  right: 0.75rem;
+  width: 28px;
+  height: 28px;
   background: #f3f4f6;
   border: none;
-  border-radius: 8px;
+  border-radius: 4px;
   color: #374151;
   cursor: pointer;
   display: flex;
@@ -501,25 +477,57 @@
 
 .closeButton:hover {
   background: #e5e7eb;
-  color: #111827;
 }
 
-/* Remove all these old styles */
-.textLengthIndicator,
-.modalLengthIndicator,
-.detailIndicator,
-.lengthIndicator {
-  display: none;
+.modalLengthIndicator {
+  position: absolute;
+  bottom: 1rem;
+  left: 1rem;
+  font-size: 0.7rem;
+  padding: 0.2rem 0.4rem;
+  border-radius: 4px;
+  background: white;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  z-index: 10001;
+}
+
+/* Placeholder color coding based on length */
+.textArea[data-length="short"]::placeholder {
+  color: #dc2626;
+  font-style: italic;
+}
+
+.textArea[data-length="medium"]::placeholder {
+  color: #ea580c;
+  font-style: italic;
+}
+
+.textArea[data-length="good"]::placeholder {
+  color: #16a34a;
+  font-style: italic;
+}
+
+/* Form Section background colors on focus */
+.formSection[data-length="short"]:focus-within {
+  background-color: rgba(220, 38, 38, 0.02) !important;
+}
+
+.formSection[data-length="medium"]:focus-within {
+  background-color: rgba(234, 88, 12, 0.02) !important;
+}
+
+.formSection[data-length="good"]:focus-within {
+  background-color: rgba(22, 163, 74, 0.02) !important;
 }
 
 /* Word Count Indicator */
-.wordCount {
+.wordCountIndicator {
   position: absolute;
-  bottom: -0.6rem;
+  bottom: -0.25rem;
   left: 0.75rem;
-  font-size: 0.75rem;
+  font-size: 0.7rem;
   font-style: italic;
-  padding: 0.1rem 0.4rem;
+  padding: 0.2rem 0.4rem;
   border-radius: 4px;
   background: white;
   opacity: 0;
@@ -528,38 +536,39 @@
   z-index: 1;
 }
 
-/* Show on focus */
-.formSection:focus-within .wordCount {
+/* Show indicator when section is focused */
+.formSection:focus-within .wordCountIndicator {
   opacity: 1;
 }
 
-/* Color states */
-.insufficient {
-  color: #dc2626;  /* Red */
+/* Word count states */
+.wordCountShort {
+  composes: wordCountIndicator;
+  color: #ef4444;  /* Red */
 }
 
-.minimal {
+.wordCountMinimal {
+  composes: wordCountIndicator;
+  color: #eab308;  /* Yellow */
+}
+
+.wordCountGood {
+  composes: wordCountIndicator;
   color: #f97316;  /* Orange */
 }
 
-.good {
-  color: #15803d;  /* Light green */
+.wordCountExcellent {
+  composes: wordCountIndicator;
+  color: #22c55e;  /* Green */
 }
 
-.excellent {
-  color: #16a34a;  /* Bold green */
-  font-weight: 500;
-}
-
-.excellent::after {
-  content: ' ✓';
-  font-weight: bold;
-}
-
-/* Modal version */
-.modalContent .wordCount {
-  bottom: 0.6rem;
+/* Modal specific styles */
+.modalContent .wordCountIndicator,
+.modalContent .wordCountShort,
+.modalContent .wordCountMinimal,
+.modalContent .wordCountGood,
+.modalContent .wordCountExcellent {
+  bottom: 0.25rem;
   left: 1rem;
   opacity: 1;
-  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
 } 

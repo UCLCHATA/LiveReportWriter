@@ -374,17 +374,13 @@ export const AssessmentForm: React.FC<AssessmentFormProps> = ({ onClear }) => {
               <div className={styles.sectionHeader}>
                 <Search className={styles.sectionIcon} size={18} />
                 <h3>Clinical Observations</h3>
-                <div className={styles.tooltipContainer}>
-                  <HelpCircle className={styles.helpIcon} size={16} />
-                  <div className={styles.tooltip}>
-                    <ul>
-                      <li>Social engagement patterns</li>
-                      <li>Communication style</li>
-                      <li>Response to activities</li>
-                      <li>Behavioral patterns</li>
-                      <li>Notable strengths/challenges</li>
-                    </ul>
-                  </div>
+                <HelpCircle className={styles.helpIcon} size={16} />
+                <div className={styles.tooltip}>
+                  • Social engagement patterns
+                  • Communication style
+                  • Response to activities
+                  • Behavioral patterns
+                  • Notable strengths/challenges
                 </div>
               </div>
               <textarea 
@@ -415,16 +411,12 @@ export const AssessmentForm: React.FC<AssessmentFormProps> = ({ onClear }) => {
               <div className={styles.sectionHeader}>
                 <AlertTriangle className={styles.sectionIcon} size={18} />
                 <h3>Priority Support Areas</h3>
-                <div className={styles.tooltipContainer}>
-                  <HelpCircle className={styles.helpIcon} size={16} />
-                  <div className={styles.tooltip}>
-                    <ul>
-                      <li>Assessment data patterns</li>
-                      <li>Family priorities</li>
-                      <li>School observations</li>
-                      <li>Clinical observations</li>
-                    </ul>
-                  </div>
+                <HelpCircle className={styles.helpIcon} size={16} />
+                <div className={styles.tooltip}>
+                  • Assessment data patterns
+                  • Family priorities
+                  • School observations
+                  • Clinical observations
                 </div>
               </div>
               <textarea 
@@ -456,16 +448,12 @@ export const AssessmentForm: React.FC<AssessmentFormProps> = ({ onClear }) => {
               <div className={styles.sectionHeader}>
                 <Dumbbell className={styles.sectionIcon} size={18} />
                 <h3>Strengths & Abilities</h3>
-                <div className={styles.tooltipContainer}>
-                  <HelpCircle className={styles.helpIcon} size={16} />
-                  <div className={styles.tooltip}>
-                    <ul>
-                      <li>Memory (e.g., Strong recall of sequences)</li>
-                      <li>Visual (e.g., Pattern recognition)</li>
-                      <li>Physical (e.g., Fine motor skills)</li>
-                      <li>Social (e.g., Empathy, sharing)</li>
-                    </ul>
-                  </div>
+                <HelpCircle className={styles.helpIcon} size={16} />
+                <div className={styles.tooltip}>
+                  • Memory (e.g., Strong recall of sequences)
+                  • Visual (e.g., Pattern recognition)
+                  • Physical (e.g., Fine motor skills)
+                  • Social (e.g., Empathy, sharing)
                 </div>
               </div>
               <textarea 
@@ -495,16 +483,12 @@ export const AssessmentForm: React.FC<AssessmentFormProps> = ({ onClear }) => {
               <div className={styles.sectionHeader}>
                 <ThumbsUp className={styles.sectionIcon} size={18} />
                 <h3>Support Recommendations</h3>
-                <div className={styles.tooltipContainer}>
-                  <HelpCircle className={styles.helpIcon} size={16} />
-                  <div className={styles.tooltip}>
-                    <ul>
-                      <li>Strength-based strategies</li>
-                      <li>Practical implementation</li>
-                      <li>Home/school alignment</li>
-                      <li>Support services coordination</li>
-                    </ul>
-                  </div>
+                <HelpCircle className={styles.helpIcon} size={16} />
+                <div className={styles.tooltip}>
+                  • Strength-based strategies
+                  • Practical implementation
+                  • Home/school alignment
+                  • Support services coordination
                 </div>
               </div>
               <textarea 

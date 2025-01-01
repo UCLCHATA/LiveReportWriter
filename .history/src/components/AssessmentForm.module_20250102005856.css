@@ -142,6 +142,22 @@
   overflow: visible;
 }
 
+/* Double click message container */
+.formSection::after {
+  content: '';
+  display: none;
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 1;
+}
+
+.formSection:hover::after {
+  display: block;
+}
+
 /* Double click message text */
 .formSection:hover::before {
   content: 'Double click to expand';
@@ -175,7 +191,7 @@
   border-width: 2.5px;
 }
 
-/* Section Headers with higher z-index */
+/* Section Headers */
 .sectionHeader {
   display: flex;
   align-items: center;
@@ -184,7 +200,7 @@
   padding-bottom: 0.25rem;
   border-bottom: 1px solid #e5e7eb;
   position: relative;
-  z-index: 100;  /* Higher z-index to ensure tooltip shows above everything */
+  z-index: 3;
 }
 
 .sectionHeader h3 {
@@ -224,7 +240,7 @@
   min-height: 96px;
   max-height: none;
   position: relative;
-  z-index: 1;  /* Above the hover message but below tooltips */
+  z-index: 0;
   color: #374151;
   transition: all 0.2s ease;
 }
@@ -328,6 +344,7 @@
 .tooltipContainer {
   position: relative;
   display: inline-flex;
+  z-index: 4;
 }
 
 /* Tooltip */
@@ -347,7 +364,7 @@
   top: 100%;
   left: 50%;
   transform: translateX(-50%) translateY(8px);
-  z-index: 101;  /* One level above section header */
+  z-index: 5;
 }
 
 /* Bullet point styling */
