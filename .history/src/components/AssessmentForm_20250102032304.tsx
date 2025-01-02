@@ -68,78 +68,36 @@ const getTooltipContent = (section: string): string => {
 export const AssessmentForm: React.FC<AssessmentFormProps> = ({ onClear, onProgressUpdate }) => {
   const { globalState, updateFormData, clearState } = useFormState();
   const [wordCounts, setWordCounts] = useState<Record<string, WordCountState>>({});
-  const lastProgress = React.useRef<number>(0);
 
   // Calculate progress whenever form fields change
   useEffect(() => {
-    const calculateProgress = () => {
-      let progress = 0;
-      
-      // Text boxes contribute 40% (10% each)
-      const textFields = {
-        clinicalObservations: globalState.formData?.clinicalObservations,
-        strengthsAbilities: globalState.formData?.strengths,
-        prioritySupportAreas: globalState.formData?.priorityAreas,
-        supportRecommendations: globalState.formData?.recommendations
-      };
-      
-      // Check each text field and add 10% if it has content
-      Object.values(textFields).forEach(field => {
-        if (field && field.trim().length > 0) {
-          progress += 10;
-        }
-      });
-
-      // Status fields contribute 5% (2.5% each)
-      if (globalState.formData?.ascStatus && globalState.formData.ascStatus !== '') {
-        progress += 2.5;
-      }
-      if (globalState.formData?.adhdStatus && globalState.formData.adhdStatus !== '') {
-        progress += 2.5;
-      }
-
-      // Professional referrals contribute 5%
-      const hasReferrals = Object.values(globalState.formData?.referrals || {}).some(value => value === true);
-      if (hasReferrals) {
-        progress += 5;
-      }
-
-      return { progress, hasReferrals };
-    };
-
-    const { progress: newProgress, hasReferrals } = calculateProgress();
+    let progress = 0;
     
-    // Only update if progress has actually changed
-    if (newProgress !== lastProgress.current) {
-      lastProgress.current = newProgress;
-      
-      // Log progress for debugging
-      console.log('Form Progress Breakdown:', {
-        textFields: {
-          clinicalObservations: globalState.formData?.clinicalObservations ? 10 : 0,
-          strengthsAbilities: globalState.formData?.strengths ? 10 : 0,
-          prioritySupportAreas: globalState.formData?.priorityAreas ? 10 : 0,
-          supportRecommendations: globalState.formData?.recommendations ? 10 : 0
-        },
-        status: {
-          asc: globalState.formData?.ascStatus ? 2.5 : 0,
-          adhd: globalState.formData?.adhdStatus ? 2.5 : 0
-        },
-        referrals: hasReferrals ? 5 : 0,
-        total: newProgress
-      });
+    // Text boxes contribute 40% (10% each)
+    const textFields = [
+      globalState.formData?.clinicalObservations,
+      globalState.formData?.strengthsAbilities,
+      globalState.formData?.prioritySupportAreas,
+      globalState.formData?.supportRecommendations
+    ];
+    
+    textFields.forEach(field => {
+      if (field && field.trim().length > 0) {
+        progress += 10;
+      }
+    });
 
-      onProgressUpdate(newProgress);
+    // Status fields contribute 5% (2.5% each)
+    if (globalState.formData?.ascStatus && globalState.formData.ascStatus !== 'Not Specified') progress += 2.5;
+    if (globalState.formData?.adhdStatus && globalState.formData.adhdStatus !== 'Not Specified') progress += 2.5;
+
+    // Professional referrals contribute 5%
+    if (globalState.formData?.professionalReferrals && globalState.formData.professionalReferrals.length > 0) {
+      progress += 5;
     }
-  }, [
-    globalState.formData?.clinicalObservations,
-    globalState.formData?.strengths,
-    globalState.formData?.priorityAreas,
-    globalState.formData?.recommendations,
-    globalState.formData?.ascStatus,
-    globalState.formData?.adhdStatus,
-    globalState.formData?.referrals
-  ]);
+
+    onProgressUpdate(progress);
+  }, [globalState.formData, onProgressUpdate]);
 
   useEffect(() => {
     if (!globalState.formData) {
@@ -158,29 +116,8 @@ export const AssessmentForm: React.FC<AssessmentFormProps> = ({ onClear, onProgr
         clinicalObservations: '',
         priorityAreas: '',
         strengths: '',
-        recommendations: '',
-        status: 'draft',
-        lastUpdated: new Date().toISOString()
+        recommendations: ''
       });
-    } else {
-      // Ensure referrals object has all required fields
-      const currentReferrals = globalState.formData.referrals || {};
-      const updatedReferrals = {
-        speech: currentReferrals.speech || false,
-        educational: currentReferrals.educational || false,
-        sleep: currentReferrals.sleep || false,
-        occupational: currentReferrals.occupational || false,
-        mental: currentReferrals.mental || false,
-        other: currentReferrals.other || false
-      };
-      
-      // Update if referrals structure has changed
-      if (JSON.stringify(currentReferrals) !== JSON.stringify(updatedReferrals)) {
-        updateFormData({
-          referrals: updatedReferrals,
-          lastUpdated: new Date().toISOString()
-        });
-      }
     }
   }, []);
 
@@ -193,35 +130,22 @@ export const AssessmentForm: React.FC<AssessmentFormProps> = ({ onClear, onProgr
   const handleInputChange = (field: string) => (
     e: React.ChangeEvent<HTMLTextAreaElement | HTMLInputElement | HTMLSelectElement>
   ) => {
-    const value = e.target.value;
-    // Update the form data with the new value
-    updateFormData({ 
-      [field]: value,
-      lastUpdated: new Date().toISOString()
-    });
+    updateFormData({ [field]: e.target.value });
   };
 
   const handleCheckboxChange = (field: keyof typeof formData.referrals) => (
     e: React.ChangeEvent<HTMLInputElement>
   ) => {
-    const updatedReferrals = {
-      ...formData.referrals,
-      [field]: e.target.checked
-    };
-    
-    // Update both the referrals object and lastUpdated timestamp
     updateFormData({
-      referrals: updatedReferrals,
-      lastUpdated: new Date().toISOString()
+      referrals: {
+        ...formData.referrals,
+        [field]: e.target.checked
+      }
     });
   };
 
   const handleStatusChange = (newStatus: 'draft' | 'submitted') => {
-    // Update both the status and lastUpdated timestamp
-    updateFormData({ 
-      status: newStatus,
-      lastUpdated: new Date().toISOString()
-    });
+    updateFormData({ status: newStatus });
   };
 
   const handleClear = () => {

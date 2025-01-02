@@ -158,29 +158,8 @@ export const AssessmentForm: React.FC<AssessmentFormProps> = ({ onClear, onProgr
         clinicalObservations: '',
         priorityAreas: '',
         strengths: '',
-        recommendations: '',
-        status: 'draft',
-        lastUpdated: new Date().toISOString()
+        recommendations: ''
       });
-    } else {
-      // Ensure referrals object has all required fields
-      const currentReferrals = globalState.formData.referrals || {};
-      const updatedReferrals = {
-        speech: currentReferrals.speech || false,
-        educational: currentReferrals.educational || false,
-        sleep: currentReferrals.sleep || false,
-        occupational: currentReferrals.occupational || false,
-        mental: currentReferrals.mental || false,
-        other: currentReferrals.other || false
-      };
-      
-      // Update if referrals structure has changed
-      if (JSON.stringify(currentReferrals) !== JSON.stringify(updatedReferrals)) {
-        updateFormData({
-          referrals: updatedReferrals,
-          lastUpdated: new Date().toISOString()
-        });
-      }
     }
   }, []);
 

@@ -33,50 +33,34 @@
 }
 
 .milestone {
-  padding: 8px;
-  background-color: white;
-  border: 1px solid #e2e8f0;
-  border-radius: 4px;
+  padding: 0.75rem 1rem;
+  background: var(--card-background);
+  border: 1px solid var(--border-color);
+  border-radius: 6px;
   cursor: grab;
   user-select: none;
-  font-size: 14px;
-  position: relative;
-  min-width: 100px;
-  max-width: 150px;
-  margin: 4px;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
-  transition: all 0.2s ease;
-}
-
-.milestone:not(.placedMilestone):hover {
-  transform: translateY(-2px);
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.15);
-}
-
-.removing {
-  opacity: 0;
-  transform: scale(0.8);
-  transition: all 0.2s ease;
-}
-
-.timelineMilestone {
-  position: absolute;
-  transform: translate(-50%, 0);
-  pointer-events: auto;
-  transition: all 0.3s ease;
+  white-space: nowrap;
+  border-left: 4px solid;
+  font-size: 0.9rem;
 }
 
 /* Add color styles for each category */
 .milestone[data-category="communication"] {
-  border-left: 4px solid #4299E1;
+  background-color: rgba(66, 153, 225, 0.95);
+  border-color: #4299E1;
+  color: white;
 }
 
 .milestone[data-category="motor"] {
-  border-left: 4px solid #48BB78;
+  background-color: rgba(72, 187, 120, 0.95);
+  border-color: #48BB78;
+  color: white;
 }
 
 .milestone[data-category="social"] {
-  border-left: 4px solid #ED8936;
+  background-color: rgba(237, 137, 54, 0.95);
+  border-color: #ED8936;
+  color: white;
 }
 
 .timeline {
@@ -176,9 +160,25 @@
   pointer-events: none;
 }
 
-.timelineMilestone.removing {
+.timelineMilestone {
+  position: absolute;
+  transform: translateX(-50%);
+  pointer-events: auto;
+  transition: top 0.3s ease, opacity 0.2s ease, transform 0.2s ease;
+}
+
+.timelineMilestone .milestone.removing {
   opacity: 0;
-  transform: translate(-50%, -20px);
+  transform: translateX(-50%) scale(0.8);
+}
+
+/* Add styles for placed milestones */
+.timelineMilestone .milestone {
+  /* Reduce size but keep content visible */
+  padding: 0.4rem 0.6rem;
+  font-size: 0.75rem;
+  position: relative;
+  transition: opacity 0.2s ease, transform 0.2s ease;
 }
 
 /* Ensure category colors are applied to placed milestones */
@@ -200,6 +200,61 @@
   color: white;
 }
 
+/* Remove the general background override that was causing the issue */
+.timelineMilestone .milestone {
+  /* Remove this line that was causing the issue: */
+  /* background: var(--card-background); */
+  opacity: 1;
+}
+
+.monthCircle {
+  position: absolute;
+  top: -6px;
+  right: -6px;
+  width: 18px;
+  height: 18px;
+  background: white;
+  border: 1px solid currentColor;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.55rem;
+  color: currentColor;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  z-index: 5;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+}
+
+.monthCircle:hover {
+  background: #fee2e2;
+  border-color: #dc2626;
+  color: #dc2626;
+}
+
+.monthText {
+  display: block;
+  line-height: 1;
+  font-weight: 700;
+  transform: scale(0.9);
+}
+
+.deleteIcon {
+  display: none;
+  line-height: 1;
+  font-weight: bold;
+  font-size: 0.7rem;
+}
+
+.monthCircle:hover .monthText {
+  display: none;
+}
+
+.monthCircle:hover .deleteIcon {
+  display: block;
+}
+
 /* Ensure the circle inherits colors from its parent milestone */
 .milestone[data-category="communication"] .monthCircle {
   color: #4299E1;
@@ -211,118 +266,6 @@
 
 .milestone[data-category="social"] .monthCircle {
   color: #ED8936;
-}
-
-/* Styles for placed milestones */
-.placedMilestone {
-  padding: 0.4rem 0.6rem;
-  font-size: 0.75rem;
-  border: 2px solid white !important;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-}
-
-.placedMilestone:hover {
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
-}
-
-/* Only show monthCircle for placed milestones */
-.placedMilestone .monthCircle {
-  position: absolute;
-  top: -6px;
-  right: -6px;
-  min-width: 20px;
-  height: 16px;
-  background: white;
-  border: 1px solid currentColor;
-  border-radius: 3px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 0.55rem;
-  color: currentColor;
-  cursor: pointer;
-  transition: all 0.2s ease;
-  z-index: 5;
-  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
-  padding: 0 2px;
-}
-
-.placedMilestone .monthCircle:hover {
-  background: #fee2e2;
-  border-color: #dc2626;
-  color: #dc2626;
-  transform: scale(1.1);
-}
-
-.monthText {
-  display: block;
-  line-height: 1;
-  font-weight: 700;
-  white-space: nowrap;
-}
-
-.deleteIcon {
-  display: none;
-  line-height: 1;
-  font-weight: bold;
-  font-size: 0.7rem;
-  padding: 0 2px;
-}
-
-.placedMilestone .monthCircle:hover .monthText {
-  display: none;
-}
-
-.placedMilestone .monthCircle:hover .deleteIcon {
-  display: block;
-}
-
-/* Delete button styles */
-.monthCircle {
-  display: none; /* Hide by default */
-  position: absolute;
-  right: -8px;
-  top: -8px;
-  width: 24px;
-  height: 24px;
-  background-color: white;
-  border: 1px solid #e53e3e;
-  border-radius: 4px;
-  color: #e53e3e;
-  cursor: pointer;
-  align-items: center;
-  justify-content: center;
-  font-size: 12px;
-  transition: all 0.2s ease;
-  z-index: 10;
-}
-
-/* Only show delete button on placed milestones */
-.placedMilestone .monthCircle {
-  display: flex;
-}
-
-.monthCircle:hover {
-  background-color: #e53e3e;
-  color: white;
-}
-
-.monthText {
-  display: block;
-}
-
-.deleteIcon {
-  display: none;
-  font-size: 16px;
-  font-weight: bold;
-}
-
-.monthCircle:hover .monthText {
-  display: none;
-}
-
-.monthCircle:hover .deleteIcon {
-  display: block;
 }
 
 /* Remove any :global styles as they're no longer needed */ 

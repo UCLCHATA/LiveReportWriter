@@ -88,25 +88,12 @@ export const AssessmentCarousel: React.FC<AssessmentCarouselProps> = ({ onProgre
 
     switch (component.type) {
       case 'milestoneTracker':
-        if (component.milestones && Array.isArray(component.milestones)) {
+        if (component.milestones) {
           const placedCount = component.milestones.filter((m: any) => 
-            typeof m.actualAge === 'number'
+            m.actualAge !== undefined && m.actualAge !== null
           ).length;
-          
-          // Each placed milestone contributes 1%
-          progress = Math.min(placedCount, 10);
-          
-          console.log('Milestone Progress Calculation:', { 
-            type: component.type,
-            totalMilestones: component.milestones.length,
-            placedCount,
-            progress,
-            milestones: component.milestones.map((m: any) => ({
-              id: m.id,
-              actualAge: m.actualAge,
-              isPlaced: typeof m.actualAge === 'number'
-            }))
-          });
+          progress = Math.min((placedCount / 15) * 10, 10); // 15 total milestones, max 10%
+          console.log('Milestone Progress:', { placedCount, progress });
         }
         break;
 
@@ -167,7 +154,7 @@ export const AssessmentCarousel: React.FC<AssessmentCarouselProps> = ({ onProgre
         break;
     }
 
-    return progress;
+    return Math.min(progress, 10);
   }, []);
 
   // Memoized total progress calculation
@@ -179,6 +166,7 @@ export const AssessmentCarousel: React.FC<AssessmentCarouselProps> = ({ onProgre
       socialCommunication: { ...globalState.assessments.socialCommunication, type: 'socialCommunication' },
       behaviorInterests: { ...globalState.assessments.behaviorInterests, type: 'behaviorInterests' },
       milestones: { 
+        ...globalState.assessments.milestones, 
         type: 'milestoneTracker',
         milestones: globalState.assessments.milestones?.milestones || []
       },
@@ -190,7 +178,7 @@ export const AssessmentCarousel: React.FC<AssessmentCarouselProps> = ({ onProgre
       if (component) {
         const componentProgress = calculateComponentProgress(component);
         totalProgress += componentProgress;
-        console.log(`Progress for ${key}:`, componentProgress, 'Total:', totalProgress);
+        console.log(`${key} Progress:`, componentProgress);
       }
     });
 
@@ -238,24 +226,18 @@ export const AssessmentCarousel: React.FC<AssessmentCarouselProps> = ({ onProgre
   };
 
   const handleComponentUpdate = (data: any) => {
-    const componentId = tools[currentIndex].id;
+    // Ensure type is set when updating component
+    const updatedData = {
+      ...data,
+      type: tools[currentIndex].id
+    };
     
-    // Special handling for milestone tracker to ensure proper state structure
-    if (componentId === 'milestones') {
-      const updatedData = {
-        type: 'milestoneTracker',
-        milestones: data.milestones || []
-      };
-      console.log('Updating Milestones:', updatedData);
-      updateAssessment(componentId, updatedData);
-    } else {
-      // Normal handling for other components
-      const updatedData = {
-        ...data,
-        type: componentId
-      };
-      updateAssessment(componentId, updatedData);
-    }
+    console.log('Component Update:', {
+      component: tools[currentIndex].id,
+      data: updatedData
+    });
+    
+    updateAssessment(tools[currentIndex].id, updatedData);
   };
 
   useEffect(() => {

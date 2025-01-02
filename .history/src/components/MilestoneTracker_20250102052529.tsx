@@ -144,7 +144,8 @@ const CurrentPositionIndicator: React.FC<{
 const DraggableMilestone: React.FC<{ 
   milestone: Milestone;
   category: CategoryType;
-}> = ({ milestone, category }) => {
+  onDelete?: () => void;
+}> = ({ milestone, category, onDelete }) => {
   const { attributes, listeners, setNodeRef, transform } = useDraggable({
     id: milestone.id,
     data: { milestone }
@@ -153,6 +154,15 @@ const DraggableMilestone: React.FC<{
   const style = transform ? {
     transform: `translate3d(${transform.x}px, ${transform.y}px, 0)`,
   } : undefined;
+
+  const handleDelete = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    e.preventDefault();
+    console.log('Delete clicked for milestone:', milestone.id);
+    if (onDelete) {
+      onDelete();
+    }
+  };
 
   const tooltipText = milestone.actualAge !== undefined 
     ? `Placed at: ${milestone.actualAge}m\nExpected: ${milestone.expectedAge}m` 
@@ -173,8 +183,16 @@ const DraggableMilestone: React.FC<{
     >
       {milestone.title}
       {milestone.actualAge !== undefined && (
-        <div className={styles.monthCircle}>
+        <div 
+          className={styles.monthCircle}
+          onClick={handleDelete}
+          onMouseDown={(e) => {
+            e.stopPropagation();
+            e.preventDefault();
+          }}
+        >
           <span className={styles.monthText}>{milestone.actualAge}m</span>
+          <span className={styles.deleteIcon}>×</span>
         </div>
       )}
     </motion.div>
@@ -237,7 +255,7 @@ const initialMilestones: Milestone[] = [
   { id: 'shows-empathy', title: 'Shows empathy', category: 'social', expectedAge: 48 }
 ];
 
-export const MilestoneTracker: React.FC<{ onChange?: (data: any) => void }> = ({ onChange }) => {
+export const MilestoneTracker: React.FC = () => {
   const { globalState, updateAssessment } = useFormState();
   const [activeMilestone, setActiveMilestone] = useState<Milestone | null>(null);
   const [currentMonth, setCurrentMonth] = useState<number | null>(null);
@@ -246,40 +264,77 @@ export const MilestoneTracker: React.FC<{ onChange?: (data: any) => void }> = ({
 
   const milestones = globalState.assessments?.milestones?.milestones || initialMilestones;
 
+  // Update progress whenever milestones change
+  useEffect(() => {
+    const placedCount = milestones.filter((m: Milestone) => m.actualAge !== undefined).length;
+    // Each placed milestone contributes 1% up to 10%
+    const progress = Math.min(placedCount, 10);
+
+    console.log('Milestone Progress:', {
+      total: milestones.length,
+      placed: placedCount,
+      progress
+    });
+
+    // Always update to ensure real-time reflection
+    updateAssessment('progress', {
+      type: 'milestoneTracker',
+      value: progress
+    });
+  }, [milestones, updateAssessment]);
+
+  const handleDeleteMilestone = useCallback((milestoneId: string) => {
+    console.log('Deleting milestone:', milestoneId);
+    
+    // Create new array with the milestone reset
+    const updatedMilestones = milestones.map((m: Milestone) => {
+      if (m.id === milestoneId) {
+        // Reset to initial state
+        const initialMilestone = initialMilestones.find(im => im.id === milestoneId);
+        return {
+          ...initialMilestone!,
+          actualAge: undefined,
+          stackPosition: undefined
+        };
+      }
+      return m;
+    });
+
+    // Update the global state
+    updateAssessment('milestones', {
+      type: 'milestoneTracker',
+      milestones: updatedMilestones
+    });
+  }, [milestones, updateAssessment]);
+
   const handleDragEnd = useCallback((event: DragEndEvent) => {
     const { active, over } = event;
     if (!over) return;
 
     const month = parseInt(over.id.toString().replace('month-', ''));
+    console.log('Placing milestone at month:', month);
     
-    const draggedMilestone = milestones.find((m: Milestone) => m.id === active.id);
-    if (!draggedMilestone) return;
+    // Create new array with the milestone placed
+    const updatedMilestones = milestones.map((m: Milestone) => {
+      if (m.id === active.id) {
+        return {
+          ...m,
+          actualAge: month,
+          stackPosition: getStackPosition(milestones, month, active.id.toString())
+        };
+      }
+      return m;
+    });
 
-    const updatedMilestones = milestones.map((m: Milestone) => 
-      m.id === active.id ? {
-        ...m,
-        actualAge: month,
-        stackPosition: getStackPosition(milestones, month, active.id.toString())
-      } : m
-    );
-
-    // Update both local state and parent
+    // Update the global state
     updateAssessment('milestones', {
       type: 'milestoneTracker',
       milestones: updatedMilestones
     });
 
-    // Notify parent of change
-    if (onChange) {
-      onChange({
-        type: 'milestoneTracker',
-        milestones: updatedMilestones
-      });
-    }
-
     setActiveMilestone(null);
     setCurrentMonth(null);
-  }, [milestones, updateAssessment, onChange]);
+  }, [milestones, updateAssessment]);
 
   const handleDragStart = useCallback((event: DragEndEvent) => {
     const draggedMilestone = milestones.find((m: Milestone) => m.id === event.active.id);
@@ -376,6 +431,7 @@ export const MilestoneTracker: React.FC<{ onChange?: (data: any) => void }> = ({
                     <DraggableMilestone
                       milestone={milestone}
                       category={milestone.category}
+                      onDelete={() => handleDeleteMilestone(milestone.id)}
                     />
                   </motion.div>
                 ))}

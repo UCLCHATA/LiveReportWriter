@@ -182,7 +182,7 @@ export const AssessmentForm: React.FC<AssessmentFormProps> = ({ onClear, onProgr
         });
       }
     }
-  }, []);
+  }, [globalState.formData, updateFormData]);
 
   if (!globalState.formData) {
     return <div>Loading...</div>;

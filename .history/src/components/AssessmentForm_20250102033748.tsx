@@ -104,10 +104,10 @@ export const AssessmentForm: React.FC<AssessmentFormProps> = ({ onClear, onProgr
         progress += 5;
       }
 
-      return { progress, hasReferrals };
+      return progress;
     };
 
-    const { progress: newProgress, hasReferrals } = calculateProgress();
+    const newProgress = calculateProgress();
     
     // Only update if progress has actually changed
     if (newProgress !== lastProgress.current) {
@@ -158,29 +158,8 @@ export const AssessmentForm: React.FC<AssessmentFormProps> = ({ onClear, onProgr
         clinicalObservations: '',
         priorityAreas: '',
         strengths: '',
-        recommendations: '',
-        status: 'draft',
-        lastUpdated: new Date().toISOString()
+        recommendations: ''
       });
-    } else {
-      // Ensure referrals object has all required fields
-      const currentReferrals = globalState.formData.referrals || {};
-      const updatedReferrals = {
-        speech: currentReferrals.speech || false,
-        educational: currentReferrals.educational || false,
-        sleep: currentReferrals.sleep || false,
-        occupational: currentReferrals.occupational || false,
-        mental: currentReferrals.mental || false,
-        other: currentReferrals.other || false
-      };
-      
-      // Update if referrals structure has changed
-      if (JSON.stringify(currentReferrals) !== JSON.stringify(updatedReferrals)) {
-        updateFormData({
-          referrals: updatedReferrals,
-          lastUpdated: new Date().toISOString()
-        });
-      }
     }
   }, []);
 
@@ -193,35 +172,22 @@ export const AssessmentForm: React.FC<AssessmentFormProps> = ({ onClear, onProgr
   const handleInputChange = (field: string) => (
     e: React.ChangeEvent<HTMLTextAreaElement | HTMLInputElement | HTMLSelectElement>
   ) => {
-    const value = e.target.value;
-    // Update the form data with the new value
-    updateFormData({ 
-      [field]: value,
-      lastUpdated: new Date().toISOString()
-    });
+    updateFormData({ [field]: e.target.value });
   };
 
   const handleCheckboxChange = (field: keyof typeof formData.referrals) => (
     e: React.ChangeEvent<HTMLInputElement>
   ) => {
-    const updatedReferrals = {
-      ...formData.referrals,
-      [field]: e.target.checked
-    };
-    
-    // Update both the referrals object and lastUpdated timestamp
     updateFormData({
-      referrals: updatedReferrals,
-      lastUpdated: new Date().toISOString()
+      referrals: {
+        ...formData.referrals,
+        [field]: e.target.checked
+      }
     });
   };
 
   const handleStatusChange = (newStatus: 'draft' | 'submitted') => {
-    // Update both the status and lastUpdated timestamp
-    updateFormData({ 
-      status: newStatus,
-      lastUpdated: new Date().toISOString()
-    });
+    updateFormData({ status: newStatus });
   };
 
   const handleClear = () => {
