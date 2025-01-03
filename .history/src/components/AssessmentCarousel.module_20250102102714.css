@@ -1,0 +1,67 @@
+.carouselContainer {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  background: #fff;
+  border-radius: 8px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+  overflow: hidden;
+}
+
+.carouselContent {
+  flex: 1;
+  padding: 1rem;
+  height: calc(100vh - 8rem); /* Force a tall height */
+  overflow-y: auto;
+  position: relative;
+}
+
+/* Component with graph */
+.componentWithGraph {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+}
+
+.graphSection {
+  flex-shrink: 0;
+  position: sticky;
+  top: 0;
+  background: white;
+  z-index: 2;
+  padding: 1rem;
+  margin: -1rem -1rem 0;
+}
+
+.sliderSection {
+  flex: 1;
+  padding: 1rem;
+  margin: 0 -1rem;
+  overflow-y: auto;
+}
+
+/* Regular component container */
+.componentContainer {
+  height: 100%;
+  overflow-y: auto;
+}
+
+/* Only these should be overflow: visible */
+.tooltipWrapper,
+.toolkitButton,
+.titleSection,
+.sliderContainer {
+  position: relative;
+  overflow: visible;
+}
+
+/* Remove all other overflow: visible rules */
+.container,
+.carouselContainer,
+.carouselContent,
+.componentContainer,
+.componentWithGraph,
+.graphSection,
+.sliderSection {
+  position: relative;
+} 
