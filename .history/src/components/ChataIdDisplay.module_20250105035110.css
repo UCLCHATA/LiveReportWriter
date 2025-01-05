@@ -1,0 +1,38 @@
+.container {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.5rem 1rem;
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 4px;
+  transition: all 0.3s ease;
+}
+
+.label {
+  font-size: 0.9rem;
+  color: rgba(255, 255, 255, 0.8);
+}
+
+.id {
+  font-family: monospace;
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: #fff;
+  letter-spacing: 1px;
+}
+
+.blinking {
+  animation: blink 2s ease-in-out infinite;
+  background: rgba(0, 123, 255, 0.2);
+}
+
+@keyframes blink {
+  0%, 100% {
+    opacity: 1;
+    background: rgba(0, 123, 255, 0.2);
+  }
+  50% {
+    opacity: 0.8;
+    background: rgba(0, 123, 255, 0.1);
+  }
+} 
