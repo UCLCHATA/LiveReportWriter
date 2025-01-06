@@ -1,0 +1,476 @@
+.container {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  padding: 0.75rem;
+  background: var(--background-color);
+  border-radius: 8px;
+  height: 600px;
+  max-height: 600px;
+  overflow-y: auto;
+  overflow-x: hidden;
+}
+
+.categoriesContainer {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 1.5rem;
+  padding: 0 0.25rem;
+}
+
+.category {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.category h3 {
+  color: var(--text-color);
+  font-size: 1.1rem;
+  margin: 0;
+  min-height: 2.75rem;
+  display: flex;
+  align-items: flex-start;
+}
+
+.milestoneList {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  padding-top: 0.5rem;
+}
+
+.milestone {
+  padding: 8px 12px;
+  background-color: white;
+  border: none;
+  border-radius: 12px;
+  cursor: grab;
+  user-select: none;
+  font-size: 14px;
+  position: relative;
+  min-width: 100px;
+  max-width: 150px;
+  margin: 4px;
+  color: white;
+  box-shadow: 
+    0 2px 4px rgba(0, 0, 0, 0.1),
+    inset 0 1px 1px rgba(255, 255, 255, 0.3);
+  transition: all 0.2s ease;
+  backdrop-filter: blur(4px);
+}
+
+.milestone:not(.placedMilestone):hover {
+  transform: translateY(-2px);
+  box-shadow: 
+    0 4px 8px rgba(0, 0, 0, 0.15),
+    inset 0 1px 2px rgba(255, 255, 255, 0.4);
+}
+
+.removing {
+  opacity: 0;
+  transform: scale(0.8);
+  transition: all 0.2s ease;
+}
+
+.timelineMilestone {
+  position: absolute;
+  transform: translate(-50%, 0);
+  pointer-events: auto;
+  transition: all 0.3s ease;
+}
+
+/* Add color styles for each category */
+.milestone[data-category="communication"] {
+  background: linear-gradient(135deg, #4299E1, #3182ce);
+  border: 1px solid #3182ce;
+}
+
+.milestone[data-category="motor"] {
+  background: linear-gradient(135deg, #48BB78, #38A169);
+  border: 1px solid #38A169;
+}
+
+.milestone[data-category="social"] {
+  background: linear-gradient(135deg, #ED8936, #DD6B20);
+  border: 1px solid #DD6B20;
+}
+
+.milestone[data-category="concerns"] {
+  background: linear-gradient(135deg, #9F7AEA, #805AD5);
+  border: 1px solid #805AD5;
+}
+
+.timelineContainer {
+  position: relative;
+  width: 100%;
+  min-height: 350px;
+  margin-bottom: 60px;
+  overflow: visible !important;
+}
+
+.timelineWrapper {
+  width: 100%;
+  overflow-x: hidden;
+  padding: 0 0.75rem;
+  margin: 0 -0.75rem;
+  position: relative;
+  min-height: 220px;
+}
+
+.timeline {
+  position: relative;
+  width: calc(100% - 1.5rem);
+  height: 160px;
+  background: var(--timeline-background);
+  border-radius: 8px;
+  margin-top: 0.5rem;
+  border: 1px solid var(--border-color);
+  padding: 1rem 0;
+  overflow: visible !important;
+}
+
+/* Remove min-width from timeline */
+.timeline {
+  min-width: unset;
+}
+
+.timelineLabels {
+  position: absolute;
+  bottom: -3rem;
+  left: 0;
+  right: 0;
+  display: flex;
+  justify-content: space-between;
+  padding: 0 1rem;
+}
+
+.timelineLabel {
+  transform: translateX(-50%);
+  color: #6b7280;
+  font-size: 0.75rem;
+  white-space: nowrap;
+}
+
+.monthMarker {
+  position: absolute;
+  height: 100%;
+  width: 1px;
+  transform: translateX(-50%);
+  top: 0;
+}
+
+.markerLine {
+  position: absolute;
+  width: 1px;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.15);
+  top: 0;
+}
+
+.markerLabel {
+  position: absolute;
+  bottom: -20px;
+  left: 50%;
+  transform: translateX(-50%);
+  font-size: 0.7rem;
+  color: var(--text-color);
+  white-space: nowrap;
+  min-width: 24px;
+  height: 16px;
+  text-align: center;
+  background: white;
+  padding: 1px 4px;
+  z-index: 1;
+  border: 1px solid var(--border-color);
+  border-radius: 3px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+}
+
+.expectedAgeIndicator {
+  position: absolute;
+  height: 100%;
+  width: 2px;
+  opacity: 0.5;
+  pointer-events: none;
+  top: 0;
+}
+
+.indicatorLabel {
+  position: absolute;
+  top: -25px;
+  left: 50%;
+  transform: translateX(-50%);
+  font-size: 0.8rem;
+  color: var(--text-muted);
+  white-space: nowrap;
+  background: white;
+  padding: 2px 6px;
+  border-radius: 4px;
+  border: 1px solid var(--border-color);
+}
+
+.currentPosition {
+  position: absolute;
+  transform: translate(-50%, 50%);
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  border: 2px solid;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.8rem;
+  z-index: 10;
+  background-color: white;
+  pointer-events: none;
+  bottom: 0;
+  top: auto;
+}
+
+.positionLine {
+  position: absolute;
+  bottom: 50%;
+  left: 50%;
+  width: 2px;
+  height: 100px;
+  background-color: currentColor;
+  opacity: 0.3;
+  z-index: 9;
+  transform-origin: bottom;
+}
+
+.placedMilestones {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+}
+
+.timelineMilestone.removing {
+  opacity: 0;
+  transform: translate(-50%, -20px);
+}
+
+/* Ensure category colors are applied to placed milestones */
+.timelineMilestone .milestone[data-category="communication"] {
+  background-color: rgba(66, 153, 225, 0.95);
+  border-color: #4299E1;
+  color: white;
+}
+
+.timelineMilestone .milestone[data-category="motor"] {
+  background-color: rgba(72, 187, 120, 0.95);
+  border-color: #48BB78;
+  color: white;
+}
+
+.timelineMilestone .milestone[data-category="social"] {
+  background-color: rgba(237, 137, 54, 0.95);
+  border-color: #ED8936;
+  color: white;
+}
+
+.timelineMilestone .milestone[data-category="concerns"] {
+  background-color: rgba(159, 122, 234, 0.95);
+  border-color: #9F7AEA;
+  color: white;
+}
+
+/* Ensure the circle inherits colors from its parent milestone */
+.milestone[data-category="communication"] .monthCircle {
+  color: #4299E1;
+}
+
+.milestone[data-category="motor"] .monthCircle {
+  color: #48BB78;
+}
+
+.milestone[data-category="social"] .monthCircle {
+  color: #ED8936;
+}
+
+.milestone[data-category="concerns"] .monthCircle {
+  color: #9F7AEA;
+}
+
+/* Styles for placed milestones */
+.placedMilestone {
+  padding: 0.4rem 0.8rem;
+  font-size: 0.75rem;
+  box-shadow: 
+    0 2px 4px rgba(0, 0, 0, 0.15),
+    inset 0 1px 1px rgba(255, 255, 255, 0.3);
+  backdrop-filter: blur(4px);
+  position: relative;
+}
+
+.placedMilestone:hover {
+  box-shadow: 
+    0 4px 8px rgba(0, 0, 0, 0.2),
+    inset 0 1px 2px rgba(255, 255, 255, 0.4);
+}
+
+/* Status bubble styles */
+.monthCircle {
+  position: absolute;
+  top: -6px;
+  right: -6px;
+  min-width: 20px;
+  height: 20px;
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.6rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  z-index: 5;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+  padding: 0 6px;
+}
+
+.monthText {
+  display: block;
+  line-height: 1;
+}
+
+.deleteIcon {
+  display: none;
+  font-size: 1rem;
+  line-height: 1;
+}
+
+.monthCircle:hover {
+  width: auto;
+  padding: 0 8px;
+}
+
+.monthCircle:hover .monthText {
+  display: none;
+}
+
+.monthCircle:hover .deleteIcon {
+  display: block;
+}
+
+/* Ensure parent elements don't clip the timeline */
+.milestone-section {
+  overflow: visible !important;
+}
+
+.form-container {
+  overflow: visible !important;
+}
+
+.main-container {
+  overflow: visible !important;
+}
+
+/* Custom concern bubble styles */
+.milestone[data-milestone-id="custom-concern"] {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.5rem;
+  font-weight: normal;
+  min-width: 36px;
+  width: 36px;
+  height: 36px;
+  padding: 0;
+  border-radius: 50%;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  background: linear-gradient(135deg, #9F7AEA, #805AD5);
+  border: 2px solid #805AD5;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  position: relative;
+  pointer-events: auto;
+}
+
+.milestone[data-milestone-id="custom-concern"]:hover {
+  transform: scale(1.1);
+  box-shadow: 0 3px 6px rgba(0, 0, 0, 0.15);
+}
+
+.milestone[data-milestone-id="custom-concern"]::before {
+  content: attr(title);
+  position: absolute;
+  bottom: 100%;
+  left: 50%;
+  transform: translateX(-50%);
+  font-size: 0.75rem;
+  white-space: nowrap;
+  background: rgba(0, 0, 0, 0.8);
+  color: white;
+  padding: 4px 8px;
+  border-radius: 4px;
+  opacity: 0;
+  transition: opacity 0.2s ease;
+  pointer-events: none;
+}
+
+.milestone[data-milestone-id="custom-concern"]:hover::before {
+  opacity: 1;
+}
+
+.customInput {
+  width: 180px;
+  height: 32px;
+  padding: 4px 12px;
+  border: 2px solid var(--border-color);
+  border-radius: 16px;
+  font-size: 0.875rem;
+  background: white;
+  color: #1a202c;
+  outline: none;
+  transition: all 0.2s ease;
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  z-index: 20;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.customInput:focus {
+  border-color: #9F7AEA;
+  box-shadow: 0 0 0 3px rgba(159, 122, 234, 0.2);
+  width: 200px; /* Slightly expand on focus */
+}
+
+.customInput::placeholder {
+  color: var(--text-muted);
+  font-size: 0.875rem;
+  text-align: center;
+}
+
+/* Style for custom concerns after they're created */
+.milestone[data-custom="true"] {
+  font-size: 0.8rem;
+  line-height: 1.2;
+  padding: 6px 10px;
+  text-align: center;
+  word-break: break-word;
+  background: linear-gradient(135deg, #9F7AEA, #805AD5);
+  border: 1px solid #805AD5;
+  color: white;
+  cursor: grab;
+  min-width: 100px;
+  max-width: 150px;
+  border-radius: 12px;
+  margin: 4px;
+  box-shadow: 
+    0 2px 4px rgba(0, 0, 0, 0.1),
+    inset 0 1px 1px rgba(255, 255, 255, 0.3);
+}
+
+.milestone[data-custom="true"]:hover {
+  transform: translateY(-2px);
+  box-shadow: 
+    0 4px 8px rgba(0, 0, 0, 0.15),
+    inset 0 1px 2px rgba(255, 255, 255, 0.4);
+} 

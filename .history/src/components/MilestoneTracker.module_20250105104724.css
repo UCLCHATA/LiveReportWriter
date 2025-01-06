@@ -1,0 +1,862 @@
+.container {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  padding: 0.75rem;
+  background: var(--background-color);
+  border-radius: 8px;
+  height: 600px;
+  max-height: 600px;
+  overflow-y: auto;
+  overflow-x: hidden;
+}
+
+.categoriesContainer {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 1rem;
+  padding: 0 0.25rem;
+  position: relative;
+  z-index: 1;
+}
+
+.category {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  min-width: 0;
+}
+
+.category h3 {
+  color: var(--text-color);
+  font-size: 1.1rem;
+  margin: 0;
+  min-height: 2rem;
+  display: flex;
+  align-items: flex-start;
+}
+
+.milestoneList {
+  display: grid;
+  grid-auto-flow: row;
+  gap: 0.35rem;
+  padding-top: 0.25rem;
+  align-items: start;
+}
+
+.milestone {
+  padding: 3px 8px;
+  background-color: white;
+  border: none;
+  border-radius: 12px;
+  cursor: grab;
+  user-select: none;
+  font-size: 14px;
+  position: relative;
+  width: max-content;
+  min-width: min-content;
+  max-width: 200px;
+  margin: 4px;
+  color: white;
+  box-shadow: 
+    0 2px 4px rgba(0, 0, 0, 0.1),
+    inset 0 1px 1px rgba(255, 255, 255, 0.3);
+  transition: all 0.2s ease;
+  backdrop-filter: blur(4px);
+  z-index: 1;
+  line-height: 1;
+  height: 20px;
+  display: flex;
+  align-items: center;
+}
+
+.milestone:not(.placedMilestone):hover {
+  transform: translateY(-2px);
+  box-shadow: 
+    0 4px 8px rgba(0, 0, 0, 0.15),
+    inset 0 1px 2px rgba(255, 255, 255, 0.4);
+  z-index: 100;
+}
+
+.removing {
+  opacity: 0;
+  transform: scale(0.8);
+  transition: all 0.2s ease;
+}
+
+.timelineMilestone {
+  position: absolute;
+  pointer-events: auto;
+  transition: all 0.3s ease;
+  display: flex;
+  align-items: center;
+  width: auto;
+  height: 20px !important;
+}
+
+/* Add color styles for each category */
+.milestone[data-category="communication"] {
+  background: linear-gradient(135deg, #4299E1, #3182ce);
+  border: 1px solid #3182ce;
+}
+
+.milestone[data-category="motor"] {
+  background: linear-gradient(135deg, #48BB78, #38A169);
+  border: 1px solid #38A169;
+}
+
+.milestone[data-category="social"] {
+  background: linear-gradient(135deg, #ED8936, #DD6B20);
+  border: 1px solid #DD6B20;
+}
+
+.milestone[data-category="concerns"] {
+  background: linear-gradient(135deg, #9F7AEA, #805AD5);
+  border: 1px solid #805AD5;
+  color: white;
+  min-width: 120px;
+  text-align: left;
+  height: 20px !important;
+  min-height: 20px !important;
+  padding: 3px 8px;
+}
+
+.milestone[data-category="concerns"]:not(.placedMilestone):hover {
+  transform: translateY(-2px);
+  box-shadow: 
+    0 4px 8px rgba(0, 0, 0, 0.15),
+    inset 0 1px 2px rgba(255, 255, 255, 0.4);
+}
+
+.timelineContainer {
+  position: relative;
+  width: 100%;
+  min-height: 350px;
+  margin-bottom: 60px;
+  overflow: visible !important;
+}
+
+.timelineWrapper {
+  width: 100%;
+  overflow-x: hidden;
+  padding: 0 0.75rem;
+  margin: 0 -0.75rem;
+  position: relative;
+  min-height: 220px;
+}
+
+.timeline {
+  position: relative;
+  width: calc(100% - 1.5rem);
+  height: 184px;
+  background: var(--timeline-background);
+  border-radius: 8px;
+  margin-top: 0.5rem;
+  border: 1px solid var(--border-color);
+  padding: 1rem 0;
+  overflow: visible !important;
+  z-index: 1;
+}
+
+/* Remove min-width from timeline */
+.timeline {
+  min-width: unset;
+}
+
+.timelineLabels {
+  position: absolute;
+  bottom: -3rem;
+  left: 0;
+  right: 0;
+  display: flex;
+  justify-content: space-between;
+  padding: 0 1rem;
+}
+
+.timelineLabel {
+  transform: translateX(-50%);
+  color: #6b7280;
+  font-size: 0.75rem;
+  white-space: nowrap;
+}
+
+.monthMarker {
+  position: absolute;
+  height: 100%;
+  width: 1px;
+  transform: translateX(-50%);
+  top: 0;
+}
+
+.markerLine {
+  position: absolute;
+  width: 1px;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.15);
+  top: 0;
+}
+
+.markerLabel {
+  position: absolute;
+  bottom: -20px;
+  left: 50%;
+  transform: translateX(-50%);
+  font-size: 0.7rem;
+  color: var(--text-color);
+  white-space: nowrap;
+  min-width: 24px;
+  height: 16px;
+  text-align: center;
+  background: white;
+  padding: 1px 4px;
+  z-index: 1;
+  border: 1px solid var(--border-color);
+  border-radius: 3px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+}
+
+.expectedAgeIndicator {
+  position: absolute;
+  height: 100%;
+  width: 2px;
+  opacity: 0.5;
+  pointer-events: none;
+  top: 0;
+}
+
+.indicatorLabel {
+  position: absolute;
+  top: -25px;
+  left: 50%;
+  transform: translateX(-50%);
+  font-size: 0.8rem;
+  color: var(--text-muted);
+  white-space: nowrap;
+  background: white;
+  padding: 2px 6px;
+  border-radius: 4px;
+  border: 1px solid var(--border-color);
+}
+
+.currentPosition {
+  position: absolute;
+  transform: translate(-50%, 50%);
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  border: 2px solid;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.8rem;
+  z-index: 10;
+  background-color: white;
+  pointer-events: none;
+  bottom: 0;
+  top: auto;
+}
+
+.positionLine {
+  position: absolute;
+  bottom: 50%;
+  left: 50%;
+  width: 2px;
+  height: 100px;
+  background-color: currentColor;
+  opacity: 0.3;
+  z-index: 9;
+  transform-origin: bottom;
+}
+
+.placedMilestones {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  z-index: 3;
+}
+
+.timelineMilestone.removing {
+  opacity: 0;
+  transform: translate(-50%, -20px);
+}
+
+/* Ensure category colors are applied to placed milestones */
+.timelineMilestone .milestone[data-category="communication"] {
+  background-color: rgba(66, 153, 225, 0.95);
+  border-color: #4299E1;
+  color: white;
+}
+
+.timelineMilestone .milestone[data-category="motor"] {
+  background-color: rgba(72, 187, 120, 0.95);
+  border-color: #48BB78;
+  color: white;
+}
+
+.timelineMilestone .milestone[data-category="social"] {
+  background-color: rgba(237, 137, 54, 0.95);
+  border-color: #ED8936;
+  color: white;
+}
+
+.timelineMilestone .milestone[data-category="concerns"] {
+  background-color: rgba(159, 122, 234, 0.95);
+  border-color: #9F7AEA;
+  color: white;
+}
+
+/* Ensure the circle inherits colors from its parent milestone */
+.milestone[data-category="communication"] .monthCircle {
+  color: #4299E1;
+}
+
+.milestone[data-category="motor"] .monthCircle {
+  color: #48BB78;
+}
+
+.milestone[data-category="social"] .monthCircle {
+  color: #ED8936;
+}
+
+.milestone[data-category="concerns"] .monthCircle {
+  color: #9F7AEA;
+}
+
+/* Styles for placed milestones */
+.placedMilestone {
+  padding: 3px 20px 3px 8px;
+  margin: 0;
+  height: 20px !important;
+  min-height: 20px !important;
+  line-height: 1 !important;
+}
+
+.placedMilestone:hover {
+  box-shadow: 
+    0 4px 8px rgba(0, 0, 0, 0.2),
+    inset 0 1px 2px rgba(255, 255, 255, 0.4);
+}
+
+/* Style for milestones placed early */
+.milestone[data-early="true"] {
+  opacity: 0.7;
+  border-style: dashed !important;
+  border-width: 2px !important;
+  height: 20px !important;
+  min-height: 20px !important;
+}
+
+/* Style for month indicator */
+.monthCircle {
+  position: absolute;
+  top: -4px;
+  right: -12px;
+  min-width: 18px;
+  height: 16px;
+  border-radius: 3px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.6rem;
+  font-weight: 600;
+  background: white;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+  padding: 0 4px;
+  z-index: 50;
+}
+
+.monthText {
+  color: #1a202c;
+  white-space: nowrap;
+  transition: color 0.2s ease;
+}
+
+/* Clean up hover states */
+.monthCircle:hover {
+  min-width: 24px;
+}
+
+/* Remove old hover styles that were hiding text */
+.monthCircle:hover .monthText {
+  display: block !important;
+}
+
+/* Remove delete icon styles */
+.deleteIcon {
+  display: none;
+}
+
+/* Color states for difference indicator */
+.monthCircle[data-delayed="true"] .monthText.showDifference {
+  color: #B22222 !important;
+}
+
+.monthCircle[data-early="true"] .monthText.showDifference {
+  color: #2E8B57 !important;
+}
+
+/* Remove any inherited colors and ensure text visibility */
+.milestone[data-category] .monthCircle .monthText {
+  color: #1a202c !important;
+  opacity: 1 !important;
+  visibility: visible !important;
+}
+
+/* Hover states for delayed/early */
+.monthCircle[data-delayed="true"]:hover .monthText {
+  color: #B22222 !important;
+}
+
+.monthCircle[data-early="true"]:hover .monthText {
+  color: #2E8B57 !important;
+}
+
+.deleteIcon {
+  display: none;
+  font-size: 1rem;
+  line-height: 1;
+}
+
+.monthCircle:hover {
+  width: auto;
+  padding: 0 8px;
+}
+
+.monthCircle:hover .monthText {
+  display: none;
+}
+
+.monthCircle:hover .deleteIcon {
+  display: block;
+}
+
+/* Ensure parent elements don't clip the timeline */
+.milestone-section {
+  overflow: visible !important;
+}
+
+.form-container {
+  overflow: visible !important;
+}
+
+.main-container {
+  overflow: visible !important;
+}
+
+/* Custom concern bubble styles */
+.milestone[data-milestone-id="custom-concern"] {
+  min-width: 36px;
+  width: 36px;
+  height: 36px;
+  padding: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.5rem;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #9F7AEA, #805AD5);
+  border: 2px solid #805AD5;
+  cursor: pointer;
+}
+
+.milestone[data-milestone-id="custom-concern"]:hover {
+  transform: scale(1.1);
+  box-shadow: 0 3px 6px rgba(0, 0, 0, 0.15);
+}
+
+.milestone[data-milestone-id="custom-concern"]::before {
+  content: attr(title);
+  position: absolute;
+  bottom: 100%;
+  left: 50%;
+  transform: translateX(-50%);
+  font-size: 0.75rem;
+  white-space: nowrap;
+  background: rgba(0, 0, 0, 0.8);
+  color: white;
+  padding: 4px 8px;
+  border-radius: 4px;
+  opacity: 0;
+  transition: opacity 0.2s ease;
+  pointer-events: none;
+}
+
+.milestone[data-milestone-id="custom-concern"]:hover::before {
+  opacity: 1;
+}
+
+.customInput {
+  width: 180px;
+  height: 32px;
+  padding: 4px 12px;
+  border: 2px solid var(--border-color);
+  border-radius: 16px;
+  font-size: 0.875rem;
+  background: white;
+  color: #1a202c;
+  outline: none;
+  transition: all 0.2s ease;
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  z-index: 20;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.customInput:focus {
+  border-color: #9F7AEA;
+  box-shadow: 0 0 0 3px rgba(159, 122, 234, 0.2);
+  width: 200px; /* Slightly expand on focus */
+}
+
+.customInput::placeholder {
+  color: var(--text-muted);
+  font-size: 0.875rem;
+  text-align: center;
+}
+
+/* Style for custom concerns after they're created */
+.milestone[data-custom="true"] {
+  font-size: 0.8rem;
+  line-height: 1.2;
+  padding: 6px 10px;
+  text-align: center;
+  word-break: break-word;
+  background: linear-gradient(135deg, #9F7AEA, #805AD5);
+  border: 1px solid #805AD5;
+  color: white;
+  cursor: grab;
+  min-width: 100px;
+  max-width: 150px;
+  border-radius: 12px;
+  margin: 4px;
+  box-shadow: 
+    0 2px 4px rgba(0, 0, 0, 0.1),
+    inset 0 1px 1px rgba(255, 255, 255, 0.3);
+}
+
+.milestone[data-custom="true"]:hover {
+  transform: translateY(-2px);
+  box-shadow: 
+    0 4px 8px rgba(0, 0, 0, 0.15),
+    inset 0 1px 2px rgba(255, 255, 255, 0.4);
+}
+
+.historyBox {
+  margin-top: 1rem;
+  padding: 1rem;
+  background: white;
+  border-radius: 8px;
+  border: 1px solid var(--border-color);
+}
+
+.historyBox h3 {
+  color: var(--text-color);
+  font-size: 1.1rem;
+  margin: 0 0 0.75rem 0;
+}
+
+.historyTextarea {
+  width: 100%;
+  min-height: 120px;
+  padding: 0.75rem;
+  border: 1px solid var(--border-color);
+  border-radius: 4px;
+  font-size: 0.875rem;
+  line-height: 1.5;
+  color: var(--text-color);
+  background: var(--background-color);
+  resize: vertical;
+  outline: none;
+  transition: all 0.2s ease;
+}
+
+.historyTextarea:focus {
+  border-color: #9F7AEA;
+  box-shadow: 0 0 0 2px rgba(159, 122, 234, 0.2);
+}
+
+.historyTextarea::placeholder {
+  color: #9CA3AF; /* Lighter grey color */
+  font-size: 0.875rem;
+  white-space: pre-line;
+  opacity: 0.7;
+}
+
+.milestone:not(.placedMilestone) {
+  position: relative;
+  z-index: 1;
+}
+
+.milestone:not(.placedMilestone):hover {
+  z-index: 100;
+}
+
+.milestone:not(.placedMilestone)::before {
+  content: attr(data-tooltip);
+  position: absolute;
+  bottom: calc(100% + 8px);
+  left: 50%;
+  transform: translateX(-50%);
+  padding: 6px 12px;
+  background: rgba(0, 0, 0, 0.7);
+  color: white;
+  font-size: 0.75rem;
+  border-radius: 4px;
+  white-space: normal;
+  width: 160px;
+  opacity: 0;
+  visibility: hidden;
+  transition: all 0.2s ease;
+  pointer-events: none;
+  z-index: 101;
+  text-align: left;
+  line-height: 1.4;
+  word-wrap: break-word;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+/* First column tooltips */
+.category:first-child .milestone:not(.placedMilestone)::before {
+  left: 0;
+  transform: none;
+}
+
+/* Last column tooltips */
+.category:last-child .milestone:not(.placedMilestone)::before {
+  left: auto;
+  right: 0;
+  transform: none;
+}
+
+/* First item in any row */
+.milestone:not(.placedMilestone):first-child::before {
+  left: 0;
+  transform: none;
+}
+
+/* Last item in any row */
+.milestone:not(.placedMilestone):last-child::before {
+  left: auto;
+  right: 0;
+  transform: none;
+}
+
+.placedMilestone {
+  z-index: 2;
+}
+
+.timelineMilestone {
+  z-index: 3;
+}
+
+/* Ensure all other elements have lower z-index */
+.milestone {
+  z-index: 1;
+}
+
+.placedMilestone {
+  z-index: 2;
+}
+
+.timelineMilestone {
+  z-index: 3;
+}
+
+/* Update container to handle overflow properly */
+.categoriesContainer {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 1rem;
+  padding: 0 0.25rem;
+  position: relative;
+  z-index: 1;
+}
+
+.milestone:not(.placedMilestone):hover {
+  z-index: 100;
+}
+
+.milestone:not(.placedMilestone):hover::before {
+  opacity: 1;
+  visibility: visible;
+}
+
+.historyBox {
+  position: relative;
+}
+
+.historyBox:hover::before {
+  content: attr(data-tooltip);
+  position: absolute;
+  top: 0;
+  right: -20px;
+  transform: translateX(100%);
+  padding: 8px 12px;
+  background: rgba(0, 0, 0, 0.7);
+  color: white;
+  font-size: 0.75rem;
+  border-radius: 4px;
+  white-space: pre-line;
+  max-width: 250px;
+  z-index: 101;
+  line-height: 1.4;
+}
+
+.threeMonthMarker {
+  background: rgba(0, 0, 0, 0.2); /* Darker color for better visibility */
+  height: 80%;
+  top: 10%;
+}
+
+.expectationLine {
+  position: absolute;
+  height: 3px;
+  pointer-events: none;
+  z-index: 2;
+  opacity: 0.8;
+  transition: all 0.3s ease;
+  border-radius: 1.5px;
+  transform-origin: left center;
+}
+
+/* Ensure proper z-indexing */
+.timeline {
+  z-index: 1;
+}
+
+.placedMilestones {
+  z-index: 3;
+}
+
+.timelineMilestone {
+  z-index: 4;
+}
+
+.milestone {
+  z-index: 5;
+}
+
+/* Remove transform from timelineMilestone */
+.timelineMilestone {
+  position: absolute;
+  pointer-events: auto;
+  transition: all 0.3s ease;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: auto;
+}
+
+/* Expectation line colors with increased opacity */
+.milestone[data-category="communication"] ~ .expectationLine {
+  background: rgba(66, 153, 225, 0.8);
+}
+
+.milestone[data-category="motor"] ~ .expectationLine {
+  background: rgba(72, 187, 120, 0.8);
+}
+
+.milestone[data-category="social"] ~ .expectationLine {
+  background: rgba(237, 137, 54, 0.8);
+}
+
+.milestone[data-category="concerns"] ~ .expectationLine {
+  background: rgba(159, 122, 234, 0.8);
+}
+
+.differenceCircle {
+  position: absolute;
+  bottom: -16px;
+  right: 10px;
+  width: 0;
+  height: 0;
+  border-left: 6px solid transparent;
+  border-right: 6px solid transparent;
+  font-size: 0.6rem;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+  z-index: 6;
+}
+
+.differenceCircle[data-delayed="true"] {
+  color: #B22222;
+  border-top: 12px solid #B22222;
+  border-bottom: none;
+}
+
+.differenceCircle[data-early="true"] {
+  color: #2E8B57;
+  border-bottom: 12px solid #2E8B57;
+  border-top: none;
+  bottom: auto;
+  top: -16px;
+}
+
+.differenceCircle::after {
+  content: attr(data-difference);
+  position: absolute;
+  left: 50%;
+  transform: translateX(-50%);
+  white-space: nowrap;
+  font-size: 0.6rem;
+  top: -16px;
+}
+
+/* Adjust milestone padding to accommodate indicators */
+.placedMilestone {
+  padding: 6px 24px 6px 10px;
+  min-height: 32px;
+}
+
+/* Adjust month indicator position */
+.monthCircle {
+  position: absolute;
+  top: -6px;
+  right: -12px;
+  min-width: 18px;
+  height: 18px;
+  font-size: 0.55rem;
+  padding: 0 3px;
+  border-radius: 3px;
+}
+
+/* Reduce spacing in milestone grid */
+.milestoneList {
+  display: grid;
+  grid-auto-flow: row;
+  gap: 0.35rem;
+  padding-top: 0.25rem;
+  align-items: start;
+}
+
+.category h3 {
+  color: var(--text-color);
+  font-size: 1.1rem;
+  margin: 0;
+  min-height: 2rem;
+  display: flex;
+  align-items: flex-start;
+}
+
+.milestone {
+  padding: 6px 10px;
+  /* ... rest of the existing styles ... */
+}
+
+.categoriesContainer {
+  gap: 1rem;
+  /* ... rest of the existing styles ... */
+}
+
+/* Adjust vertical spacing in timeline */
+.timelineMilestone {
+  margin-bottom: 4px;
+} 
