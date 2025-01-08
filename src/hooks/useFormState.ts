@@ -1,39 +1,55 @@
-import { useState, useEffect, useCallback } from 'react';
-import { 
-  FormState, 
-  ClinicianInfo, 
-  AssessmentData,
-  AssessmentDomain,
-  BaseAssessment,
-  SensoryProfileAssessment,
-  SocialCommunicationAssessment,
-  BehaviorInterestsAssessment
-} from '../types';
+import { useState, useEffect } from 'react';
 
-// Type guard for base assessments
-const isBaseAssessment = (
-  assessment: AssessmentData[keyof AssessmentData]
-): assessment is SensoryProfileAssessment | SocialCommunicationAssessment | BehaviorInterestsAssessment => {
-  return ['sensoryProfile', 'socialCommunication', 'behaviorInterests'].includes(assessment.type);
-};
+interface ClinicianInfo {
+  name: string;
+  email: string;
+}
 
 interface GlobalFormState {
   chataId: string;
   clinician: ClinicianInfo;
-  formData: FormState;
-  assessments: AssessmentData;
+  formData: {
+    referralReason: string;
+    developmentalConcerns: string;
+    medicalHistory: string;
+    familyHistory: string;
+    status: 'draft' | 'submitted';
+    ascStatus: string;
+    adhdStatus: string;
+    referrals: {
+      speech: boolean;
+      educational: boolean;
+      sleep: boolean;
+      occupational: boolean;
+      mental: boolean;
+      other: boolean;
+    };
+    remarks: string;
+    clinicalObservations: string;
+    priorityAreas: string;
+    strengths: string;
+    recommendations: string;
+  };
+  assessments: {
+    sensoryProfile: any | null;
+    socialCommunication: any | null;
+    behaviorInterests: any | null;
+    milestones: any | null;
+    assessmentLog: any | null;
+  };
   currentStep: number;
   lastUpdated: string;
   status: 'draft' | 'submitted';
 }
 
-const STORAGE_KEY = 'chata-form-state';
-let saveTimeout: NodeJS.Timeout | null = null;
+const getStorageKey = (chataId: string) => `chata-form-state-${chataId}`;
 
-export { STORAGE_KEY };
-
-const initialFormData: FormState = {
-  status: 'draft',
+const initialFormData = {
+  referralReason: '',
+  developmentalConcerns: '',
+  medicalHistory: '',
+  familyHistory: '',
+  status: 'draft' as const,
   ascStatus: '',
   adhdStatus: '',
   referrals: {
@@ -48,77 +64,22 @@ const initialFormData: FormState = {
   clinicalObservations: '',
   priorityAreas: '',
   strengths: '',
-  recommendations: '',
-  formProgress: 0,
-  lastUpdated: new Date().toISOString()
+  recommendations: ''
 };
 
 const initialState: GlobalFormState = {
   chataId: '',
   clinician: {
     name: '',
-    email: '',
-    clinicName: '',
-    childName: '',
-    childAge: '',
-    childGender: ''
+    email: ''
   },
   formData: initialFormData,
   assessments: {
-    sensoryProfile: {
-      type: 'sensoryProfile',
-      domains: {
-        visual: { value: 0, observations: [] },
-        auditory: { value: 0, observations: [] },
-        tactile: { value: 0, observations: [] },
-        vestibular: { value: 0, observations: [] },
-        proprioceptive: { value: 0, observations: [] },
-        oral: { value: 0, observations: [] }
-      },
-      progress: 0,
-      isComplete: false,
-      lastUpdated: new Date().toISOString()
-    },
-    socialCommunication: {
-      type: 'socialCommunication',
-      domains: {
-        jointAttention: { value: 0, observations: [] },
-        nonverbalCommunication: { value: 0, observations: [] },
-        verbalCommunication: { value: 0, observations: [] },
-        socialUnderstanding: { value: 0, observations: [] },
-        playSkills: { value: 0, observations: [] },
-        peerInteractions: { value: 0, observations: [] }
-      },
-      progress: 0,
-      isComplete: false,
-      lastUpdated: new Date().toISOString()
-    },
-    behaviorInterests: {
-      type: 'behaviorInterests',
-      domains: {
-        repetitiveBehaviors: { value: 0, observations: [] },
-        routinesRituals: { value: 0, observations: [] },
-        specialInterests: { value: 0, observations: [] },
-        sensoryInterests: { value: 0, observations: [] },
-        emotionalRegulation: { value: 0, observations: [] },
-        flexibility: { value: 0, observations: [] }
-      },
-      progress: 0,
-      isComplete: false,
-      lastUpdated: new Date().toISOString()
-    },
-    milestones: {
-      type: 'milestoneTracker',
-      milestones: [],
-      history: '',
-      progress: 0
-    },
-    assessmentLog: {
-      type: 'assessmentLog',
-      selectedAssessments: [],
-      entries: {},
-      progress: 0
-    }
+    sensoryProfile: null,
+    socialCommunication: null,
+    behaviorInterests: null,
+    milestones: null,
+    assessmentLog: null
   },
   currentStep: 0,
   lastUpdated: new Date().toISOString(),
@@ -126,264 +87,87 @@ const initialState: GlobalFormState = {
 };
 
 export const useFormState = () => {
-  // Load initial state from localStorage
-  const [globalState, setGlobalState] = useState<GlobalFormState>(() => {
-    try {
-      const saved = localStorage.getItem(STORAGE_KEY);
-      if (saved) {
-        const parsed = JSON.parse(saved);
-        console.log('📥 Loading saved state:', {
-          content: {
-            clinicalObservations: parsed?.formData?.clinicalObservations?.length || 0,
-            strengths: parsed?.formData?.strengths?.length || 0,
-            priorityAreas: parsed?.formData?.priorityAreas?.length || 0,
-            recommendations: parsed?.formData?.recommendations?.length || 0
-          },
-          progress: {
-            form: parsed?.formData?.formProgress || 0,
-            assessment: parsed?.assessments?.sensoryProfile?.progress || 0
-          }
-        });
-        
-        if (parsed && parsed.status === 'draft') {
-          const restoredState = {
-            ...initialState,
-            ...parsed,
-            formData: {
-              ...initialFormData,
-              ...parsed.formData,
-              formProgress: parsed.formData?.formProgress || 0
-            },
-            assessments: {
-              ...initialState.assessments,
-              ...parsed.assessments,
-              sensoryProfile: {
-                ...initialState.assessments.sensoryProfile,
-                ...parsed.assessments?.sensoryProfile,
-                progress: parsed.assessments?.sensoryProfile?.progress || 0
-              }
-            }
-          };
-          
-          return restoredState;
-        }
-      }
-    } catch (error) {
-      console.error('❌ Failed to restore state:', error);
-    }
-    return initialState;
-  });
+  const [globalState, setGlobalState] = useState<GlobalFormState>(initialState);
+  const [validatedChataId, setValidatedChataId] = useState<string>('');
 
-  // Debounced save with type checking
-  const saveState = useCallback((state: GlobalFormState) => {
-    if (saveTimeout) {
-      clearTimeout(saveTimeout);
-    }
-    saveTimeout = setTimeout(() => {
-      try {
-        if (!state.formData || !state.assessments) {
-          console.error('❌ Invalid state structure');
-          return;
-        }
-        
-        const stateToSave = {
-          ...state,
-          lastUpdated: new Date().toISOString()
-        };
-        
-        localStorage.setItem(STORAGE_KEY, JSON.stringify(stateToSave));
-        console.log('💾 Saved state:', {
-          content: {
-            clinicalObservations: state.formData?.clinicalObservations?.length || 0,
-            strengths: state.formData?.strengths?.length || 0,
-            priorityAreas: state.formData?.priorityAreas?.length || 0,
-            recommendations: state.formData?.recommendations?.length || 0
-          },
-          progress: {
-            form: state.formData?.formProgress || 0,
-            assessment: state.assessments?.sensoryProfile?.progress || 0
-          }
-        });
-      } catch (error) {
-        console.error('❌ Failed to save state:', error);
-      }
-    }, 2000);
-  }, []);
-
-  // Save state when it changes
   useEffect(() => {
-    const hasContent = 
-      globalState.formData?.clinicalObservations ||
-      globalState.formData?.strengths ||
-      globalState.formData?.priorityAreas ||
-      globalState.formData?.recommendations;
-    
-    const hasProgress = 
-      globalState.formData?.formProgress > 0 ||
-      globalState.assessments?.sensoryProfile.progress > 0;
-    
-    if (hasContent || hasProgress) {
-      saveState(globalState);
+    if (validatedChataId && globalState) {
+      const stateToSave = {
+        ...globalState,
+        lastUpdated: new Date().toISOString()
+      };
+      localStorage.setItem(getStorageKey(validatedChataId), JSON.stringify(stateToSave));
     }
-  }, [globalState, saveState]);
+  }, [globalState, validatedChataId]);
 
-  const clearState = useCallback(() => {
-    localStorage.removeItem(STORAGE_KEY);
-    setGlobalState(initialState);
-    console.log('🗑️ State cleared');
-  }, []);
-
-  const updateFormData = useCallback((updates: Partial<FormState>) => {
-    setGlobalState(prev => {
-      // Don't update if values haven't changed or if new progress is lower
-      const hasValidChanges = Object.entries(updates).some(([key, value]) => {
-        if (key === 'formProgress') {
-          // For progress, only update if new value is higher
-          const currentProgress = prev.formData.formProgress || 0;
-          const newProgress = typeof value === 'number' ? value : 0;
-          return newProgress > currentProgress;
-        }
-        return prev.formData[key as keyof FormState] !== value;
-      });
-
-      if (!hasValidChanges) {
-        console.log('📝 Skipping form update:', {
-          reason: 'No valid changes or lower progress',
-          current: {
-            progress: prev.formData.formProgress,
-            content: {
-              clinicalObservations: prev.formData.clinicalObservations?.length || 0,
-              strengths: prev.formData.strengths?.length || 0,
-              priorityAreas: prev.formData.priorityAreas?.length || 0,
-              recommendations: prev.formData.recommendations?.length || 0
-            }
-          },
-          updates
-        });
-        return prev;
+  const checkExistingDraft = (chataId: string): GlobalFormState | null => {
+    const saved = localStorage.getItem(getStorageKey(chataId));
+    if (saved) {
+      const state = JSON.parse(saved);
+      if (state.status === 'draft') {
+        return state;
       }
+    }
+    return null;
+  };
 
-      console.log('📝 Applying form update:', {
-        current: {
-          progress: prev.formData.formProgress,
-          content: {
-            clinicalObservations: prev.formData.clinicalObservations?.length || 0,
-            strengths: prev.formData.strengths?.length || 0,
-            priorityAreas: prev.formData.priorityAreas?.length || 0,
-            recommendations: prev.formData.recommendations?.length || 0
-          }
-        },
-        updates
-      });
+  const restoreDraft = (chataId: string): GlobalFormState | null => {
+    const draft = checkExistingDraft(chataId);
+    if (draft) {
+      setValidatedChataId(chataId);
+      setGlobalState(draft);
+      return draft;
+    }
+    return null;
+  };
 
-      const currentProgress = prev.formData.formProgress || 0;
-      const newProgress = typeof updates.formProgress === 'number' ? updates.formProgress : currentProgress;
+  const clearState = () => {
+    if (validatedChataId) {
+      localStorage.removeItem(getStorageKey(validatedChataId));
+    }
+    setValidatedChataId('');
+    setGlobalState(initialState);
+  };
 
-      return {
+  const updateFormData = (updates: Partial<GlobalFormState['formData']>) => {
+    setGlobalState((prev: GlobalFormState) => ({
       ...prev,
       formData: {
         ...prev.formData,
-          ...updates,
-          // Ensure progress never decreases
-          formProgress: Math.max(currentProgress, newProgress),
-          lastUpdated: new Date().toISOString()
-        }
-      };
-    });
-  }, []);
-
-  const updateAssessment = useCallback((type: keyof AssessmentData, data: Partial<AssessmentData[keyof AssessmentData]>) => {
-    setGlobalState(prev => {
-      const prevAssessment = prev.assessments[type];
-      
-      // Only handle completion status for base assessments
-      if (!isBaseAssessment(prevAssessment)) {
-        return {
-          ...prev,
-          assessments: {
-            ...prev.assessments,
-            [type]: {
-              ...prevAssessment,
-              ...data,
-              lastUpdated: new Date().toISOString()
-            }
-          }
-        };
+        ...updates
       }
-
-      // Check if this update should mark the assessment as complete
-      let isComplete = (data as Partial<BaseAssessment>).isComplete;
-      if (isComplete === undefined && data.progress === 100) {
-        isComplete = true;
-      }
-
-      // Don't update if values haven't changed
-      const hasChanges = Object.entries(data).some(
-        ([key, value]) => {
-          if (key === 'domains') {
-            const domainData = value as Record<string, AssessmentDomain>;
-            return Object.entries(domainData).some(
-              ([domainKey, domainValue]) => {
-                const domains = prevAssessment.domains as Record<string, AssessmentDomain>;
-                const prevDomain = domains[domainKey];
-                return (
-                  prevDomain.value !== domainValue.value ||
-                  JSON.stringify(prevDomain.observations) !== JSON.stringify(domainValue.observations)
-                );
-              }
-            );
-          }
-          return prevAssessment[key as keyof typeof prevAssessment] !== value;
-        }
-      );
-
-      if (!hasChanges && isComplete === prevAssessment.isComplete) {
-        return prev;
-      }
-
-      console.log('📝 Updating assessment:', {
-        type,
-        progress: data.progress,
-        isComplete,
-        domains: Object.keys((data as Partial<BaseAssessment>).domains || {}).length
-      });
-
-      return {
-        ...prev,
-        assessments: {
-          ...prev.assessments,
-          [type]: {
-            ...prevAssessment,
-            ...data,
-            isComplete: isComplete ?? prevAssessment.isComplete,
-            lastUpdated: new Date().toISOString()
-          }
-        }
-      };
-    });
-  }, []);
-
-  const setClinicianInfo = useCallback((info: ClinicianInfo) => {
-    setGlobalState(prev => {
-      // Don't update if values haven't changed
-      const hasChanges = Object.entries(info).some(
-        ([key, value]) => prev.clinician[key as keyof ClinicianInfo] !== value
-      );
-      if (!hasChanges) return prev;
-
-      return {
-      ...prev,
-        clinician: info,
-        chataId: info.chataId || prev.chataId
+    }));
   };
-    });
-  }, []);
+
+  const updateAssessment = (
+    type: keyof GlobalFormState['assessments'],
+    data: any
+  ) => {
+    setGlobalState((prev: GlobalFormState) => ({
+      ...prev,
+      assessments: {
+        ...prev.assessments,
+        [type]: data
+      }
+    }));
+  };
+
+  const setClinicianInfo = (info: ClinicianInfo) => {
+    setGlobalState((prev: GlobalFormState) => ({
+      ...prev,
+      clinician: info
+    }));
+  };
 
   return {
     globalState,
+    setGlobalState,
+    checkExistingDraft,
+    restoreDraft,
+    clearState,
     updateFormData,
     updateAssessment,
     setClinicianInfo,
-    clearState
+    validatedChataId
   };
 };
