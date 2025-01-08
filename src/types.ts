@@ -34,75 +34,88 @@ interface AssessmentBase {
   progress: number;
 }
 
-export interface AssessmentDomain {
+export interface AssessmentDomainBase {
+  name: string;
   value: number;
   observations: string[];
 }
 
-export interface BaseAssessment {
-  type: string;
+export interface SensoryDomain extends AssessmentDomainBase {
+  label: "Significantly Under-responsive" | "Under-responsive" | "Typical" | "Over-responsive" | "Significantly Over-responsive";
+}
+
+export interface SocialCommunicationDomain extends AssessmentDomainBase {
+  label: "Age Appropriate" | "Subtle Differences" | "Emerging" | "Limited" | "Significantly Limited";
+}
+
+export interface BehaviorDomain extends AssessmentDomainBase {
+  label: "Not Present" | "Minimal Impact" | "Moderate Impact" | "Significant Impact" | "Severe Impact";
+}
+
+export interface SensoryProfileData {
+  type: 'sensoryProfile';
   domains: {
-    [key: string]: AssessmentDomain;
+    visual: SensoryDomain;
+    auditory: SensoryDomain;
+    tactile: SensoryDomain;
+    vestibular: SensoryDomain;
+    proprioceptive: SensoryDomain;
+    oral: SensoryDomain;
   };
   progress: number;
   isComplete: boolean;
-  lastUpdated: string;
 }
 
-export interface SensoryProfileAssessment extends BaseAssessment {
-  type: 'sensoryProfile';
-  domains: {
-    visual: AssessmentDomain;
-    auditory: AssessmentDomain;
-    tactile: AssessmentDomain;
-    vestibular: AssessmentDomain;
-    proprioceptive: AssessmentDomain;
-    oral: AssessmentDomain;
-  };
-}
-
-export interface SocialCommunicationAssessment extends BaseAssessment {
+export interface SocialCommunicationData {
   type: 'socialCommunication';
   domains: {
-    jointAttention: AssessmentDomain;
-    nonverbalCommunication: AssessmentDomain;
-    verbalCommunication: AssessmentDomain;
-    socialUnderstanding: AssessmentDomain;
-    playSkills: AssessmentDomain;
-    peerInteractions: AssessmentDomain;
+    jointAttention: SocialCommunicationDomain;
+    nonverbalCommunication: SocialCommunicationDomain;
+    verbalCommunication: SocialCommunicationDomain;
+    socialUnderstanding: SocialCommunicationDomain;
+    playSkills: SocialCommunicationDomain;
+    peerInteractions: SocialCommunicationDomain;
   };
+  progress: number;
+  isComplete: boolean;
 }
 
-export interface BehaviorInterestsAssessment extends BaseAssessment {
+export interface BehaviorInterestsData {
   type: 'behaviorInterests';
   domains: {
-    repetitiveBehaviors: AssessmentDomain;
-    routinesRituals: AssessmentDomain;
-    specialInterests: AssessmentDomain;
-    sensoryInterests: AssessmentDomain;
-    emotionalRegulation: AssessmentDomain;
-    flexibility: AssessmentDomain;
+    repetitiveBehaviors: BehaviorDomain;
+    routinesRituals: BehaviorDomain;
+    specialInterests: BehaviorDomain;
+    sensoryInterests: BehaviorDomain;
+    emotionalRegulation: BehaviorDomain;
+    flexibility: BehaviorDomain;
   };
+  progress: number;
+  isComplete: boolean;
 }
 
-export interface MilestoneTracker extends AssessmentBase {
+export interface MilestoneTrackerData {
   type: 'milestoneTracker';
   milestones: any[];
   history: string;
+  progress: number;
+  isComplete: boolean;
 }
 
-export interface AssessmentLog extends AssessmentBase {
+export interface AssessmentLogData {
   type: 'assessmentLog';
   selectedAssessments: any[];
   entries: Record<string, any>;
+  progress: number;
+  isComplete: boolean;
 }
 
 export interface AssessmentData {
-  sensoryProfile: SensoryProfileAssessment;
-  socialCommunication: SocialCommunicationAssessment;
-  behaviorInterests: BehaviorInterestsAssessment;
-  milestones: MilestoneTracker;
-  assessmentLog: AssessmentLog;
+  sensoryProfile: SensoryProfileData;
+  socialCommunication: SocialCommunicationData;
+  behaviorInterests: BehaviorInterestsData;
+  milestones: MilestoneTrackerData;
+  assessmentLog: AssessmentLogData;
 }
 
 export interface GlobalState {
