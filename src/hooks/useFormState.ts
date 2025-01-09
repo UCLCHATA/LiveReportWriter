@@ -1,5 +1,12 @@
 import { useState, useEffect, useCallback } from 'react';
-import { FormState, ClinicianInfo, AssessmentData } from '../types';
+import { 
+  FormState, 
+  ClinicianInfo, 
+  AssessmentData,
+  SensoryProfileData,
+  SocialCommunicationData,
+  BehaviorInterestsData
+} from '../types';
 
 interface GlobalFormState {
   chataId: string;
@@ -180,9 +187,37 @@ const initialState: GlobalFormState = {
     },
     milestones: {
       type: 'milestoneTracker',
-      milestones: [],
+      milestones: [
+        // Communication milestones
+        { id: 'babbling', title: 'Babbling', category: 'communication', expectedAge: 6 },
+        { id: 'name-response', title: 'Name response', category: 'communication', expectedAge: 9 },
+        { id: 'points-to-show', title: 'Points to show', category: 'communication', expectedAge: 12 },
+        { id: 'first-words', title: 'First words', category: 'communication', expectedAge: 12 },
+        { id: 'combines-words', title: 'Combines words', category: 'communication', expectedAge: 24 },
+        
+        // Motor milestones
+        { id: 'head-control', title: 'Head control', category: 'motor', expectedAge: 3 },
+        { id: 'reaches-grasps', title: 'Reaches & grasps', category: 'motor', expectedAge: 4 },
+        { id: 'independent-sitting', title: 'Independent sitting', category: 'motor', expectedAge: 6 },
+        { id: 'independent-walking', title: 'Independent walking', category: 'motor', expectedAge: 12 },
+        { id: 'climbs-runs', title: 'Climbs & runs', category: 'motor', expectedAge: 18 },
+        
+        // Social milestones
+        { id: 'social-smile', title: 'Social smile', category: 'social', expectedAge: 2 },
+        { id: 'eye-contact', title: 'Eye contact', category: 'social', expectedAge: 3 },
+        { id: 'imitation', title: 'Imitation', category: 'social', expectedAge: 9 },
+        { id: 'pretend-play', title: 'Pretend play', category: 'social', expectedAge: 18 },
+        { id: 'interactive-play', title: 'Interactive play', category: 'social', expectedAge: 24 },
+        
+        // Development concerns
+        { id: 'rigid-play', title: 'Rigid play patterns', category: 'concerns', expectedAge: 0 },
+        { id: 'limited-social', title: 'Limited social engagement', category: 'concerns', expectedAge: 0 },
+        { id: 'sensory-issues', title: 'Sensory seeking/avoiding', category: 'concerns', expectedAge: 0 }
+      ],
+      customMilestones: [],
       history: '',
       progress: 0,
+      formProgress: 0,
       isComplete: false
     },
     assessmentLog: {
@@ -216,7 +251,21 @@ export const useFormState = () => {
             form: parsed?.formData?.formProgress || 0,
             sensory: parsed?.assessments?.sensoryProfile?.progress || 0,
             social: parsed?.assessments?.socialCommunication?.progress || 0,
-            behavior: parsed?.assessments?.behaviorInterests?.progress || 0
+            behavior: parsed?.assessments?.behaviorInterests?.progress || 0,
+            milestones: parsed?.assessments?.milestones?.progress || 0,
+            assessmentLog: parsed?.assessments?.assessmentLog?.progress || 0
+          },
+          completion: {
+            sensory: parsed?.assessments?.sensoryProfile?.isComplete || false,
+            social: parsed?.assessments?.socialCommunication?.isComplete || false,
+            behavior: parsed?.assessments?.behaviorInterests?.isComplete || false,
+            milestones: parsed?.assessments?.milestones?.isComplete || false,
+            assessmentLog: parsed?.assessments?.assessmentLog?.isComplete || false
+          },
+          domains: {
+            sensory: Object.keys(parsed?.assessments?.sensoryProfile?.domains || {}).length,
+            social: Object.keys(parsed?.assessments?.socialCommunication?.domains || {}).length,
+            behavior: Object.keys(parsed?.assessments?.behaviorInterests?.domains || {}).length
           }
         });
         
@@ -230,35 +279,93 @@ export const useFormState = () => {
               formProgress: parsed.formData?.formProgress || 0
             },
             assessments: {
-              ...initialState.assessments,
-              ...parsed.assessments,
               sensoryProfile: {
-                ...initialState.assessments.sensoryProfile,
-                ...parsed.assessments?.sensoryProfile,
-                progress: parsed.assessments?.sensoryProfile?.progress || 0
+                type: 'sensoryProfile',
+                domains: Object.fromEntries(
+                  Object.entries(initialState.assessments.sensoryProfile.domains).map(([key, defaultDomain]) => {
+                    const savedDomain = parsed.assessments?.sensoryProfile?.domains?.[key];
+                    return [key, {
+                      ...defaultDomain,
+                      value: savedDomain?.value ?? defaultDomain.value,
+                      observations: savedDomain?.observations ?? defaultDomain.observations,
+                      label: savedDomain?.label ?? defaultDomain.label
+                    }];
+                  })
+                ),
+                progress: parsed.assessments?.sensoryProfile?.progress || 0,
+                isComplete: parsed.assessments?.sensoryProfile?.isComplete || false
               },
               socialCommunication: {
-                ...initialState.assessments.socialCommunication,
-                ...parsed.assessments?.socialCommunication,
-                progress: parsed.assessments?.socialCommunication?.progress || 0
+                type: 'socialCommunication',
+                domains: Object.fromEntries(
+                  Object.entries(initialState.assessments.socialCommunication.domains).map(([key, defaultDomain]) => {
+                    const savedDomain = parsed.assessments?.socialCommunication?.domains?.[key];
+                    return [key, {
+                      ...defaultDomain,
+                      value: savedDomain?.value ?? defaultDomain.value,
+                      observations: savedDomain?.observations ?? defaultDomain.observations,
+                      label: savedDomain?.label ?? defaultDomain.label
+                    }];
+                  })
+                ),
+                progress: parsed.assessments?.socialCommunication?.progress || 0,
+                isComplete: parsed.assessments?.socialCommunication?.isComplete || false
               },
               behaviorInterests: {
-                ...initialState.assessments.behaviorInterests,
-                ...parsed.assessments?.behaviorInterests,
-                progress: parsed.assessments?.behaviorInterests?.progress || 0
+                type: 'behaviorInterests',
+                domains: Object.fromEntries(
+                  Object.entries(initialState.assessments.behaviorInterests.domains).map(([key, defaultDomain]) => {
+                    const savedDomain = parsed.assessments?.behaviorInterests?.domains?.[key];
+                    return [key, {
+                      ...defaultDomain,
+                      value: savedDomain?.value ?? defaultDomain.value,
+                      observations: savedDomain?.observations ?? defaultDomain.observations,
+                      label: savedDomain?.label ?? defaultDomain.label
+                    }];
+                  })
+                ),
+                progress: parsed.assessments?.behaviorInterests?.progress || 0,
+                isComplete: parsed.assessments?.behaviorInterests?.isComplete || false
               },
               milestones: {
-                ...initialState.assessments.milestones,
-                ...parsed.assessments?.milestones,
-                progress: parsed.assessments?.milestones?.progress || 0
+                type: 'milestoneTracker',
+                milestones: parsed.assessments?.milestones?.milestones?.map((m: any) => ({...m})) || 
+                           initialState.assessments.milestones.milestones,
+                customMilestones: parsed.assessments?.milestones?.customMilestones?.map((m: any) => ({...m})) || [],
+                history: parsed.assessments?.milestones?.history || '',
+                progress: parsed.assessments?.milestones?.progress || 0,
+                formProgress: parsed.assessments?.milestones?.formProgress || 0,
+                isComplete: parsed.assessments?.milestones?.isComplete || false
               },
               assessmentLog: {
-                ...initialState.assessments.assessmentLog,
-                ...parsed.assessments?.assessmentLog,
-                progress: parsed.assessments?.assessmentLog?.progress || 0
+                type: 'assessmentLog',
+                selectedAssessments: parsed.assessments?.assessmentLog?.selectedAssessments?.map((a: any) => ({...a})) || [],
+                entries: parsed.assessments?.assessmentLog?.entries || {},
+                progress: parsed.assessments?.assessmentLog?.progress || 0,
+                isComplete: parsed.assessments?.assessmentLog?.isComplete || false
               }
             }
           };
+
+          console.log('🔄 Restored state:', {
+            sensoryDomains: Object.keys(restoredState.assessments.sensoryProfile.domains).length,
+            socialDomains: Object.keys(restoredState.assessments.socialCommunication.domains).length,
+            behaviorDomains: Object.keys(restoredState.assessments.behaviorInterests.domains).length,
+            progress: {
+              sensory: restoredState.assessments.sensoryProfile.progress,
+              social: restoredState.assessments.socialCommunication.progress,
+              behavior: restoredState.assessments.behaviorInterests.progress,
+              milestones: restoredState.assessments.milestones.progress,
+              assessmentLog: restoredState.assessments.assessmentLog.progress
+            },
+            completion: {
+              sensory: restoredState.assessments.sensoryProfile.isComplete,
+              social: restoredState.assessments.socialCommunication.isComplete,
+              behavior: restoredState.assessments.behaviorInterests.isComplete,
+              milestones: restoredState.assessments.milestones.isComplete,
+              assessmentLog: restoredState.assessments.assessmentLog.isComplete
+            }
+          });
           
           return restoredState;
         }
@@ -281,9 +388,76 @@ export const useFormState = () => {
           return;
         }
         
+        // Deep clone the state to ensure we don't lose nested structures
         const stateToSave = {
           ...state,
-          lastUpdated: new Date().toISOString()
+          lastUpdated: new Date().toISOString(),
+          assessments: {
+            sensoryProfile: {
+              type: 'sensoryProfile',
+              domains: Object.fromEntries(
+                Object.entries(state.assessments.sensoryProfile.domains).map(([key, domain]) => [
+                  key,
+                  {
+                    ...domain,
+                    value: domain.value,
+                    observations: [...domain.observations],
+                    label: domain.label
+                  }
+                ])
+              ),
+              progress: state.assessments.sensoryProfile.progress,
+              isComplete: state.assessments.sensoryProfile.isComplete
+            },
+            socialCommunication: {
+              type: 'socialCommunication',
+              domains: Object.fromEntries(
+                Object.entries(state.assessments.socialCommunication.domains).map(([key, domain]) => [
+                  key,
+                  {
+                    ...domain,
+                    value: domain.value,
+                    observations: [...domain.observations],
+                    label: domain.label
+                  }
+                ])
+              ),
+              progress: state.assessments.socialCommunication.progress,
+              isComplete: state.assessments.socialCommunication.isComplete
+            },
+            behaviorInterests: {
+              type: 'behaviorInterests',
+              domains: Object.fromEntries(
+                Object.entries(state.assessments.behaviorInterests.domains).map(([key, domain]) => [
+                  key,
+                  {
+                    ...domain,
+                    value: domain.value,
+                    observations: [...domain.observations],
+                    label: domain.label
+                  }
+                ])
+              ),
+              progress: state.assessments.behaviorInterests.progress,
+              isComplete: state.assessments.behaviorInterests.isComplete
+            },
+            milestones: {
+              type: 'milestoneTracker',
+              milestones: state.assessments.milestones.milestones.map(m => ({...m})),
+              customMilestones: state.assessments.milestones.customMilestones.map(m => ({...m})),
+              history: state.assessments.milestones.history,
+              progress: state.assessments.milestones.progress,
+              formProgress: state.assessments.milestones.formProgress,
+              isComplete: state.assessments.milestones.isComplete
+            },
+            assessmentLog: {
+              type: 'assessmentLog',
+              selectedAssessments: [...state.assessments.assessmentLog.selectedAssessments],
+              entries: {...state.assessments.assessmentLog.entries},
+              progress: state.assessments.assessmentLog.progress,
+              isComplete: state.assessments.assessmentLog.isComplete
+            }
+          }
         };
         
         localStorage.setItem(STORAGE_KEY, JSON.stringify(stateToSave));
@@ -298,7 +472,21 @@ export const useFormState = () => {
             form: state.formData?.formProgress || 0,
             sensory: state.assessments?.sensoryProfile?.progress || 0,
             social: state.assessments?.socialCommunication?.progress || 0,
-            behavior: state.assessments?.behaviorInterests?.progress || 0
+            behavior: state.assessments?.behaviorInterests?.progress || 0,
+            milestones: state.assessments?.milestones?.progress || 0,
+            assessmentLog: state.assessments?.assessmentLog?.progress || 0
+          },
+          completion: {
+            sensory: state.assessments?.sensoryProfile?.isComplete || false,
+            social: state.assessments?.socialCommunication?.isComplete || false,
+            behavior: state.assessments?.behaviorInterests?.isComplete || false,
+            milestones: state.assessments?.milestones?.isComplete || false,
+            assessmentLog: state.assessments?.assessmentLog?.isComplete || false
+          },
+          domains: {
+            sensory: Object.keys(state.assessments?.sensoryProfile?.domains || {}).length,
+            social: Object.keys(state.assessments?.socialCommunication?.domains || {}).length,
+            behavior: Object.keys(state.assessments?.behaviorInterests?.domains || {}).length
           }
         });
       } catch (error) {
@@ -392,16 +580,44 @@ export const useFormState = () => {
   const updateAssessment = useCallback((type: keyof AssessmentData, data: Partial<AssessmentData[keyof AssessmentData]>) => {
     setGlobalState(prev => {
       const prevAssessment = prev.assessments[type];
-      // Don't update if values haven't changed
-      const hasChanges = Object.entries(data).some(
-        ([key, value]) => prevAssessment[key as keyof typeof prevAssessment] !== value
-      );
-      if (!hasChanges) return prev;
-
+      
+      // Handle domain updates specially for components that have domains
+      if (
+        (type === 'sensoryProfile' || 
+         type === 'socialCommunication' || 
+         type === 'behaviorInterests')
+      ) {
+        const assessment = prevAssessment as SensoryProfileData | SocialCommunicationData | BehaviorInterestsData;
+        const updateData = data as Partial<typeof assessment>;
+        
+        if ('domains' in updateData) {
+          const updatedDomains = {
+            ...assessment.domains,
+            ...updateData.domains
+          };
+          
+          // Create new assessment state with properly merged domains
+          const updatedAssessment = {
+            ...assessment,
+            ...updateData,
+            domains: updatedDomains
+          };
+          
+          return {
+            ...prev,
+            assessments: {
+              ...prev.assessments,
+              [type]: updatedAssessment
+            }
+          };
+        }
+      }
+      
+      // For non-domain updates, proceed as before
       return {
-      ...prev,
-      assessments: {
-        ...prev.assessments,
+        ...prev,
+        assessments: {
+          ...prev.assessments,
           [type]: {
             ...prevAssessment,
             ...data
