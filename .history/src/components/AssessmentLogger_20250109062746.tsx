@@ -3,7 +3,6 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { X, Search, AlertTriangle, Dumbbell, ThumbsUp } from 'lucide-react';
 import { useFormState } from '../hooks/useFormState';
 import styles from './AssessmentLogger.module.css';
-import { debounce } from 'lodash';
 
 // Assessment tools data with proper categorization
 export const assessmentTools = {
@@ -37,9 +36,6 @@ interface Assessment {
   color: string;
   category: string;
   selected?: boolean;
-  status?: 'pending' | 'completed' | 'scheduled';
-  addedAt?: string;
-  lastModified?: string;
 }
 
 const AssessmentBubble: React.FC<{
@@ -68,42 +64,6 @@ const AssessmentEntry: React.FC<{
 }> = ({ assessment, onUpdate, onRemove }) => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [customTitle, setCustomTitle] = useState(assessment.id === 'other' ? assessment.name : '');
-  const [localNotes, setLocalNotes] = useState(assessment.notes || '');
-
-  // Debounced update functions
-  const debouncedUpdateNotes = useCallback(
-    debounce((id: string, notes: string) => {
-      onUpdate(id, { notes });
-    }, 1000),
-    [onUpdate]
-  );
-
-  const debouncedUpdateTitle = useCallback(
-    debounce((id: string, name: string) => {
-      onUpdate(id, { name: name || 'Other Assessment' });
-    }, 1000),
-    [onUpdate]
-  );
-
-  useEffect(() => {
-    setLocalNotes(assessment.notes || '');
-  }, [assessment.notes]);
-
-  useEffect(() => {
-    setCustomTitle(assessment.id === 'other' ? assessment.name : assessment.name);
-  }, [assessment.id, assessment.name]);
-
-  const handleNotesChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
-    const newNotes = e.target.value;
-    setLocalNotes(newNotes);
-    debouncedUpdateNotes(assessment.id, newNotes);
-  };
-
-  const handleCustomTitleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const newTitle = e.target.value;
-    setCustomTitle(newTitle);
-    debouncedUpdateTitle(assessment.id, newTitle);
-  };
 
   const handleDoubleClick = () => {
     setIsModalOpen(true);
@@ -111,6 +71,12 @@ const AssessmentEntry: React.FC<{
 
   const handleModalClose = () => {
     setIsModalOpen(false);
+  };
+
+  const handleCustomTitleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const newTitle = e.target.value;
+    setCustomTitle(newTitle);
+    onUpdate(assessment.id, { name: newTitle || 'Other Assessment' });
   };
 
   return (
@@ -163,8 +129,8 @@ const AssessmentEntry: React.FC<{
 
         <div className={styles.entryContent} onDoubleClick={handleDoubleClick}>
           <textarea
-            value={localNotes}
-            onChange={handleNotesChange}
+            value={assessment.notes || ''}
+            onChange={(e) => onUpdate(assessment.id, { notes: e.target.value })}
             placeholder="Add key observations and conclusions..."
             className={styles.notesInput}
             rows={3}
@@ -198,8 +164,8 @@ const AssessmentEntry: React.FC<{
               </button>
             </div>
             <textarea
-              value={localNotes}
-              onChange={handleNotesChange}
+              value={assessment.notes || ''}
+              onChange={(e) => onUpdate(assessment.id, { notes: e.target.value })}
               placeholder="Add key observations and conclusions..."
               className={styles.modalTextarea}
               autoFocus
@@ -219,7 +185,7 @@ interface ComponentProps {
 export const AssessmentLogger: React.FC<ComponentProps> = ({ data, onChange }) => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const lastSaveRef = useRef<number>(0);
-  const MIN_SAVE_INTERVAL = 2000; // Increased to 2 seconds
+  const MIN_SAVE_INTERVAL = 1000; // 1 second minimum between saves
 
   // Initialize state from props or create default with proper typing
   const assessmentLog = useMemo(() => {
@@ -347,7 +313,7 @@ export const AssessmentLogger: React.FC<ComponentProps> = ({ data, onChange }) =
     if (totalAssessments === 0) return;
 
     const completedAssessments = selectedAssessments.filter(
-      (assessment: Assessment) => assessment.date && assessment.notes && assessment.status === 'completed'
+      assessment => assessment.date && assessment.notes && assessment.status === 'completed'
     ).length;
 
     const progress = Math.round((completedAssessments / totalAssessments) * 100);

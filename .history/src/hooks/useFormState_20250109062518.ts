@@ -230,8 +230,7 @@ const initialState: GlobalFormState = {
       history: '',
       progress: 0,
       formProgress: 0,
-      isComplete: false,
-      lastUpdated: new Date().toISOString()
+      isComplete: false
     },
     assessmentLog: {
       type: 'assessmentLog',

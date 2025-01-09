@@ -27,11 +27,7 @@ interface GlobalFormState {
 }
 
 const STORAGE_KEY = 'chata-form-state';
-const SAVE_DELAY = 2000; // 2 seconds
-const MIN_SAVE_INTERVAL = 1000; // 1 second minimum between saves
-
 let saveTimeout: NodeJS.Timeout | null = null;
-let lastSaveTime = 0;
 
 export { STORAGE_KEY };
 
@@ -230,8 +226,7 @@ const initialState: GlobalFormState = {
       history: '',
       progress: 0,
       formProgress: 0,
-      isComplete: false,
-      lastUpdated: new Date().toISOString()
+      isComplete: false
     },
     assessmentLog: {
       type: 'assessmentLog',
@@ -253,7 +248,7 @@ function processMilestoneData(
 ): MilestoneTrackerData {
   if (!saved) return initial;
 
-  // Deep clone the milestones to avoid reference issues
+  // Validate and process milestones
   const processedMilestones = saved.milestones?.filter(isMilestone).map(m => ({
     ...m,
     actualAge: m.actualAge,
@@ -261,7 +256,7 @@ function processMilestoneData(
     status: m.status || 'pending'
   })) || initial.milestones;
 
-  // Deep clone the custom milestones
+  // Validate and process custom milestones
   const processedCustomMilestones = saved.customMilestones?.filter(isMilestone).map(m => ({
     ...m,
     actualAge: m.actualAge,
@@ -290,26 +285,22 @@ function processAssessmentLogData(
 
   // Validate and process selected assessments
   const processedSelectedAssessments = saved.selectedAssessments?.filter(isAssessmentEntry).map(assessment => ({
-    id: assessment.id,
-    name: assessment.name,
+    ...assessment,
     status: assessment.status || 'pending',
     date: assessment.date || '',
-    notes: assessment.notes || '',
-    result: assessment.result || ''
+    notes: assessment.notes || ''
   })) || [];
 
-  // Validate and process entries with proper typing
+  // Validate and process entries
   const processedEntries: Record<string, AssessmentEntry> = {};
   if (saved.entries) {
     Object.entries(saved.entries).forEach(([key, entry]) => {
       if (isAssessmentEntry(entry)) {
         processedEntries[key] = {
-          id: entry.id,
-          name: entry.name,
+          ...entry,
           status: entry.status || 'pending',
           date: entry.date || '',
-          notes: entry.notes || '',
-          result: entry.result || ''
+          notes: entry.notes || ''
         };
       }
     });
@@ -319,17 +310,10 @@ function processAssessmentLogData(
     type: 'assessmentLog',
     selectedAssessments: processedSelectedAssessments,
     entries: processedEntries,
-    progress: typeof saved.progress === 'number' ? saved.progress : 0,
-    isComplete: Boolean(saved.isComplete),
+    progress: saved.progress || 0,
+    isComplete: saved.isComplete || false,
     lastUpdated: saved.lastUpdated || new Date().toISOString()
   };
-}
-
-// Add this before the useFormState hook
-function shouldSave(): boolean {
-  const now = Date.now();
-  const timeSinceLastSave = now - lastSaveTime;
-  return timeSinceLastSave >= MIN_SAVE_INTERVAL;
 }
 
 export const useFormState = () => {
@@ -471,21 +455,12 @@ export const useFormState = () => {
     if (saveTimeout) {
       clearTimeout(saveTimeout);
     }
-
-    if (!shouldSave()) {
-      // If we're saving too frequently, delay the save
-      saveTimeout = setTimeout(() => saveState(state), MIN_SAVE_INTERVAL);
-      return;
-    }
-
     saveTimeout = setTimeout(() => {
       try {
         if (!state.formData || !state.assessments) {
           console.error('❌ Invalid state structure');
           return;
         }
-        
-        lastSaveTime = Date.now();
         
         // Deep clone the state to ensure we don't lose nested structures
         const stateToSave = {
@@ -546,13 +521,13 @@ export const useFormState = () => {
                 ...m,
                 actualAge: m.actualAge,
                 stackPosition: m.stackPosition,
-                status: m.status || 'pending'
+                status: m.status
               })),
               customMilestones: state.assessments.milestones.customMilestones.map(m => ({
                 ...m,
                 actualAge: m.actualAge,
                 stackPosition: m.stackPosition,
-                status: m.status || 'pending'
+                status: m.status
               })),
               history: state.assessments.milestones.history,
               progress: state.assessments.milestones.progress,
@@ -563,23 +538,19 @@ export const useFormState = () => {
             assessmentLog: {
               type: 'assessmentLog',
               selectedAssessments: state.assessments.assessmentLog.selectedAssessments.map(assessment => ({
-                id: assessment.id,
-                name: assessment.name,
+                ...assessment,
                 status: assessment.status || 'pending',
                 date: assessment.date || '',
-                notes: assessment.notes || '',
-                result: assessment.result || ''
+                notes: assessment.notes || ''
               })),
               entries: Object.fromEntries(
                 Object.entries(state.assessments.assessmentLog.entries).map(([key, entry]) => [
                   key,
                   {
-                    id: entry.id,
-                    name: entry.name,
+                    ...entry,
                     status: entry.status || 'pending',
                     date: entry.date || '',
-                    notes: entry.notes || '',
-                    result: entry.result || ''
+                    notes: entry.notes || ''
                   }
                 ])
               ),
@@ -592,7 +563,6 @@ export const useFormState = () => {
         
         localStorage.setItem(STORAGE_KEY, JSON.stringify(stateToSave));
         console.log('💾 Saved state:', {
-          timestamp: new Date().toISOString(),
           content: {
             clinicalObservations: state.formData?.clinicalObservations?.length || 0,
             strengths: state.formData?.strengths?.length || 0,
@@ -618,19 +588,12 @@ export const useFormState = () => {
             sensory: Object.keys(state.assessments?.sensoryProfile?.domains || {}).length,
             social: Object.keys(state.assessments?.socialCommunication?.domains || {}).length,
             behavior: Object.keys(state.assessments?.behaviorInterests?.domains || {}).length
-          },
-          milestones: {
-            total: stateToSave.assessments.milestones.milestones.length,
-            placed: stateToSave.assessments.milestones.milestones.filter(m => m.actualAge !== undefined).length,
-            custom: stateToSave.assessments.milestones.customMilestones.length,
-            progress: stateToSave.assessments.milestones.progress,
-            isComplete: stateToSave.assessments.milestones.isComplete
           }
         });
       } catch (error) {
         console.error('❌ Failed to save state:', error);
       }
-    }, SAVE_DELAY);
+    }, 2000);
   }, []);
 
   // Save state when it changes
@@ -646,11 +609,6 @@ export const useFormState = () => {
       globalState.assessments?.sensoryProfile.progress > 0;
     
     if (hasContent || hasProgress) {
-      console.log('🔄 Triggering save:', {
-        hasContent,
-        hasProgress,
-        formProgress: globalState.formData?.formProgress
-      });
       saveState(globalState);
     }
   }, [globalState, saveState]);

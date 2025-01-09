@@ -230,8 +230,7 @@ const initialState: GlobalFormState = {
       history: '',
       progress: 0,
       formProgress: 0,
-      isComplete: false,
-      lastUpdated: new Date().toISOString()
+      isComplete: false
     },
     assessmentLog: {
       type: 'assessmentLog',
@@ -253,20 +252,30 @@ function processMilestoneData(
 ): MilestoneTrackerData {
   if (!saved) return initial;
 
-  // Deep clone the milestones to avoid reference issues
+  // Validate and process milestones with deep cloning
   const processedMilestones = saved.milestones?.filter(isMilestone).map(m => ({
     ...m,
-    actualAge: m.actualAge,
-    stackPosition: m.stackPosition,
-    status: m.status || 'pending'
+    id: m.id,
+    title: m.title,
+    category: m.category,
+    expectedAge: m.expectedAge,
+    actualAge: m.actualAge || null,
+    stackPosition: m.stackPosition || 0,
+    status: m.status || 'pending',
+    notes: m.notes || ''
   })) || initial.milestones;
 
-  // Deep clone the custom milestones
+  // Validate and process custom milestones with deep cloning
   const processedCustomMilestones = saved.customMilestones?.filter(isMilestone).map(m => ({
     ...m,
-    actualAge: m.actualAge,
-    stackPosition: m.stackPosition,
-    status: m.status || 'pending'
+    id: m.id,
+    title: m.title,
+    category: m.category,
+    expectedAge: m.expectedAge,
+    actualAge: m.actualAge || null,
+    stackPosition: m.stackPosition || 0,
+    status: m.status || 'pending',
+    notes: m.notes || ''
   })) || [];
 
   return {
@@ -274,9 +283,9 @@ function processMilestoneData(
     milestones: processedMilestones,
     customMilestones: processedCustomMilestones,
     history: saved.history || '',
-    progress: saved.progress || 0,
-    formProgress: saved.formProgress || 0,
-    isComplete: saved.isComplete || false,
+    progress: typeof saved.progress === 'number' ? saved.progress : 0,
+    formProgress: typeof saved.formProgress === 'number' ? saved.formProgress : 0,
+    isComplete: Boolean(saved.isComplete),
     lastUpdated: saved.lastUpdated || new Date().toISOString()
   };
 }
@@ -546,13 +555,13 @@ export const useFormState = () => {
                 ...m,
                 actualAge: m.actualAge,
                 stackPosition: m.stackPosition,
-                status: m.status || 'pending'
+                status: m.status
               })),
               customMilestones: state.assessments.milestones.customMilestones.map(m => ({
                 ...m,
                 actualAge: m.actualAge,
                 stackPosition: m.stackPosition,
-                status: m.status || 'pending'
+                status: m.status
               })),
               history: state.assessments.milestones.history,
               progress: state.assessments.milestones.progress,
@@ -618,13 +627,6 @@ export const useFormState = () => {
             sensory: Object.keys(state.assessments?.sensoryProfile?.domains || {}).length,
             social: Object.keys(state.assessments?.socialCommunication?.domains || {}).length,
             behavior: Object.keys(state.assessments?.behaviorInterests?.domains || {}).length
-          },
-          milestones: {
-            total: stateToSave.assessments.milestones.milestones.length,
-            placed: stateToSave.assessments.milestones.milestones.filter(m => m.actualAge !== undefined).length,
-            custom: stateToSave.assessments.milestones.customMilestones.length,
-            progress: stateToSave.assessments.milestones.progress,
-            isComplete: stateToSave.assessments.milestones.isComplete
           }
         });
       } catch (error) {

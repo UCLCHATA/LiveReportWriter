@@ -112,35 +112,32 @@ export interface MilestoneTrackerData {
   progress: number;
   formProgress: number;
   isComplete: boolean;
-  lastUpdated: string;
+  lastUpdated?: string;
 }
 
-export function isMilestoneTrackerData(obj: any): obj is MilestoneTrackerData {
+export function isMilestoneTrackerData(data: any): data is MilestoneTrackerData {
   return (
-    obj &&
-    obj.type === 'milestoneTracker' &&
-    Array.isArray(obj.milestones) &&
-    obj.milestones.every(isMilestone) &&
-    Array.isArray(obj.customMilestones) &&
-    obj.customMilestones.every(isMilestone) &&
-    typeof obj.history === 'string' &&
-    typeof obj.progress === 'number' &&
-    typeof obj.formProgress === 'number' &&
-    typeof obj.isComplete === 'boolean' &&
-    typeof obj.lastUpdated === 'string'
+    data &&
+    data.type === 'milestoneTracker' &&
+    Array.isArray(data.milestones) &&
+    Array.isArray(data.customMilestones) &&
+    typeof data.history === 'string' &&
+    typeof data.progress === 'number' &&
+    typeof data.formProgress === 'number' &&
+    typeof data.isComplete === 'boolean'
   );
 }
 
-export function isMilestone(obj: any): obj is Milestone {
+export function isMilestone(data: any): data is Milestone {
   return (
-    obj &&
-    typeof obj.id === 'string' &&
-    typeof obj.title === 'string' &&
-    ['communication', 'motor', 'social', 'concerns'].includes(obj.category) &&
-    typeof obj.expectedAge === 'number' &&
-    (obj.actualAge === undefined || typeof obj.actualAge === 'number') &&
-    (obj.stackPosition === undefined || typeof obj.stackPosition === 'number') &&
-    (obj.status === undefined || ['typical', 'monitor', 'delayed', 'pending'].includes(obj.status))
+    data &&
+    typeof data.id === 'string' &&
+    typeof data.title === 'string' &&
+    ['communication', 'motor', 'social', 'concerns'].includes(data.category) &&
+    typeof data.expectedAge === 'number' &&
+    (data.actualAge === undefined || typeof data.actualAge === 'number') &&
+    (data.stackPosition === undefined || typeof data.stackPosition === 'number') &&
+    (data.status === undefined || ['typical', 'monitor', 'delayed', 'pending'].includes(data.status))
   );
 }
 
