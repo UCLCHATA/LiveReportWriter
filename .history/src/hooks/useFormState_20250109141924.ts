@@ -31,7 +31,7 @@ interface GlobalFormState {
 }
 
 // Constants can stay outside
-export const getStorageKey = (chataId: string = 'KOS-JOH-321') => `chata-form-${chataId || 'draft'}`;
+const STORAGE_KEY = 'chata-form-state';
 const SAVE_DELAY = 2000; // 2 seconds
 const MIN_SAVE_INTERVAL = 1000; // 1 second minimum between saves
 const MIN_OPERATION_INTERVAL = 500; // ms
@@ -63,7 +63,7 @@ const initialFormData: FormState = {
 };
 
 const initialState: GlobalFormState = {
-  chataId: 'KOS-JOH-321',
+  chataId: '',
   clinician: {
     name: '',
     email: '',
@@ -280,77 +280,14 @@ export const useFormState = () => {
   // Load initial state from localStorage first
   const [globalState, setGlobalState] = useState<GlobalFormState>(() => {
     try {
-      const storageKey = getStorageKey('KOS-JOH-321');
-      const saved = localStorage.getItem(storageKey);
+      const saved = localStorage.getItem(STORAGE_KEY);
       if (!saved) return initialState;
       
       const parsed = JSON.parse(saved);
       if (!isValidState(parsed)) return initialState;
       
-      // Ensure we preserve all progress values
-      const restoredState = {
-        ...initialState,
-        ...parsed,
-        formData: {
-          ...initialState.formData,
-          ...parsed.formData,
-          formProgress: Math.max(parsed.formData?.formProgress || 0, initialState.formData.formProgress)
-        },
-        assessments: {
-          ...initialState.assessments,
-          ...parsed.assessments,
-          sensoryProfile: {
-            ...initialState.assessments.sensoryProfile,
-            ...parsed.assessments.sensoryProfile,
-            progress: Math.max(parsed.assessments.sensoryProfile?.progress || 0, initialState.assessments.sensoryProfile.progress),
-            domains: {
-              ...initialState.assessments.sensoryProfile.domains,
-              ...parsed.assessments.sensoryProfile.domains
-            }
-          },
-          socialCommunication: {
-            ...initialState.assessments.socialCommunication,
-            ...parsed.assessments.socialCommunication,
-            progress: Math.max(parsed.assessments.socialCommunication?.progress || 0, initialState.assessments.socialCommunication.progress),
-            domains: {
-              ...initialState.assessments.socialCommunication.domains,
-              ...parsed.assessments.socialCommunication.domains
-            }
-          },
-          behaviorInterests: {
-            ...initialState.assessments.behaviorInterests,
-            ...parsed.assessments.behaviorInterests,
-            progress: Math.max(parsed.assessments.behaviorInterests?.progress || 0, initialState.assessments.behaviorInterests.progress),
-            domains: {
-              ...initialState.assessments.behaviorInterests.domains,
-              ...parsed.assessments.behaviorInterests.domains
-            }
-          },
-          milestones: {
-            ...initialState.assessments.milestones,
-            ...parsed.assessments.milestones,
-            progress: Math.max(parsed.assessments.milestones?.progress || 0, initialState.assessments.milestones.progress)
-          },
-          assessmentLog: {
-            ...initialState.assessments.assessmentLog,
-            ...parsed.assessments.assessmentLog,
-            progress: Math.max(parsed.assessments.assessmentLog?.progress || 0, initialState.assessments.assessmentLog.progress)
-          }
-        }
-      };
-      
-      console.log(`✅ [${hookId.current}] Successfully restored state in ${componentName.current}`, {
-        formProgress: restoredState.formData.formProgress,
-        assessmentProgress: {
-          sensory: restoredState.assessments.sensoryProfile.progress,
-          social: restoredState.assessments.socialCommunication.progress,
-          behavior: restoredState.assessments.behaviorInterests.progress,
-          milestones: restoredState.assessments.milestones.progress,
-          assessmentLog: restoredState.assessments.assessmentLog.progress
-        }
-      });
-      
-      return restoredState;
+      console.log(`✅ [${hookId.current}] Successfully restored state in ${componentName.current}`);
+      return parsed;
     } catch (error) {
       console.error(`❌ [${hookId.current}] Failed to restore state in ${componentName.current}:`, error);
       return initialState;
@@ -380,8 +317,7 @@ export const useFormState = () => {
       
       saveTimeoutRef.current = setTimeout(() => {
         try {
-          const storageKey = getStorageKey(globalState.chataId);
-          localStorage.setItem(storageKey, JSON.stringify({
+          localStorage.setItem(STORAGE_KEY, JSON.stringify({
             ...globalState,
             lastUpdated: new Date().toISOString()
           }));
@@ -439,14 +375,13 @@ export const useFormState = () => {
   }, []);
 
   const clearState = useCallback(() => {
-    const storageKey = getStorageKey(globalState.chataId);
-    localStorage.removeItem(storageKey);
+    localStorage.removeItem(STORAGE_KEY);
     setGlobalState({
       ...initialState,
       status: 'draft',
       lastUpdated: new Date().toISOString()
     });
-  }, [globalState.chataId]);
+  }, []);
 
   return {
     globalState,
