@@ -1,0 +1,84 @@
+.container {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  padding: 0.5rem;
+  overflow: hidden;
+  position: relative;
+}
+
+.timelineViewer {
+  width: 100%;
+  height: 120px;
+  position: relative;
+  background: white;
+  border: 1px solid #e5e7eb;
+  border-radius: 8px;
+  padding: 1rem;
+  margin-top: 1rem;
+}
+
+.timelineGrid {
+  position: relative;
+  width: 100%;
+  height: 24px;
+  border-bottom: 1px solid #e5e7eb;
+}
+
+.timeMarker {
+  position: absolute;
+  transform: translateX(-50%);
+}
+
+.markerLabel {
+  font-size: 0.75rem;
+  color: #6b7280;
+  position: relative;
+  padding-bottom: 4px;
+}
+
+.markerLabel::after {
+  content: '';
+  position: absolute;
+  bottom: -4px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 1px;
+  height: 4px;
+  background-color: #e5e7eb;
+}
+
+.milestonesLayer {
+  position: relative;
+  width: 100%;
+  height: calc(100% - 24px);
+  padding-top: 1rem;
+}
+
+.timelineMilestone {
+  position: absolute;
+  transform: translateX(-50%);
+  background-color: #4f46e5;
+  color: white;
+  padding: 4px 8px;
+  border-radius: 4px;
+  font-size: 0.75rem;
+  white-space: nowrap;
+  cursor: default;
+}
+
+.timelineMilestone.delayed {
+  background-color: #ef4444;
+}
+
+.timelineMilestone.onTrack {
+  background-color: #10b981;
+}
+
+.ageIndicator {
+  font-size: 0.625rem;
+  opacity: 0.8;
+  margin-left: 4px;
+} 

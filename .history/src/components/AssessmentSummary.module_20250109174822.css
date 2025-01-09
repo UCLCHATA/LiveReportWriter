@@ -1,0 +1,135 @@
+.container {
+  display: flex;
+  flex-direction: column;
+  gap: 2rem;
+  padding: 1.5rem;
+  height: 100%;
+  overflow-y: auto;
+}
+
+.container h3 {
+  font-size: 1.125rem;
+  font-weight: 600;
+  color: #1f2937;
+  margin-bottom: 1rem;
+  padding-bottom: 0.5rem;
+  border-bottom: 1px solid #e5e7eb;
+}
+
+.graphSection {
+  flex: 0 0 auto;
+  min-height: 400px;
+  background: white;
+  border-radius: 0.5rem;
+  padding: 1.5rem;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+}
+
+.combinedGraph {
+  width: 100%;
+  height: 100%;
+  min-height: 350px;
+  position: relative;
+}
+
+.timelineSection {
+  flex: 0 0 auto;
+  min-height: 300px;
+  background: white;
+  border-radius: 0.5rem;
+  padding: 1.5rem;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+}
+
+.timeline {
+  width: 100%;
+  height: 100%;
+  min-height: 250px;
+}
+
+.logsSection {
+  flex: 1;
+  background: white;
+  border-radius: 0.5rem;
+  padding: 1.5rem;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+  min-height: 300px;
+}
+
+.assessmentLogs {
+  width: 100%;
+  height: 100%;
+  min-height: 250px;
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  overflow-y: auto;
+}
+
+/* Assessment Log Entry Styles */
+.logEntry {
+  background: #f9fafb;
+  border-radius: 0.5rem;
+  padding: 1rem;
+  border: 1px solid #e5e7eb;
+}
+
+.logHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 0.5rem;
+}
+
+.logTitle {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.logColor {
+  width: 3px;
+  height: 1rem;
+  border-radius: 9999px;
+}
+
+.logName {
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: #1f2937;
+}
+
+.logCategory {
+  font-size: 0.675rem;
+  color: #6b7280;
+  background: #f3f4f6;
+  padding: 0.125rem 0.375rem;
+  border-radius: 9999px;
+}
+
+.logDate {
+  font-size: 0.75rem;
+  color: #6b7280;
+}
+
+.logNotes {
+  font-size: 0.875rem;
+  color: #4b5563;
+  line-height: 1.5;
+  white-space: pre-wrap;
+  margin-top: 0.5rem;
+  padding-top: 0.5rem;
+  border-top: 1px solid #e5e7eb;
+}
+
+/* Styles for the combined radar graph */
+.radarGraph {
+  width: 100%;
+  height: 100%;
+  position: relative;
+}
+
+.radarGraph svg {
+  width: 100%;
+  height: 100%;
+} 
