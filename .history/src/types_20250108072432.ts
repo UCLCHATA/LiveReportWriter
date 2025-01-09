@@ -96,22 +96,10 @@ export interface BehaviorInterestsData {
 
 export interface MilestoneTrackerData {
   type: 'milestoneTracker';
-  milestones: Milestone[];
-  customMilestones: Milestone[];
+  milestones: any[];
   history: string;
   progress: number;
-  formProgress: number;
   isComplete: boolean;
-}
-
-export interface Milestone {
-  id: string;
-  title: string;
-  category: 'communication' | 'motor' | 'social' | 'concerns';
-  expectedAge: number;
-  actualAge?: number;
-  stackPosition?: number;
-  status?: 'typical' | 'monitor' | 'delayed' | 'pending';
 }
 
 export interface AssessmentLogData {

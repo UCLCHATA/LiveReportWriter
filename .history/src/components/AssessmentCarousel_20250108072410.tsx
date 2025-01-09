@@ -6,19 +6,7 @@ import { BehaviorInterestsProfile, BehaviorInterestsGraph } from './BehaviorInte
 import { MilestoneTracker } from './MilestoneTracker';
 import { AssessmentLogger } from './AssessmentLogger';
 import { useFormState } from '../hooks/useFormState';
-import sensoryIcon from '../assets/sensory.png';
-import socialIcon from '../assets/Social.png';
-import behaviorIcon from '../assets/behavior icon.png';
-import developmentIcon from '../assets/development icon.png';
-import assessmentIcon from '../assets/assessment icon.png';
-import type { 
-  FormState, 
-  AssessmentData, 
-  SensoryProfileData,
-  SocialCommunicationData,
-  BehaviorInterestsData,
-  AssessmentDomainBase
-} from '../types';
+import type { FormState, AssessmentData } from '../types';
 import styles from './AssessmentCarousel.module.css';
 import { assessmentTools } from './AssessmentLogger';
 import confetti from 'canvas-confetti';
@@ -45,7 +33,6 @@ interface Tool {
   title: string;
   component: React.ComponentType<ComponentProps>;
   description: string;
-  icon: string;
 }
 
 const tools: Tool[] = [
@@ -53,36 +40,31 @@ const tools: Tool[] = [
     id: 'sensoryProfile',
     title: 'Sensory Profile',
     component: SensoryProfileBuilder,
-    description: 'Evaluate sensory processing patterns',
-    icon: sensoryIcon
+    description: 'Evaluate sensory processing patterns'
   },
   {
     id: 'socialCommunication',
     title: 'Social Communication',
     component: SocialCommunicationProfile,
-    description: 'Assess social interaction and communication skills',
-    icon: socialIcon
+    description: 'Assess social interaction and communication skills'
   },
   {
     id: 'behaviorInterests',
     title: 'Behavior & Interests',
     component: BehaviorInterestsProfile,
-    description: 'Document behavioral patterns and interests',
-    icon: behaviorIcon
+    description: 'Document behavioral patterns and interests'
   },
   {
     id: 'milestones',
     title: 'Milestone Tracker',
     component: MilestoneTracker,
-    description: 'Track developmental milestones',
-    icon: developmentIcon
+    description: 'Track developmental milestones'
   },
   {
     id: 'assessmentLog',
     title: 'Assessment Log',
     component: AssessmentLogger,
-    description: 'Record and monitor assessment progress',
-    icon: assessmentIcon
+    description: 'Record and monitor assessment progress'
   }
 ];
 
@@ -102,14 +84,14 @@ export const AssessmentCarousel: React.FC<AssessmentCarouselProps> = ({
       case 'socialCommunication':
       case 'behaviorInterests':
         if (component.domains) {
-          const domains = Object.values(component.domains) as AssessmentDomainBase[];
+          const domains = Object.values(component.domains);
           const domainCount = domains.length;
 
-          const sliderProgress = domains.filter(domain => 
+          const sliderProgress = domains.filter((domain: any) => 
             typeof domain.value === 'number' && domain.value !== 0
           ).length / domainCount * 60;
           
-          const observationProgress = domains.filter(domain => 
+          const observationProgress = domains.filter((domain: any) => 
             domain.observations?.length > 0 && domain.observations.some((obs: string) => obs.trim().length > 0)
           ).length / domainCount * 40;
           
@@ -249,11 +231,6 @@ export const AssessmentCarousel: React.FC<AssessmentCarouselProps> = ({
       <div className={styles.carouselContainer}>
         <div className={styles.carouselHeader}>
           <div className={styles.titleSection}>
-            <img 
-              src={currentTool.icon} 
-              alt={`${currentTool.title} icon`}
-              className={styles.componentIcon}
-            />
             <h2 className={styles.title}>
               {currentTool.title}
               <button className={styles.toolkitButton}>
@@ -268,26 +245,13 @@ export const AssessmentCarousel: React.FC<AssessmentCarouselProps> = ({
           <div className={styles.navigationSection}>
             <div className={styles.completionControls}>
               {!completionStates[currentTool.id]?.isComplete && (
-                <>
-                  <div className={styles.componentProgress}>
-                    <div className={styles.progressIndicator}>
-                      <div 
-                        className={styles.progressBar} 
-                        style={{ 
-                          width: `${completionStates[currentTool.id]?.progress || 0}%` 
-                        }} 
-                      />
-                    </div>
-                    <span>{Math.round(completionStates[currentTool.id]?.progress || 0)}%</span>
-                  </div>
-                  <button
-                    className={styles.completeButton}
-                    onClick={() => handleMarkComplete(currentTool.id)}
-                  >
-                    <CheckCircle2 size={16} />
-                    <span>Mark Complete</span>
-                  </button>
-                </>
+                <button
+                  className={styles.completeButton}
+                  onClick={() => handleMarkComplete(currentTool.id)}
+                >
+                  <CheckCircle2 size={16} />
+                  <span>Mark Complete</span>
+                </button>
               )}
               {completionStates[currentTool.id]?.isComplete && (
                 <div className={styles.completionStatus}>

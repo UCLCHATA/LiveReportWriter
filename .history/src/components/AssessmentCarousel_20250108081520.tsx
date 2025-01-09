@@ -266,28 +266,27 @@ export const AssessmentCarousel: React.FC<AssessmentCarouselProps> = ({
           </div>
 
           <div className={styles.navigationSection}>
+            <div className={styles.componentProgress}>
+              <div className={styles.progressIndicator}>
+                <div 
+                  className={styles.progressBar} 
+                  style={{ 
+                    width: `${completionStates[currentTool.id]?.progress || 0}%` 
+                  }} 
+                />
+              </div>
+              <span>{Math.round(completionStates[currentTool.id]?.progress || 0)}%</span>
+            </div>
+
             <div className={styles.completionControls}>
               {!completionStates[currentTool.id]?.isComplete && (
-                <>
-                  <div className={styles.componentProgress}>
-                    <div className={styles.progressIndicator}>
-                      <div 
-                        className={styles.progressBar} 
-                        style={{ 
-                          width: `${completionStates[currentTool.id]?.progress || 0}%` 
-                        }} 
-                      />
-                    </div>
-                    <span>{Math.round(completionStates[currentTool.id]?.progress || 0)}%</span>
-                  </div>
-                  <button
-                    className={styles.completeButton}
-                    onClick={() => handleMarkComplete(currentTool.id)}
-                  >
-                    <CheckCircle2 size={16} />
-                    <span>Mark Complete</span>
-                  </button>
-                </>
+                <button
+                  className={styles.completeButton}
+                  onClick={() => handleMarkComplete(currentTool.id)}
+                >
+                  <CheckCircle2 size={16} />
+                  <span>Mark Complete</span>
+                </button>
               )}
               {completionStates[currentTool.id]?.isComplete && (
                 <div className={styles.completionStatus}>

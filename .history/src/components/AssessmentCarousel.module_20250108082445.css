@@ -108,16 +108,15 @@
 }
 
 .componentIcon {
-  height: 80px;
+  height: 55px;
   width: auto;
   object-fit: contain;
-  margin-right: 0.75rem;
+  margin-right: 0.5rem;
   display: flex;
   align-items: center;
   opacity: 0.85;
   filter: brightness(1.05) contrast(0.95);
   transition: all 0.2s ease;
-  padding: 0.5rem;
 }
 
 .componentIcon:hover {
@@ -126,13 +125,7 @@
 }
 
 .componentProgress {
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-  font-size: 0.75rem;
-  color: #6b7280;
-  min-width: 120px;
-  margin-bottom: 0.25rem;
+  display: none;
 }
 
 .completionControls {
@@ -303,10 +296,10 @@
 
 /* Progress bar animation */
 .progressIndicator {
-  flex: 1;
-  height: 3px;
+  width: 120px;
+  height: 4px;
   background: #e5e7eb;
-  border-radius: 1.5px;
+  border-radius: 2px;
   overflow: hidden;
   position: relative;
 }
@@ -318,7 +311,7 @@
   top: 0;
   width: 0%;
   background: #10b981;
-  border-radius: 1.5px;
+  border-radius: 2px;
   transition: width 0.3s ease;
 }
 
