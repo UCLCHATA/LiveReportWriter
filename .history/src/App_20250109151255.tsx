@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback, useMemo } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { Header } from './components/Header';
 import { Overlay } from './components/Overlay';
 import { AssessmentCarousel } from './components/AssessmentCarousel';
@@ -135,7 +135,7 @@ export const App: React.FC = () => {
     setCarouselProgress(0);
   };
 
-  const handleFormProgressUpdate = useCallback((progress: number) => {
+  const handleFormProgressUpdate = (progress: number) => {
     // Only update if the new progress is higher than current
     // This prevents resetting progress on component mount
     if (progress <= formProgress) return;
@@ -148,11 +148,12 @@ export const App: React.FC = () => {
     
     setFormProgress(progress);
     updateFormData({ formProgress: progress });
-  }, [formProgress, updateFormData]);
+  };
 
-  const handleCarouselProgressUpdate = useCallback((progress: number) => {
-    // Prevent unnecessary updates
-    if (progress === carouselProgress) return;
+  const handleCarouselProgressUpdate = (progress: number) => {
+    // Only update if the new progress is higher than current
+    // This prevents resetting progress on component mount
+    if (progress <= carouselProgress) return;
     
     console.log('📊 Carousel progress update:', {
       current: carouselProgress,
@@ -172,7 +173,7 @@ export const App: React.FC = () => {
     assessmentTypes.forEach(type => {
       updateAssessment(type, { progress });
     });
-  }, [carouselProgress, updateAssessment]);
+  };
 
   const celebrateMilestone = useCallback((progress: number) => {
     const milestone = Math.floor(progress / 25) * 25;
@@ -346,53 +347,34 @@ export const App: React.FC = () => {
   }, [lastCelebrated]);
 
   // Calculate total progress
-  const totalProgress = useMemo(() => Math.round(formProgress + carouselProgress), [formProgress, carouselProgress]);
+  const totalProgress = Math.round(formProgress + carouselProgress);
 
   useEffect(() => {
     celebrateMilestone(totalProgress);
-  }, [totalProgress, celebrateMilestone]);
+  }, [formProgress, carouselProgress, celebrateMilestone]);
 
   return (
     <div className="app">
       <Header 
         chataId={globalState.chataId}
-        progress={totalProgress}
+        progress={formProgress}
       />
-      
-      <main>
-        {!showForm ? (
-          <Overlay onCreateReport={handleCreateReport} />
-        ) : (
-          <>
-            <div className="left-panel active">
-              <AssessmentCarousel
-                onProgressUpdate={handleCarouselProgressUpdate}
-                initialProgress={carouselProgress}
-              />
-            </div>
-            <div className="right-panel active">
-              <div className="form-container active">
-                <AssessmentForm
-                  onProgressUpdate={handleFormProgressUpdate}
-                  initialProgress={formProgress}
-                  onClear={handleClearForm}
-                />
-              </div>
-            </div>
-          </>
-        )}
-      </main>
-
-      <footer>
-        <div className="footer-content">
-          <div className="footer-logos">
-            <img src="/assets/ucl-logo.png" alt="UCL Logo" className="ucl-logo" />
-            <img src="/assets/nhs-logo.png" alt="NHS Logo" className="nhs-logo" />
-          </div>
-          <div>© 2024 UCL & NHS. For support contact: uclchata@gmail.com</div>
-        </div>
-      </footer>
-
+      {!showForm && (
+        <Overlay onCreateReport={handleCreateReport} />
+      )}
+      {showForm && (
+        <>
+          <AssessmentCarousel
+            onProgressUpdate={handleCarouselProgressUpdate}
+            initialProgress={carouselProgress}
+          />
+          <AssessmentForm
+            onProgressUpdate={handleFormProgressUpdate}
+            initialProgress={formProgress}
+            onClear={handleClearForm}
+          />
+        </>
+      )}
       <ClinicianModal
         isOpen={showModal}
         onSubmit={handleClinicianSubmit}

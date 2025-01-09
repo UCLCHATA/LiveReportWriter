@@ -77,33 +77,6 @@ export const ClinicianModal: React.FC<ClinicianModalProps> = ({
   const [showRetrievalOverlay, setShowRetrievalOverlay] = useState(false);
   const ageOptions = useMemo(() => generateAgeOptions(), []);
 
-  const createNewForm = () => {
-    // Generate new CHATA ID and create new form
-    const newChataId = generateChataId(clinicianInfo.name, clinicianInfo.childName);
-    setCurrentChataId(newChataId);
-    
-    // Delete any existing unsubmitted forms for this clinician
-    const existingForms = formPersistence.getAllUnsubmittedForms();
-    existingForms.forEach(form => {
-      if (form.clinicianInfo.email === clinicianInfo.email) {
-        formPersistence.markAsSubmitted(form.chataId);
-      }
-    });
-    
-    const formData = {
-      chataId: newChataId,
-      clinicianInfo,
-      lastUpdated: Date.now(),
-      isSubmitted: false
-    };
-    
-    formPersistence.saveForm(formData);
-    onSubmit({ ...clinicianInfo, chataId: newChataId });
-    setShowChataIdInfo(true);
-    onChataIdDialogChange?.(true);
-    setShowRetrievalOverlay(false);
-  };
-
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (clinicianInfo.name && clinicianInfo.email && clinicianInfo.clinicName) {
@@ -113,20 +86,35 @@ export const ClinicianModal: React.FC<ClinicianModalProps> = ({
         clinicianInfo.childName
       );
 
-      if (existingForm && clinicianInfo.childName) {
+      if (existingForm) {
         setChataIdInput(existingForm.chataId);
         setShowRetrievalOverlay(true);
         return;
       }
 
-      createNewForm();
+      // Only generate CHATA ID if no existing form found
+      const newChataId = generateChataId(clinicianInfo.name, clinicianInfo.childName);
+      setCurrentChataId(newChataId);
+      
+      const formData = {
+        chataId: newChataId,
+        clinicianInfo: {
+          name: clinicianInfo.name,
+          email: clinicianInfo.email,
+          clinicName: clinicianInfo.clinicName,
+          childName: clinicianInfo.childName,
+          childAge: clinicianInfo.childAge,
+          childGender: clinicianInfo.childGender,
+        },
+        lastUpdated: Date.now(),
+        isSubmitted: false
+      };
+      
+      formPersistence.saveForm(formData);
+      onSubmit({ ...clinicianInfo, chataId: newChataId });
+      setShowChataIdInfo(true);
+      onChataIdDialogChange?.(true);
     }
-  };
-
-  const handleStartNew = () => {
-    setShowRetrievalOverlay(false);
-    setChataIdError('');
-    createNewForm();
   };
 
   const handleRetrieveClick = () => {
@@ -341,7 +329,10 @@ export const ClinicianModal: React.FC<ClinicianModalProps> = ({
                 Restore Form
               </button>
               <button
-                onClick={handleStartNew}
+                onClick={() => {
+                  handleRetrieveClose();
+                  handleSubmit(new Event('submit') as any);
+                }}
                 className={`${styles.submitButton} ${styles.startNewButton}`}
               >
                 Start New

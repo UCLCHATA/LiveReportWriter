@@ -351,48 +351,4 @@ select:focus {
   height: 38px;
   line-height: 38px;
 }
-
-.ageField {
-  min-width: 220px !important;
-}
-
-.ageSelect {
-  font-size: 0.85rem;
-}
-
-.ageSelect :global(.age-select__control) {
-  min-height: 32px;
-  border-color: #ddd;
-  box-shadow: none;
-}
-
-.ageSelect :global(.age-select__control--is-focused) {
-  border-color: #007bff;
-  box-shadow: 0 0 0 2px rgba(0, 123, 255, 0.25);
-}
-
-.ageSelect :global(.age-select__menu) {
-  font-size: 0.85rem;
-}
-
-.ageSelect :global(.age-select__option) {
-  padding: 6px 12px;
-}
-
-.ageSelect :global(.age-select__option--is-focused) {
-  background-color: rgba(0, 123, 255, 0.1);
-}
-
-.ageSelect :global(.age-select__option--is-selected) {
-  background-color: #007bff;
-}
-
-.ageSelect :global(.age-select__value-container) {
-  padding: 0 8px;
-}
-
-.ageSelect :global(.age-select__input-container) {
-  margin: 0;
-  padding: 0;
-}
  

@@ -92,7 +92,14 @@ export const ClinicianModal: React.FC<ClinicianModalProps> = ({
     
     const formData = {
       chataId: newChataId,
-      clinicianInfo,
+      clinicianInfo: {
+        name: clinicianInfo.name,
+        email: clinicianInfo.email,
+        clinicName: clinicianInfo.clinicName,
+        childName: clinicianInfo.childName,
+        childAge: clinicianInfo.childAge,
+        childGender: clinicianInfo.childGender,
+      },
       lastUpdated: Date.now(),
       isSubmitted: false
     };
@@ -101,7 +108,6 @@ export const ClinicianModal: React.FC<ClinicianModalProps> = ({
     onSubmit({ ...clinicianInfo, chataId: newChataId });
     setShowChataIdInfo(true);
     onChataIdDialogChange?.(true);
-    setShowRetrievalOverlay(false);
   };
 
   const handleSubmit = (e: React.FormEvent) => {
@@ -124,8 +130,7 @@ export const ClinicianModal: React.FC<ClinicianModalProps> = ({
   };
 
   const handleStartNew = () => {
-    setShowRetrievalOverlay(false);
-    setChataIdError('');
+    handleRetrieveClose();
     createNewForm();
   };
 
@@ -341,7 +346,10 @@ export const ClinicianModal: React.FC<ClinicianModalProps> = ({
                 Restore Form
               </button>
               <button
-                onClick={handleStartNew}
+                onClick={() => {
+                  handleRetrieveClose();
+                  handleSubmit(new Event('submit') as any);
+                }}
                 className={`${styles.submitButton} ${styles.startNewButton}`}
               >
                 Start New

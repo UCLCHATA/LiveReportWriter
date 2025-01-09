@@ -13,29 +13,12 @@ export const Header: React.FC<HeaderProps> = ({
   progress = 0,
   isChataIdDialogOpen = false 
 }) => {
-  const [milestone, setMilestone] = React.useState<number | null>(null);
-
   const getProgressState = (progress: number): 'low' | 'medium' | 'high' | 'complete' => {
     if (progress >= 95) return 'complete';
     if (progress >= 70) return 'high';
     if (progress >= 40) return 'medium';
     return 'low';
   };
-
-  // Handle milestone detection
-  React.useEffect(() => {
-    const milestones = [25, 50, 75, 100];
-    const currentMilestone = milestones.find(m => progress >= m && progress < m + 5);
-    
-    if (currentMilestone) {
-      setMilestone(currentMilestone);
-      // Reset milestone after animation
-      const timer = setTimeout(() => {
-        setMilestone(null);
-      }, 1500);
-      return () => clearTimeout(timer);
-    }
-  }, [progress]);
 
   return (
     <header className={styles.siteHeader}>
@@ -55,7 +38,6 @@ export const Header: React.FC<HeaderProps> = ({
                 className={styles.progressBar} 
                 style={{ width: `${progress}%` }}
                 data-progress={getProgressState(progress)}
-                data-milestone={milestone}
               >
                 <span className={styles.progressText}>{progress}%</span>
               </div>

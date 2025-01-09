@@ -89,11 +89,7 @@
 
 /* Add opacity for early milestones */
 .milestone[data-early="true"] {
-  opacity: 0.6;
-}
-
-.milestone[data-early="true"] .monthText {
-  color: #1a202c !important;
+  opacity: 0.4;
 }
 
 .timelineWrapper {

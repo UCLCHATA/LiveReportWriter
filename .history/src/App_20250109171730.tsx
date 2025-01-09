@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback, useMemo } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { Header } from './components/Header';
 import { Overlay } from './components/Overlay';
 import { AssessmentCarousel } from './components/AssessmentCarousel';
@@ -135,7 +135,7 @@ export const App: React.FC = () => {
     setCarouselProgress(0);
   };
 
-  const handleFormProgressUpdate = useCallback((progress: number) => {
+  const handleFormProgressUpdate = (progress: number) => {
     // Only update if the new progress is higher than current
     // This prevents resetting progress on component mount
     if (progress <= formProgress) return;
@@ -148,12 +148,9 @@ export const App: React.FC = () => {
     
     setFormProgress(progress);
     updateFormData({ formProgress: progress });
-  }, [formProgress, updateFormData]);
+  };
 
-  const handleCarouselProgressUpdate = useCallback((progress: number) => {
-    // Prevent unnecessary updates
-    if (progress === carouselProgress) return;
-    
+  const handleCarouselProgressUpdate = (progress: number) => {
     console.log('📊 Carousel progress update:', {
       current: carouselProgress,
       new: progress,
@@ -172,7 +169,7 @@ export const App: React.FC = () => {
     assessmentTypes.forEach(type => {
       updateAssessment(type, { progress });
     });
-  }, [carouselProgress, updateAssessment]);
+  };
 
   const celebrateMilestone = useCallback((progress: number) => {
     const milestone = Math.floor(progress / 25) * 25;
@@ -346,11 +343,11 @@ export const App: React.FC = () => {
   }, [lastCelebrated]);
 
   // Calculate total progress
-  const totalProgress = useMemo(() => Math.round(formProgress + carouselProgress), [formProgress, carouselProgress]);
+  const totalProgress = Math.round(formProgress + carouselProgress);
 
   useEffect(() => {
     celebrateMilestone(totalProgress);
-  }, [totalProgress, celebrateMilestone]);
+  }, [formProgress, carouselProgress, celebrateMilestone]);
 
   return (
     <div className="app">

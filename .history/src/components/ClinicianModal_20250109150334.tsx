@@ -4,7 +4,6 @@ import { DotLottieReact } from '@lottiefiles/dotlottie-react';
 import styles from './ClinicianModal.module.css';
 import { generateChataId, validateChataId } from '../utils/chataId';
 import { ChataIdInput } from './ChataIdInput';
-import { formPersistence } from '../services/formPersistence';
 
 type ClinicianInfo = {
   name: string;
@@ -74,67 +73,25 @@ export const ClinicianModal: React.FC<ClinicianModalProps> = ({
   const [chataIdError, setChataIdError] = useState('');
   const [currentChataId, setCurrentChataId] = useState<string | null>(null);
   const [showDraftAlert, setShowDraftAlert] = useState(false);
-  const [showRetrievalOverlay, setShowRetrievalOverlay] = useState(false);
   const ageOptions = useMemo(() => generateAgeOptions(), []);
-
-  const createNewForm = () => {
-    // Generate new CHATA ID and create new form
-    const newChataId = generateChataId(clinicianInfo.name, clinicianInfo.childName);
-    setCurrentChataId(newChataId);
-    
-    // Delete any existing unsubmitted forms for this clinician
-    const existingForms = formPersistence.getAllUnsubmittedForms();
-    existingForms.forEach(form => {
-      if (form.clinicianInfo.email === clinicianInfo.email) {
-        formPersistence.markAsSubmitted(form.chataId);
-      }
-    });
-    
-    const formData = {
-      chataId: newChataId,
-      clinicianInfo,
-      lastUpdated: Date.now(),
-      isSubmitted: false
-    };
-    
-    formPersistence.saveForm(formData);
-    onSubmit({ ...clinicianInfo, chataId: newChataId });
-    setShowChataIdInfo(true);
-    onChataIdDialogChange?.(true);
-    setShowRetrievalOverlay(false);
-  };
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (clinicianInfo.name && clinicianInfo.email && clinicianInfo.clinicName) {
-      // Check for existing form with same clinician/child combination
-      const existingForm = formPersistence.getFormByClinicianAndChild(
-        clinicianInfo.name,
-        clinicianInfo.childName
-      );
-
-      if (existingForm && clinicianInfo.childName) {
-        setChataIdInput(existingForm.chataId);
-        setShowRetrievalOverlay(true);
-        return;
-      }
-
-      createNewForm();
+      const newChataId = generateChataId(clinicianInfo.name, clinicianInfo.childName);
+      setCurrentChataId(newChataId);
+      onSubmit({ ...clinicianInfo, chataId: newChataId });
+      setShowChataIdInfo(true);
+      onChataIdDialogChange?.(true);
     }
   };
 
-  const handleStartNew = () => {
-    setShowRetrievalOverlay(false);
-    setChataIdError('');
-    createNewForm();
-  };
-
   const handleRetrieveClick = () => {
-    setShowRetrievalOverlay(true);
+    setShowDraftAlert(true);
   };
 
   const handleRetrieveClose = () => {
-    setShowRetrievalOverlay(false);
+    setShowDraftAlert(false);
     setChataIdInput('');
     setChataIdError('');
   };
@@ -145,29 +102,29 @@ export const ClinicianModal: React.FC<ClinicianModalProps> = ({
       return;
     }
 
-    const existingForm = formPersistence.getForm(chataIdInput);
-    if (!existingForm) {
+    const form = localStorage.getItem(`chata-form-${chataIdInput}`);
+    if (!form) {
       setChataIdError('No form found with this CHATA ID');
       return;
     }
 
     try {
-      const info: ClinicianInfo = {
-        name: existingForm.clinicianInfo.name,
-        email: existingForm.clinicianInfo.email,
-        clinicName: existingForm.clinicianInfo.clinicName,
-        childName: existingForm.clinicianInfo.childName || '',
-        childAge: existingForm.clinicianInfo.childAge || '',
-        childGender: existingForm.clinicianInfo.childGender || '',
-        chataId: chataIdInput
-      };
-      setClinicianInfo(info);
-      onSubmit(info);
-      setShowRetrievalOverlay(false);
-      setChataIdError('');
-      console.log('✅ Successfully restored form with CHATA ID:', chataIdInput);
+      const parsedForm = JSON.parse(form);
+      if (parsedForm.clinician) {
+        const info: ClinicianInfo = {
+          name: parsedForm.clinician.name,
+          email: parsedForm.clinician.email,
+          clinicName: parsedForm.clinician.clinicName || '',
+          childName: parsedForm.clinician.childName || '',
+          childAge: parsedForm.clinician.childAge || '',
+          childGender: parsedForm.clinician.childGender || '',
+          chataId: chataIdInput
+        };
+        setClinicianInfo(info);
+        onSubmit(info);
+        setShowDraftAlert(false);
+      }
     } catch (error) {
-      console.error('❌ Error restoring form:', error);
       setChataIdError('Error restoring form data');
     }
   };
@@ -285,7 +242,6 @@ export const ClinicianModal: React.FC<ClinicianModalProps> = ({
                     <option value="male">Male</option>
                     <option value="female">Female</option>
                     <option value="other">Other</option>
-                    <option value="prefer-not-to-say">Prefer not to say</option>
                   </select>
                 </div>
               </div>
@@ -310,7 +266,7 @@ export const ClinicianModal: React.FC<ClinicianModalProps> = ({
         </div>
       </div>
 
-      {showRetrievalOverlay && (
+      {showDraftAlert && (
         <div className={styles.dialogOverlay}>
           <div className={styles.dialogContent}>
             <button 
@@ -340,12 +296,6 @@ export const ClinicianModal: React.FC<ClinicianModalProps> = ({
               >
                 Restore Form
               </button>
-              <button
-                onClick={handleStartNew}
-                className={`${styles.submitButton} ${styles.startNewButton}`}
-              >
-                Start New
-              </button>
             </div>
           </div>
         </div>
@@ -369,8 +319,10 @@ export const ClinicianModal: React.FC<ClinicianModalProps> = ({
               </span>
             </div>
             <p className={styles.chataIdNote}>
-              Your CHATA ID is your key to access this form later.<br />
-              Keep it safe and secure.
+              Your CHATA ID breaks down as:<br />
+              • Your code: {currentChataId.split('-')[0]}<br />
+              • Child's code: {currentChataId.split('-')[1]}<br />
+              • Unique number: {currentChataId.split('-')[2]}
             </p>
             <div className={styles.writingAnimation}>
               <DotLottieReact

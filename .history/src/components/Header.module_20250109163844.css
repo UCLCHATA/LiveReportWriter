@@ -196,90 +196,25 @@
 .chataIdDisplay {
   font-family: monospace;
   font-size: 0.9rem;
-  font-weight: 500;
-  color: #6b7280;
-  background: rgba(0, 0, 0, 0.05);
+  font-weight: 600;
+  color: #2c3e50;
+  background: rgba(255, 255, 255, 0.1);
   padding: 0.25rem 0.75rem;
   border-radius: 4px;
+  border: 1px solid rgba(255, 255, 255, 0.2);
   letter-spacing: 1px;
   display: flex;
   align-items: center;
   gap: 0.5rem;
-  transition: all 0.3s ease;
 }
 
 .chataIdLabel {
-  color: #6b7280;
+  color: rgba(255, 255, 255, 0.8);
   font-size: 0.8rem;
   font-weight: normal;
-  opacity: 0.8;
 }
 
 .chataIdValue {
-  color: #374151;
+  color: #fff;
   font-weight: 600;
-}
-
-@keyframes subtlePulse {
-  0% {
-    background: rgba(0, 0, 0, 0.05);
-  }
-  50% {
-    background: rgba(0, 0, 0, 0.08);
-  }
-  100% {
-    background: rgba(0, 0, 0, 0.05);
-  }
-}
-
-.chataIdDisplay.pulsing {
-  animation: subtlePulse 2s ease-in-out infinite;
-}
-
-/* Progress levels with milestone effects */
-@keyframes milestonePulse {
-  0% {
-    transform: scale(1);
-    filter: brightness(1);
-    box-shadow: 0 0 0 0 rgba(79, 70, 229, 0.4);
-  }
-  50% {
-    transform: scale(1.02);
-    filter: brightness(1.2);
-    box-shadow: 0 0 20px 10px rgba(79, 70, 229, 0.2);
-  }
-  100% {
-    transform: scale(1);
-    filter: brightness(1);
-    box-shadow: 0 0 0 0 rgba(79, 70, 229, 0);
-  }
-}
-
-.progressBar[data-milestone="25"] {
-  animation: milestonePulse 1.5s ease-in-out;
-  --progress-color-start: #818cf8;
-  --progress-color-end: #6366f1;
-}
-
-.progressBar[data-milestone="50"] {
-  animation: milestonePulse 1.5s ease-in-out;
-  --progress-color-start: #6366f1;
-  --progress-color-end: #4f46e5;
-}
-
-.progressBar[data-milestone="75"] {
-  animation: milestonePulse 1.5s ease-in-out;
-  --progress-color-start: #4f46e5;
-  --progress-color-end: #4338ca;
-}
-
-.progressBar[data-milestone="100"] {
-  animation: milestonePulse 1.5s ease-in-out;
-  --progress-color-start: #15803d;
-  --progress-color-end: #16a34a;
-}
-
-/* Ensure milestone animations take precedence */
-.progressBar[data-milestone] {
-  z-index: 1;
 } 

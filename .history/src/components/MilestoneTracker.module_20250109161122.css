@@ -71,31 +71,6 @@
   line-height: 1.2;
 }
 
-.milestone:hover .monthCircle .monthText {
-  display: flex;
-}
-
-.milestone:hover .monthCircle .monthText.showDifference {
-  display: flex;
-}
-
-.monthText.delayedText {
-  color: #E53E3E !important;
-}
-
-.monthText.advancedText {
-  color: #38A169 !important;
-}
-
-/* Add opacity for early milestones */
-.milestone[data-early="true"] {
-  opacity: 0.6;
-}
-
-.milestone[data-early="true"] .monthText {
-  color: #1a202c !important;
-}
-
 .timelineWrapper {
   width: 100%;
   overflow: visible;

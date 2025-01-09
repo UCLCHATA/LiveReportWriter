@@ -81,7 +81,7 @@ const tools: Tool[] = [
     id: 'assessmentLog',
     title: 'Assessment Log',
     component: AssessmentLogger,
-    description: 'Select utilized assessments, their scores and key observations/insights',
+    description: 'Record and monitor assessment progress',
     icon: assessmentIcon
   }
 ];
@@ -211,38 +211,42 @@ export const AssessmentCarousel: React.FC<AssessmentCarouselProps> = ({
     const component = globalState.assessments[currentTool.id];
     const progress = calculateProgress(component);
     
-    // Only update if progress has changed
-    if (progress !== completionStates[currentTool.id]?.progress) {
-      setCompletionStates(prev => ({
-        ...prev,
-        [currentTool.id]: {
-          ...prev[currentTool.id],
-          progress,
-          autoDetected: progress >= 100 && !prev[currentTool.id].isComplete
-        }
-      }));
-    }
-  }, [currentIndex, globalState.assessments, tools]);
+    setCompletionStates(prev => ({
+      ...prev,
+      [currentTool.id]: {
+        ...prev[currentTool.id],
+        progress,
+        autoDetected: progress >= 90 && !prev[currentTool.id].isComplete
+      }
+    }));
+  }, [currentIndex, globalState.assessments]);
 
   // Separate effect for total progress calculation
   useEffect(() => {
     const totalProgress = Math.floor(
       Object.values(completionStates).reduce(
         (acc, state) => {
-          // Each component can contribute max 10% to total progress
-          // Using 10:1 ratio - every 10% of component progress = 1% of total
-          const componentContribution = state.isComplete ? 10 : Math.min(Math.floor(state.progress / 10), 10);
+          // Each component contributes 20% to total progress
+          if (state.isComplete) {
+            return acc + 20; // Full contribution when complete
+          }
+          // Otherwise, contribute proportionally up to 20%
+          const componentContribution = (state.progress / 100) * 20;
           return acc + componentContribution;
         },
         0
       )
     );
+    
+    // Auto-mark components as complete if they reach 90% progress
+    Object.entries(completionStates).forEach(([toolId, state]) => {
+      if (state.progress >= 90 && !state.isComplete && !state.autoDetected) {
+        handleMarkComplete(toolId as keyof AssessmentData);
+      }
+    });
 
-    // Only update if total progress has changed
-    if (totalProgress !== initialProgress) {
-      onProgressUpdate(totalProgress);
-    }
-  }, [completionStates, onProgressUpdate, initialProgress]);
+    onProgressUpdate(totalProgress);
+  }, [completionStates, onProgressUpdate, handleMarkComplete]);
 
   const handleNext = () => {
     setCurrentIndex(prev => prev === tools.length - 1 ? 0 : prev + 1);

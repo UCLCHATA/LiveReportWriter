@@ -247,8 +247,6 @@ const DraggableMilestone: React.FC<{
       whileHover={{ scale: isCustomButton ? 1 : 1.05 }}
       whileTap={{ scale: isCustomButton ? 1 : 0.95 }}
       onClick={handleCustomClick}
-      onMouseEnter={() => setShowDifference(true)}
-      onMouseLeave={() => setShowDifference(false)}
     >
       {isEditing ? (
         <input
@@ -269,10 +267,12 @@ const DraggableMilestone: React.FC<{
           {milestone.actualAge !== undefined && milestone.expectedAge !== 0 && (
             <div 
               className={styles.monthCircle}
+              onMouseEnter={() => setShowDifference(true)}
+              onMouseLeave={() => setShowDifference(false)}
               data-delayed={isDelayed}
               data-early={!isDelayed}
             >
-              <span className={`${styles.monthText} ${showDifference ? styles.showDifference : ''} ${isDelayed ? styles.delayedText : styles.advancedText}`}>
+              <span className={`${styles.monthText} ${showDifference ? styles.showDifference : ''}`}>
                 {showDifference && differenceText ? differenceText : `${milestone.actualAge}m`}
               </span>
             </div>

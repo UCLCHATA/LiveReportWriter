@@ -81,7 +81,7 @@ const tools: Tool[] = [
     id: 'assessmentLog',
     title: 'Assessment Log',
     component: AssessmentLogger,
-    description: 'Select utilized assessments, their scores and key observations/insights',
+    description: 'Record and monitor assessment progress',
     icon: assessmentIcon
   }
 ];
@@ -211,18 +211,15 @@ export const AssessmentCarousel: React.FC<AssessmentCarouselProps> = ({
     const component = globalState.assessments[currentTool.id];
     const progress = calculateProgress(component);
     
-    // Only update if progress has changed
-    if (progress !== completionStates[currentTool.id]?.progress) {
-      setCompletionStates(prev => ({
-        ...prev,
-        [currentTool.id]: {
-          ...prev[currentTool.id],
-          progress,
-          autoDetected: progress >= 100 && !prev[currentTool.id].isComplete
-        }
-      }));
-    }
-  }, [currentIndex, globalState.assessments, tools]);
+    setCompletionStates(prev => ({
+      ...prev,
+      [currentTool.id]: {
+        ...prev[currentTool.id],
+        progress,
+        autoDetected: progress >= 100 && !prev[currentTool.id].isComplete
+      }
+    }));
+  }, [currentIndex, globalState.assessments]);
 
   // Separate effect for total progress calculation
   useEffect(() => {
@@ -238,11 +235,8 @@ export const AssessmentCarousel: React.FC<AssessmentCarouselProps> = ({
       )
     );
 
-    // Only update if total progress has changed
-    if (totalProgress !== initialProgress) {
-      onProgressUpdate(totalProgress);
-    }
-  }, [completionStates, onProgressUpdate, initialProgress]);
+    onProgressUpdate(totalProgress);
+  }, [completionStates, onProgressUpdate]);
 
   const handleNext = () => {
     setCurrentIndex(prev => prev === tools.length - 1 ? 0 : prev + 1);

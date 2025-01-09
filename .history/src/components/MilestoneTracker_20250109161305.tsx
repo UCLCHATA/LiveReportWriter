@@ -188,7 +188,7 @@ const DraggableMilestone: React.FC<{
     ? `Placed at: ${milestone.actualAge}m${milestone.expectedAge ? ` (Expected: ${milestone.expectedAge}m)` : ''}${
       differenceText ? ` - ${isDelayed ? 'Delayed' : 'Advanced'} by ${Math.abs(milestone.actualAge - milestone.expectedAge)}m` : ''
     }`
-    : categoryInfo[category].tooltips[milestone.title] || milestone.title;
+    : categoryInfo[category].tooltips[milestone.title];
 
   const isEarly = milestone.actualAge !== undefined && 
                   milestone.expectedAge !== 0 && 
@@ -242,13 +242,12 @@ const DraggableMilestone: React.FC<{
       data-milestone-id={milestone.id}
       data-custom={isCustom}
       data-early={isEarly}
-      title={tooltipText}
+      data-tooltip={tooltipText}
       style={style}
+      title={milestone.actualAge !== undefined ? tooltipText : undefined}
       whileHover={{ scale: isCustomButton ? 1 : 1.05 }}
       whileTap={{ scale: isCustomButton ? 1 : 0.95 }}
       onClick={handleCustomClick}
-      onMouseEnter={() => setShowDifference(true)}
-      onMouseLeave={() => setShowDifference(false)}
     >
       {isEditing ? (
         <input
@@ -269,10 +268,12 @@ const DraggableMilestone: React.FC<{
           {milestone.actualAge !== undefined && milestone.expectedAge !== 0 && (
             <div 
               className={styles.monthCircle}
+              onMouseEnter={() => setShowDifference(true)}
+              onMouseLeave={() => setShowDifference(false)}
               data-delayed={isDelayed}
               data-early={!isDelayed}
             >
-              <span className={`${styles.monthText} ${showDifference ? styles.showDifference : ''} ${isDelayed ? styles.delayedText : styles.advancedText}`}>
+              <span className={`${styles.monthText} ${showDifference ? styles.showDifference : ''}`}>
                 {showDifference && differenceText ? differenceText : `${milestone.actualAge}m`}
               </span>
             </div>

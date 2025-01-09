@@ -71,31 +71,6 @@
   line-height: 1.2;
 }
 
-.milestone:hover .monthCircle .monthText {
-  display: flex;
-}
-
-.milestone:hover .monthCircle .monthText.showDifference {
-  display: flex;
-}
-
-.monthText.delayedText {
-  color: #E53E3E !important;
-}
-
-.monthText.advancedText {
-  color: #38A169 !important;
-}
-
-/* Add opacity for early milestones */
-.milestone[data-early="true"] {
-  opacity: 0.6;
-}
-
-.milestone[data-early="true"] .monthText {
-  color: #1a202c !important;
-}
-
 .timelineWrapper {
   width: 100%;
   overflow: visible;
@@ -196,21 +171,6 @@
   background: var(--background-color);
   resize: none;
   outline: none;
-  transition: border-color 0.2s ease;
-}
-
-.historyTextarea:hover {
-  border-color: #4A5568;
-}
-
-.historyTextarea:focus {
-  border-color: #4299E1;
-  box-shadow: 0 0 0 1px #4299E1;
-}
-
-.textareaWrapper {
-  position: relative;
-  width: 100%;
 }
 
 /* Add color styles for each category */

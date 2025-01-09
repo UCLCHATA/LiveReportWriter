@@ -287,7 +287,7 @@ export const useFormState = () => {
       const parsed = JSON.parse(saved);
       if (!isValidState(parsed)) return initialState;
       
-      // Ensure we preserve all progress values and assessment states
+      // Ensure we preserve all progress values
       const restoredState = {
         ...initialState,
         ...parsed,
@@ -302,72 +302,51 @@ export const useFormState = () => {
           sensoryProfile: {
             ...initialState.assessments.sensoryProfile,
             ...parsed.assessments.sensoryProfile,
-            progress: parsed.assessments.sensoryProfile?.progress || 0,
+            progress: Math.max(parsed.assessments.sensoryProfile?.progress || 0, initialState.assessments.sensoryProfile.progress),
             domains: {
               ...initialState.assessments.sensoryProfile.domains,
               ...parsed.assessments.sensoryProfile.domains
-            },
-            isComplete: parsed.assessments.sensoryProfile?.isComplete || false
+            }
           },
           socialCommunication: {
             ...initialState.assessments.socialCommunication,
             ...parsed.assessments.socialCommunication,
-            progress: parsed.assessments.socialCommunication?.progress || 0,
+            progress: Math.max(parsed.assessments.socialCommunication?.progress || 0, initialState.assessments.socialCommunication.progress),
             domains: {
               ...initialState.assessments.socialCommunication.domains,
               ...parsed.assessments.socialCommunication.domains
-            },
-            isComplete: parsed.assessments.socialCommunication?.isComplete || false
+            }
           },
           behaviorInterests: {
             ...initialState.assessments.behaviorInterests,
             ...parsed.assessments.behaviorInterests,
-            progress: parsed.assessments.behaviorInterests?.progress || 0,
+            progress: Math.max(parsed.assessments.behaviorInterests?.progress || 0, initialState.assessments.behaviorInterests.progress),
             domains: {
               ...initialState.assessments.behaviorInterests.domains,
               ...parsed.assessments.behaviorInterests.domains
-            },
-            isComplete: parsed.assessments.behaviorInterests?.isComplete || false
+            }
           },
           milestones: {
             ...initialState.assessments.milestones,
             ...parsed.assessments.milestones,
-            progress: parsed.assessments.milestones?.progress || 0,
-            isComplete: parsed.assessments.milestones?.isComplete || false
+            progress: Math.max(parsed.assessments.milestones?.progress || 0, initialState.assessments.milestones.progress)
           },
           assessmentLog: {
             ...initialState.assessments.assessmentLog,
             ...parsed.assessments.assessmentLog,
-            progress: parsed.assessments.assessmentLog?.progress || 0,
-            isComplete: parsed.assessments.assessmentLog?.isComplete || false
+            progress: Math.max(parsed.assessments.assessmentLog?.progress || 0, initialState.assessments.assessmentLog.progress)
           }
         }
       };
       
-      // Log detailed progress information
       console.log(`✅ [${hookId.current}] Successfully restored state in ${componentName.current}`, {
         formProgress: restoredState.formData.formProgress,
         assessmentProgress: {
-          sensory: {
-            progress: restoredState.assessments.sensoryProfile.progress,
-            isComplete: restoredState.assessments.sensoryProfile.isComplete
-          },
-          social: {
-            progress: restoredState.assessments.socialCommunication.progress,
-            isComplete: restoredState.assessments.socialCommunication.isComplete
-          },
-          behavior: {
-            progress: restoredState.assessments.behaviorInterests.progress,
-            isComplete: restoredState.assessments.behaviorInterests.isComplete
-          },
-          milestones: {
-            progress: restoredState.assessments.milestones.progress,
-            isComplete: restoredState.assessments.milestones.isComplete
-          },
-          assessmentLog: {
-            progress: restoredState.assessments.assessmentLog.progress,
-            isComplete: restoredState.assessments.assessmentLog.isComplete
-          }
+          sensory: restoredState.assessments.sensoryProfile.progress,
+          social: restoredState.assessments.socialCommunication.progress,
+          behavior: restoredState.assessments.behaviorInterests.progress,
+          milestones: restoredState.assessments.milestones.progress,
+          assessmentLog: restoredState.assessments.assessmentLog.progress
         }
       });
       

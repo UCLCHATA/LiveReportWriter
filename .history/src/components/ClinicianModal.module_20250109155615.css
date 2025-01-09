@@ -1,4 +1,4 @@
- .modalOverlay {
+.modalOverlay {
   position: fixed;
   top: 0;
   left: 0;
@@ -315,84 +315,5 @@
   .modalContent {
     padding: 1.25rem;
   }
-}
-
-.startNewButton {
-  margin-left: 8px;
-  background-color: #4a5568;
-}
-
-.startNewButton:hover {
-  background-color: #2d3748;
-}
-
-select {
-  appearance: none;
-  background-color: white;
-  border: 1px solid #e2e8f0;
-  border-radius: 0.375rem;
-  padding: 0.5rem;
-  padding-right: 2rem;
-  width: 100%;
-  cursor: pointer;
-  background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='%236b7280' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='M6 8l4 4 4-4'/%3e%3c/svg%3e");
-  background-position: right 0.5rem center;
-  background-repeat: no-repeat;
-  background-size: 1.5em 1.5em;
-}
-
-select:focus {
-  outline: none;
-  border-color: #4299e1;
-  box-shadow: 0 0 0 3px rgba(66, 153, 225, 0.5);
-}
-
-.formGroup select {
-  height: 38px;
-  line-height: 38px;
-}
-
-.ageField {
-  min-width: 220px !important;
-}
-
-.ageSelect {
-  font-size: 0.85rem;
-}
-
-.ageSelect :global(.age-select__control) {
-  min-height: 32px;
-  border-color: #ddd;
-  box-shadow: none;
-}
-
-.ageSelect :global(.age-select__control--is-focused) {
-  border-color: #007bff;
-  box-shadow: 0 0 0 2px rgba(0, 123, 255, 0.25);
-}
-
-.ageSelect :global(.age-select__menu) {
-  font-size: 0.85rem;
-}
-
-.ageSelect :global(.age-select__option) {
-  padding: 6px 12px;
-}
-
-.ageSelect :global(.age-select__option--is-focused) {
-  background-color: rgba(0, 123, 255, 0.1);
-}
-
-.ageSelect :global(.age-select__option--is-selected) {
-  background-color: #007bff;
-}
-
-.ageSelect :global(.age-select__value-container) {
-  padding: 0 8px;
-}
-
-.ageSelect :global(.age-select__input-container) {
-  margin: 0;
-  padding: 0;
 }
  

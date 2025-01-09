@@ -247,8 +247,6 @@ const DraggableMilestone: React.FC<{
       whileHover={{ scale: isCustomButton ? 1 : 1.05 }}
       whileTap={{ scale: isCustomButton ? 1 : 0.95 }}
       onClick={handleCustomClick}
-      onMouseEnter={() => setShowDifference(true)}
-      onMouseLeave={() => setShowDifference(false)}
     >
       {isEditing ? (
         <input

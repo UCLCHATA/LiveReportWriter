@@ -31,7 +31,7 @@ interface GlobalFormState {
 }
 
 // Constants can stay outside
-export const getStorageKey = (chataId: string = '') => `chata-form-${chataId || 'draft'}`;
+export const getStorageKey = (chataId: string = 'KOS-JOH-321') => `chata-form-${chataId || 'draft'}`;
 const SAVE_DELAY = 3000; // Increase to 3 seconds
 const MIN_SAVE_INTERVAL = 2000; // Increase to 2 seconds
 const MIN_OPERATION_INTERVAL = 1000; // Increase to 1 second
@@ -63,7 +63,7 @@ const initialFormData: FormState = {
 };
 
 const initialState: GlobalFormState = {
-  chataId: '',
+  chataId: 'KOS-JOH-321',
   clinician: {
     name: '',
     email: '',
@@ -280,14 +280,14 @@ export const useFormState = () => {
   // Load initial state from localStorage first
   const [globalState, setGlobalState] = useState<GlobalFormState>(() => {
     try {
-      const storageKey = getStorageKey();
+      const storageKey = getStorageKey('KOS-JOH-321');
       const saved = localStorage.getItem(storageKey);
       if (!saved) return initialState;
       
       const parsed = JSON.parse(saved);
       if (!isValidState(parsed)) return initialState;
       
-      // Ensure we preserve all progress values and assessment states
+      // Ensure we preserve all progress values
       const restoredState = {
         ...initialState,
         ...parsed,
@@ -302,72 +302,51 @@ export const useFormState = () => {
           sensoryProfile: {
             ...initialState.assessments.sensoryProfile,
             ...parsed.assessments.sensoryProfile,
-            progress: parsed.assessments.sensoryProfile?.progress || 0,
+            progress: Math.max(parsed.assessments.sensoryProfile?.progress || 0, initialState.assessments.sensoryProfile.progress),
             domains: {
               ...initialState.assessments.sensoryProfile.domains,
               ...parsed.assessments.sensoryProfile.domains
-            },
-            isComplete: parsed.assessments.sensoryProfile?.isComplete || false
+            }
           },
           socialCommunication: {
             ...initialState.assessments.socialCommunication,
             ...parsed.assessments.socialCommunication,
-            progress: parsed.assessments.socialCommunication?.progress || 0,
+            progress: Math.max(parsed.assessments.socialCommunication?.progress || 0, initialState.assessments.socialCommunication.progress),
             domains: {
               ...initialState.assessments.socialCommunication.domains,
               ...parsed.assessments.socialCommunication.domains
-            },
-            isComplete: parsed.assessments.socialCommunication?.isComplete || false
+            }
           },
           behaviorInterests: {
             ...initialState.assessments.behaviorInterests,
             ...parsed.assessments.behaviorInterests,
-            progress: parsed.assessments.behaviorInterests?.progress || 0,
+            progress: Math.max(parsed.assessments.behaviorInterests?.progress || 0, initialState.assessments.behaviorInterests.progress),
             domains: {
               ...initialState.assessments.behaviorInterests.domains,
               ...parsed.assessments.behaviorInterests.domains
-            },
-            isComplete: parsed.assessments.behaviorInterests?.isComplete || false
+            }
           },
           milestones: {
             ...initialState.assessments.milestones,
             ...parsed.assessments.milestones,
-            progress: parsed.assessments.milestones?.progress || 0,
-            isComplete: parsed.assessments.milestones?.isComplete || false
+            progress: Math.max(parsed.assessments.milestones?.progress || 0, initialState.assessments.milestones.progress)
           },
           assessmentLog: {
             ...initialState.assessments.assessmentLog,
             ...parsed.assessments.assessmentLog,
-            progress: parsed.assessments.assessmentLog?.progress || 0,
-            isComplete: parsed.assessments.assessmentLog?.isComplete || false
+            progress: Math.max(parsed.assessments.assessmentLog?.progress || 0, initialState.assessments.assessmentLog.progress)
           }
         }
       };
       
-      // Log detailed progress information
       console.log(`✅ [${hookId.current}] Successfully restored state in ${componentName.current}`, {
         formProgress: restoredState.formData.formProgress,
         assessmentProgress: {
-          sensory: {
-            progress: restoredState.assessments.sensoryProfile.progress,
-            isComplete: restoredState.assessments.sensoryProfile.isComplete
-          },
-          social: {
-            progress: restoredState.assessments.socialCommunication.progress,
-            isComplete: restoredState.assessments.socialCommunication.isComplete
-          },
-          behavior: {
-            progress: restoredState.assessments.behaviorInterests.progress,
-            isComplete: restoredState.assessments.behaviorInterests.isComplete
-          },
-          milestones: {
-            progress: restoredState.assessments.milestones.progress,
-            isComplete: restoredState.assessments.milestones.isComplete
-          },
-          assessmentLog: {
-            progress: restoredState.assessments.assessmentLog.progress,
-            isComplete: restoredState.assessments.assessmentLog.isComplete
-          }
+          sensory: restoredState.assessments.sensoryProfile.progress,
+          social: restoredState.assessments.socialCommunication.progress,
+          behavior: restoredState.assessments.behaviorInterests.progress,
+          milestones: restoredState.assessments.milestones.progress,
+          assessmentLog: restoredState.assessments.assessmentLog.progress
         }
       });
       
@@ -399,53 +378,30 @@ export const useFormState = () => {
         clearTimeout(saveTimeoutRef.current);
       }
       
-      const saveState = () => {
-        try {
-          const storageKey = getStorageKey(globalState.chataId);
-          const stateToSave = {
-            ...globalState,
-            lastUpdated: new Date().toISOString()
-          };
-          
-          localStorage.setItem(storageKey, JSON.stringify(stateToSave));
-          console.log(`💾 [${hookId.current}] Successfully saved state from ${componentName.current}`);
-          
-          // Verify the save was successful
-          const savedState = localStorage.getItem(storageKey);
-          if (!savedState) {
-            throw new Error('State was not saved properly');
+      // Add a small delay before setting up the save timeout
+      const setupSaveTimeout = () => {
+        saveTimeoutRef.current = setTimeout(() => {
+          try {
+            const storageKey = getStorageKey(globalState.chataId);
+            const stateToSave = {
+              ...globalState,
+              lastUpdated: new Date().toISOString()
+            };
+            
+            // Use requestAnimationFrame to ensure UI updates complete first
+            requestAnimationFrame(() => {
+              localStorage.setItem(storageKey, JSON.stringify(stateToSave));
+              console.log(`💾 [${hookId.current}] Successfully saved state from ${componentName.current}`);
+              saveTimeoutRef.current = null;
+            });
+          } catch (error) {
+            console.error(`❌ [${hookId.current}] Failed to save state in ${componentName.current}:`, error);
+            saveTimeoutRef.current = null;
           }
-          
-          const parsedSavedState = JSON.parse(savedState);
-          if (!isValidState(parsedSavedState)) {
-            throw new Error('Saved state is invalid');
-          }
-        } catch (error) {
-          console.error(`❌ [${hookId.current}] Failed to save state in ${componentName.current}:`, error);
-          
-          // Retry once on failure
-          setTimeout(() => {
-            try {
-              const storageKey = getStorageKey(globalState.chataId);
-              localStorage.setItem(storageKey, JSON.stringify({
-                ...globalState,
-                lastUpdated: new Date().toISOString()
-              }));
-              console.log(`💾 [${hookId.current}] Successfully saved state on retry from ${componentName.current}`);
-            } catch (retryError) {
-              console.error(`❌ [${hookId.current}] Failed to save state on retry in ${componentName.current}:`, retryError);
-            }
-          }, 500);
-        }
+        }, SAVE_DELAY);
       };
 
-      // Debounce the save operation
-      saveTimeoutRef.current = setTimeout(() => {
-        requestAnimationFrame(() => {
-          saveState();
-          saveTimeoutRef.current = null;
-        });
-      }, SAVE_DELAY);
+      setTimeout(setupSaveTimeout, MIN_OPERATION_INTERVAL);
     }
   }, [globalState]);
 
@@ -454,23 +410,10 @@ export const useFormState = () => {
     return () => {
       if (saveTimeoutRef.current) {
         clearTimeout(saveTimeoutRef.current);
-        
-        // Final save on unmount if there's a pending save
-        const storageKey = getStorageKey(globalState.chataId);
-        try {
-          localStorage.setItem(storageKey, JSON.stringify({
-            ...globalState,
-            lastUpdated: new Date().toISOString()
-          }));
-          console.log(`💾 [${hookId.current}] Successfully saved state on unmount from ${componentName.current}`);
-        } catch (error) {
-          console.error(`❌ [${hookId.current}] Failed to save state on unmount in ${componentName.current}:`, error);
-        }
-        
         saveTimeoutRef.current = null;
       }
     };
-  }, [globalState]);
+  }, []);
 
   // Keep the existing update functions
   const updateFormData = useCallback((updates: Partial<FormState>) => {

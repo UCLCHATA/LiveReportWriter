@@ -1,4 +1,4 @@
- .modalOverlay {
+.modalOverlay {
   position: fixed;
   top: 0;
   left: 0;
@@ -179,10 +179,10 @@
 
 .dialogContent {
   background: white;
-  padding: 1.25rem;
-  border-radius: 8px;
+  padding: 1.5rem;
+  border-radius: 12px;
   width: 90%;
-  max-width: 360px;
+  max-width: 400px;
   box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
   position: relative;
   z-index: 2001;
@@ -190,15 +190,8 @@
 }
 
 .dialogContent h3 {
-  font-size: 1.1rem;
-  margin-bottom: 0.5rem;
-  color: #333;
-}
-
-.dialogContent p {
-  font-size: 0.9rem;
-  color: #666;
-  margin-bottom: 1rem;
+  font-size: 1.2rem;
+  margin-bottom: 0.75rem;
 }
 
 .closeButton {
@@ -244,50 +237,54 @@
 }
 
 .chataIdDisplay {
-  margin: 1.5rem 0;
-  padding: 1.25rem;
+  margin: 2rem 0;
+  padding: 1.5rem;
   background-color: #f8f9fa;
-  border-radius: 6px;
+  border-radius: 8px;
   border: 2px dashed #3498db;
 }
 
 .blinkingId {
-  font-size: 1.75rem;
+  font-size: 2rem;
   font-weight: bold;
   color: #2c3e50;
   letter-spacing: 2px;
+  animation: blink 2s infinite;
+}
+
+@keyframes blink {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.5; }
 }
 
 .chataIdNote {
   color: #7f8c8d;
-  font-size: 0.85rem;
-  margin: 0.75rem 0;
-  line-height: 1.3;
+  font-size: 0.9rem;
+  margin: 1rem 0;
 }
 
 .writingAnimation {
-  width: 160px;
-  height: 160px;
-  margin: 0.75rem auto;
+  width: 200px;
+  height: 200px;
+  margin: 1rem auto;
 }
 
 .segmentedInput {
   display: flex;
   align-items: center;
-  gap: 0.4rem;
+  gap: 0.5rem;
   justify-content: center;
-  margin: 1.25rem 0;
+  margin: 1.5rem 0;
 }
 
 .segment {
-  width: 3.5rem;
+  width: 4rem;
   text-align: center;
-  padding: 0.5rem;
+  padding: 0.75rem;
   border: 1px solid #ddd;
-  border-radius: 4px;
-  font-size: 1.1rem;
+  border-radius: 6px;
+  font-size: 1.2rem;
   text-transform: uppercase;
-  height: 32px;
 }
 
 .segment:focus {
@@ -297,7 +294,7 @@
 }
 
 .separator {
-  font-size: 1.25rem;
+  font-size: 1.5rem;
   color: #95a5a6;
   user-select: none;
 }
@@ -315,84 +312,5 @@
   .modalContent {
     padding: 1.25rem;
   }
-}
-
-.startNewButton {
-  margin-left: 8px;
-  background-color: #4a5568;
-}
-
-.startNewButton:hover {
-  background-color: #2d3748;
-}
-
-select {
-  appearance: none;
-  background-color: white;
-  border: 1px solid #e2e8f0;
-  border-radius: 0.375rem;
-  padding: 0.5rem;
-  padding-right: 2rem;
-  width: 100%;
-  cursor: pointer;
-  background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='%236b7280' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='M6 8l4 4 4-4'/%3e%3c/svg%3e");
-  background-position: right 0.5rem center;
-  background-repeat: no-repeat;
-  background-size: 1.5em 1.5em;
-}
-
-select:focus {
-  outline: none;
-  border-color: #4299e1;
-  box-shadow: 0 0 0 3px rgba(66, 153, 225, 0.5);
-}
-
-.formGroup select {
-  height: 38px;
-  line-height: 38px;
-}
-
-.ageField {
-  min-width: 220px !important;
-}
-
-.ageSelect {
-  font-size: 0.85rem;
-}
-
-.ageSelect :global(.age-select__control) {
-  min-height: 32px;
-  border-color: #ddd;
-  box-shadow: none;
-}
-
-.ageSelect :global(.age-select__control--is-focused) {
-  border-color: #007bff;
-  box-shadow: 0 0 0 2px rgba(0, 123, 255, 0.25);
-}
-
-.ageSelect :global(.age-select__menu) {
-  font-size: 0.85rem;
-}
-
-.ageSelect :global(.age-select__option) {
-  padding: 6px 12px;
-}
-
-.ageSelect :global(.age-select__option--is-focused) {
-  background-color: rgba(0, 123, 255, 0.1);
-}
-
-.ageSelect :global(.age-select__option--is-selected) {
-  background-color: #007bff;
-}
-
-.ageSelect :global(.age-select__value-container) {
-  padding: 0 8px;
-}
-
-.ageSelect :global(.age-select__input-container) {
-  margin: 0;
-  padding: 0;
 }
  

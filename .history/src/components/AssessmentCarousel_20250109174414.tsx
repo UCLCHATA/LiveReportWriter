@@ -81,7 +81,7 @@ const tools: Tool[] = [
     id: 'assessmentLog',
     title: 'Assessment Log',
     component: AssessmentLogger,
-    description: 'Select utilized assessments, their scores and key observations/insights',
+    description: 'Record and monitor assessment progress',
     icon: assessmentIcon
   }
 ];
