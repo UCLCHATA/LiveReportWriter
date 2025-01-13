@@ -1,0 +1,32 @@
+.header {
+  position: sticky;
+  top: 0;
+  z-index: 100001;
+  background: white;
+  padding: 1rem 2rem;
+  border-bottom: 1px solid #E2E8F0;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.titleContainer {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+
+.title {
+  font-size: 2rem;
+  font-weight: bold;
+  margin: 0;
+  color: #2D3748;
+  letter-spacing: 0.05em;
+}
+
+.subtitle {
+  font-size: 1.2rem;
+  font-weight: 500;
+  margin: 0.5rem 0 0;
+  color: #4A5568;
+  letter-spacing: 0.02em;
+} 

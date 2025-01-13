@@ -1,0 +1,472 @@
+import { useState, useEffect, useCallback, useRef, useTransition } from 'react';
+import { debounce } from 'lodash';
+import { 
+  FormState, 
+  ClinicianInfo, 
+  AssessmentData,
+  SensoryProfileData,
+  SocialCommunicationData,
+  BehaviorInterestsData,
+  MilestoneTrackerData,
+  AssessmentLogData,
+  Milestone,
+  AssessmentEntry,
+  isMilestone,
+  isMilestoneTrackerData,
+  isAssessmentEntry,
+  isAssessmentLogData,
+  SensoryDomain,
+  SocialCommunicationDomain,
+  BehaviorDomain
+} from '../types';
+
+// Add back the interface
+interface GlobalFormState {
+  chataId: string;
+  clinician: ClinicianInfo;
+  formData: FormState;
+  assessments: AssessmentData;
+  currentStep: number;
+  lastUpdated: string;
+  status: 'draft' | 'submitted';
+}
+
+// Constants can stay outside
+export const getStorageKey = (chataId: string = '') => `chata-form-${chataId || 'draft'}`;
+const SAVE_DELAY = 3000; // Increase to 3 seconds
+const MIN_SAVE_INTERVAL = 2000; // Increase to 2 seconds
+const MIN_OPERATION_INTERVAL = 1000; // Increase to 1 second
+
+// Keep only essential counters
+let hookInstanceCount = 0;
+let restoreAttemptCount = 0;
+
+// Add back initial state and validation
+const initialFormData: FormState = {
+  status: 'draft',
+  ascStatus: '',
+  adhdStatus: '',
+  referrals: {
+    speech: false,
+    educational: false,
+    sleep: false,
+    occupational: false,
+    mental: false,
+    other: false
+  },
+  remarks: '',
+  clinicalObservations: '',
+  priorityAreas: '',
+  strengths: '',
+  recommendations: '',
+  formProgress: 0,
+  lastUpdated: new Date().toISOString()
+};
+
+const initialState: GlobalFormState = {
+  chataId: '',
+  clinician: {
+    name: '',
+    email: '',
+    clinicName: '',
+    childName: '',
+    childAge: '',
+    childGender: ''
+  },
+  formData: initialFormData,
+  assessments: {
+    sensoryProfile: {
+      type: 'sensoryProfile',
+      domains: {
+        visual: { 
+          name: 'Visual',
+          value: 0, 
+          observations: [],
+          label: 'Typical'
+        },
+        auditory: { 
+          name: 'Auditory',
+          value: 0, 
+          observations: [],
+          label: 'Typical'
+        },
+        tactile: { 
+          name: 'Tactile',
+          value: 0, 
+          observations: [],
+          label: 'Typical'
+        },
+        vestibular: { 
+          name: 'Vestibular',
+          value: 0, 
+          observations: [],
+          label: 'Typical'
+        },
+        proprioceptive: { 
+          name: 'Proprioceptive',
+          value: 0, 
+          observations: [],
+          label: 'Typical'
+        },
+        oral: { 
+          name: 'Oral',
+          value: 0, 
+          observations: [],
+          label: 'Typical'
+        }
+      },
+      progress: 0,
+      isComplete: false
+    },
+    socialCommunication: {
+      type: 'socialCommunication',
+      domains: {
+        jointAttention: { 
+          name: 'Joint Attention',
+          value: 0, 
+          observations: [],
+          label: 'Emerging'
+        },
+        nonverbalCommunication: { 
+          name: 'Non-verbal Communication',
+          value: 0, 
+          observations: [],
+          label: 'Emerging'
+        },
+        verbalCommunication: { 
+          name: 'Verbal Communication',
+          value: 0, 
+          observations: [],
+          label: 'Emerging'
+        },
+        socialUnderstanding: { 
+          name: 'Social Understanding',
+          value: 0, 
+          observations: [],
+          label: 'Emerging'
+        },
+        playSkills: { 
+          name: 'Play Skills',
+          value: 0, 
+          observations: [],
+          label: 'Emerging'
+        },
+        peerInteractions: { 
+          name: 'Peer Interactions',
+          value: 0, 
+          observations: [],
+          label: 'Emerging'
+        }
+      },
+      progress: 0,
+      isComplete: false
+    },
+    behaviorInterests: {
+      type: 'behaviorInterests',
+      domains: {
+        repetitiveBehaviors: { 
+          name: 'Repetitive Behaviors',
+          value: 0, 
+          observations: [],
+          label: 'Moderate Impact'
+        },
+        routinesRituals: { 
+          name: 'Routines & Rituals',
+          value: 0, 
+          observations: [],
+          label: 'Moderate Impact'
+        },
+        specialInterests: { 
+          name: 'Special Interests',
+          value: 0, 
+          observations: [],
+          label: 'Moderate Impact'
+        },
+        sensoryInterests: { 
+          name: 'Sensory Interests',
+          value: 0, 
+          observations: [],
+          label: 'Moderate Impact'
+        },
+        emotionalRegulation: { 
+          name: 'Emotional Regulation',
+          value: 0, 
+          observations: [],
+          label: 'Moderate Impact'
+        },
+        flexibility: { 
+          name: 'Flexibility',
+          value: 0, 
+          observations: [],
+          label: 'Moderate Impact'
+        }
+      },
+      progress: 0,
+      isComplete: false
+    },
+    milestones: {
+      type: 'milestoneTracker',
+      milestones: [],
+      customMilestones: [],
+      history: '',
+      progress: 0,
+      formProgress: 0,
+      isComplete: false,
+      lastUpdated: new Date().toISOString()
+    },
+    assessmentLog: {
+      type: 'assessmentLog',
+      selectedAssessments: [],
+      entries: {},
+      progress: 0,
+      isComplete: false
+    },
+    summary: {
+      type: 'summary',
+      isComplete: false,
+      lastUpdated: new Date().toISOString()
+    }
+  },
+  currentStep: 0,
+  lastUpdated: new Date().toISOString(),
+  status: 'draft'
+};
+
+// Add back validation function
+function isValidState(state: any): state is GlobalFormState {
+  if (!state || typeof state !== 'object') return false;
+  if (!state.formData || !state.assessments) return false;
+  
+  // Check for required properties
+  const requiredProps = ['chataId', 'clinician', 'currentStep', 'lastUpdated', 'status'];
+  if (!requiredProps.every(prop => prop in state)) return false;
+
+  // Validate form data
+  const formProps = ['status', 'formProgress', 'lastUpdated'];
+  if (!formProps.every(prop => prop in state.formData)) return false;
+
+  // Validate assessments
+  const assessmentTypes = ['sensoryProfile', 'socialCommunication', 'behaviorInterests', 'milestones', 'assessmentLog'];
+  if (!assessmentTypes.every(type => type in state.assessments)) return false;
+
+  return true;
+}
+
+export const useFormState = () => {
+  const saveTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+  const hookId = useRef(`hook-${++hookInstanceCount}`);
+  const componentName = useRef(new Error().stack?.split('\n')[2]?.trim()?.split(' ')[1] || 'unknown');
+  const [isPending, startTransition] = useTransition();
+
+  // Load initial state from localStorage first
+  const [globalState, setGlobalState] = useState<GlobalFormState>(() => {
+    try {
+      const storageKey = getStorageKey();
+      const saved = localStorage.getItem(storageKey);
+      if (!saved) return initialState;
+      
+      const parsed = JSON.parse(saved);
+      if (!isValidState(parsed)) return initialState;
+      
+      // Ensure we preserve all progress values and assessment states
+      const restoredState = {
+        ...initialState,
+        ...parsed,
+        formData: {
+          ...initialState.formData,
+          ...parsed.formData,
+          formProgress: Math.max(parsed.formData?.formProgress || 0, initialState.formData.formProgress)
+        },
+        assessments: {
+          ...initialState.assessments,
+          ...parsed.assessments,
+          sensoryProfile: {
+            ...initialState.assessments.sensoryProfile,
+            ...parsed.assessments.sensoryProfile,
+            progress: parsed.assessments.sensoryProfile?.progress || 0,
+            domains: {
+              ...initialState.assessments.sensoryProfile.domains,
+              ...parsed.assessments.sensoryProfile.domains
+            },
+            isComplete: parsed.assessments.sensoryProfile?.isComplete || false
+          },
+          socialCommunication: {
+            ...initialState.assessments.socialCommunication,
+            ...parsed.assessments.socialCommunication,
+            progress: parsed.assessments.socialCommunication?.progress || 0,
+            domains: {
+              ...initialState.assessments.socialCommunication.domains,
+              ...parsed.assessments.socialCommunication.domains
+            },
+            isComplete: parsed.assessments.socialCommunication?.isComplete || false
+          },
+          behaviorInterests: {
+            ...initialState.assessments.behaviorInterests,
+            ...parsed.assessments.behaviorInterests,
+            progress: parsed.assessments.behaviorInterests?.progress || 0,
+            domains: {
+              ...initialState.assessments.behaviorInterests.domains,
+              ...parsed.assessments.behaviorInterests.domains
+            },
+            isComplete: parsed.assessments.behaviorInterests?.isComplete || false
+          },
+          milestones: {
+            ...initialState.assessments.milestones,
+            ...parsed.assessments.milestones,
+            progress: parsed.assessments.milestones?.progress || 0,
+            isComplete: parsed.assessments.milestones?.isComplete || false
+          },
+          assessmentLog: {
+            ...initialState.assessments.assessmentLog,
+            ...parsed.assessments.assessmentLog,
+            progress: parsed.assessments.assessmentLog?.progress || 0,
+            isComplete: parsed.assessments.assessmentLog?.isComplete || false
+          }
+        }
+      };
+      
+      // Log detailed progress information
+      console.log(`✅ [${hookId.current}] Successfully restored state in ${componentName.current}`, {
+        formProgress: restoredState.formData.formProgress,
+        assessmentProgress: {
+          sensory: {
+            progress: restoredState.assessments.sensoryProfile.progress,
+            isComplete: restoredState.assessments.sensoryProfile.isComplete
+          },
+          social: {
+            progress: restoredState.assessments.socialCommunication.progress,
+            isComplete: restoredState.assessments.socialCommunication.isComplete
+          },
+          behavior: {
+            progress: restoredState.assessments.behaviorInterests.progress,
+            isComplete: restoredState.assessments.behaviorInterests.isComplete
+          },
+          milestones: {
+            progress: restoredState.assessments.milestones.progress,
+            isComplete: restoredState.assessments.milestones.isComplete
+          },
+          assessmentLog: {
+            progress: restoredState.assessments.assessmentLog.progress,
+            isComplete: restoredState.assessments.assessmentLog.isComplete
+          }
+        }
+      });
+      
+      return restoredState;
+    } catch (error) {
+      console.error(`❌ [${hookId.current}] Failed to restore state in ${componentName.current}:`, error);
+      return initialState;
+    }
+  });
+
+  // Optimized save function with debouncing
+  const debouncedSave = useRef(
+    debounce((state: GlobalFormState) => {
+      const storageKey = getStorageKey(state.chataId);
+      try {
+        localStorage.setItem(storageKey, JSON.stringify({
+          ...state,
+          lastUpdated: new Date().toISOString()
+        }));
+        console.log(`💾 [${hookId.current}] Successfully saved state from ${componentName.current}`);
+      } catch (error) {
+        console.error(`❌ [${hookId.current}] Failed to save state in ${componentName.current}:`, error);
+      }
+    }, 1000)
+  ).current;
+
+  // Optimized state updates
+  const updateFormData = useCallback((updates: Partial<FormState>) => {
+    setGlobalState(prev => {
+      const newState = {
+        ...prev,
+        formData: {
+          ...prev.formData,
+          ...updates,
+          lastUpdated: new Date().toISOString()
+        }
+      };
+      
+      // Start non-critical updates in transition
+      startTransition(() => {
+        debouncedSave(newState);
+      });
+      
+      return newState;
+    });
+  }, []);
+
+  // Optimized assessment updates with batching
+  const updateAssessment = useCallback((type: keyof AssessmentData, data: Partial<AssessmentData[keyof AssessmentData]>) => {
+    setGlobalState(prev => {
+      const newState = {
+        ...prev,
+        assessments: {
+          ...prev.assessments,
+          [type]: {
+            ...prev.assessments[type],
+            ...data
+          }
+        }
+      };
+
+      // Start non-critical updates in transition
+      startTransition(() => {
+        debouncedSave(newState);
+      });
+
+      return newState;
+    });
+  }, []);
+
+  // Clean up on unmount
+  useEffect(() => {
+    return () => {
+      if (saveTimeoutRef.current) {
+        clearTimeout(saveTimeoutRef.current);
+        
+        // Final save on unmount if there's a pending save
+        const storageKey = getStorageKey(globalState.chataId);
+        try {
+          localStorage.setItem(storageKey, JSON.stringify({
+            ...globalState,
+            lastUpdated: new Date().toISOString()
+          }));
+          console.log(`💾 [${hookId.current}] Successfully saved state on unmount from ${componentName.current}`);
+        } catch (error) {
+          console.error(`❌ [${hookId.current}] Failed to save state on unmount in ${componentName.current}:`, error);
+        }
+        
+        saveTimeoutRef.current = null;
+      }
+    };
+  }, [globalState]);
+
+  const setClinicianInfo = useCallback((info: ClinicianInfo) => {
+    setGlobalState(prev => ({
+      ...prev,
+      clinician: info,
+      chataId: info.chataId || prev.chataId
+    }));
+  }, []);
+
+  const clearState = useCallback(() => {
+    const storageKey = getStorageKey(globalState.chataId);
+    localStorage.removeItem(storageKey);
+    setGlobalState({
+      ...initialState,
+      status: 'draft',
+      lastUpdated: new Date().toISOString()
+    });
+  }, [globalState.chataId]);
+
+  return {
+    globalState,
+    setGlobalState,
+    updateFormData,
+    updateAssessment,
+    setClinicianInfo,
+    clearState,
+    isPending
+  };
+};
