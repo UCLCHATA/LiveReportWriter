@@ -67,21 +67,21 @@ export const SensoryProfileGraph: React.FC<SensoryProfileGraphProps> = ({ data }
       <RadarChart data={radarData} margin={{ top: 5, right: 25, bottom: 5, left: 25 }}>
         <PolarGrid 
           gridType="polygon"
-          stroke="#e5e7eb"
+          stroke="#fce7f3"
           strokeWidth={1}
         />
         <PolarAngleAxis 
           dataKey="domain" 
-          tick={{ fontSize: 13, fill: '#374151', fontWeight: 500 }}
-          stroke="#94a3b8"
+          tick={{ fontSize: 12, fill: '#64748b' }}
+          stroke="#f9a8d4"
           strokeWidth={1}
         />
         <PolarRadiusAxis 
           angle={30} 
           domain={[1, 5]} 
           tickCount={5} 
-          tick={{ fontSize: 12, fill: '#374151' }}
-          stroke="#94a3b8"
+          tick={{ fontSize: 11, fill: '#64748b' }}
+          stroke="#f9a8d4"
           strokeWidth={1}
           scale="linear"
           allowDataOverflow={false}
@@ -91,8 +91,8 @@ export const SensoryProfileGraph: React.FC<SensoryProfileGraphProps> = ({ data }
           dataKey="sensitivity"
           stroke="#be185d"
           fill="#be185d"
-          fillOpacity={0.2}
-          strokeWidth={1.5}
+          fillOpacity={0.15}
+          strokeWidth={2}
         />
       </RadarChart>
     </ResponsiveContainer>

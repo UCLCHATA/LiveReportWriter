@@ -1,55 +1,55 @@
 import React, { useState, useEffect } from 'react';
 import { HelpCircle } from 'lucide-react';
 import { RadarChart, PolarGrid, PolarAngleAxis, PolarRadiusAxis, Radar, ResponsiveContainer } from 'recharts';
-import styles from './SocialCommunicationProfile.module.css';
+import styles from './BehaviorInterestsProfile.module.css';
 
 interface Domain {
   name: string;
   value: number | undefined;
   observations: string[];
-  label: 'Age Appropriate' | 'Subtle Differences' | 'Emerging' | 'Limited' | 'Significantly Limited';
+  label: 'Not Present' | 'Minimal Impact' | 'Moderate Impact' | 'Significant Impact' | 'Severe Impact';
 }
 
-interface SocialCommunicationData {
+interface BehaviorInterestsData {
   domains: Record<string, Domain>;
 }
 
-interface SocialCommunicationProfileProps {
-  data: SocialCommunicationData;
-  onChange: (data: SocialCommunicationData) => void;
+interface BehaviorInterestsProfileProps {
+  data: BehaviorInterestsData;
+  onChange: (data: BehaviorInterestsData) => void;
 }
 
-interface SocialCommunicationGraphProps {
-  data: SocialCommunicationData;
+interface BehaviorInterestsGraphProps {
+  data: BehaviorInterestsData;
 }
 
-const getSensitivityLabel = (value: number): 'Age Appropriate' | 'Subtle Differences' | 'Emerging' | 'Limited' | 'Significantly Limited' => {
+const getSensitivityLabel = (value: number): 'Not Present' | 'Minimal Impact' | 'Moderate Impact' | 'Significant Impact' | 'Severe Impact' => {
   switch (value) {
-    case 1: return 'Age Appropriate';
-    case 2: return 'Subtle Differences';
-    case 3: return 'Emerging';
-    case 4: return 'Limited';
-    case 5: return 'Significantly Limited';
-    default: return 'Emerging';
+    case 1: return 'Not Present';
+    case 2: return 'Minimal Impact';
+    case 3: return 'Moderate Impact';
+    case 4: return 'Significant Impact';
+    case 5: return 'Severe Impact';
+    default: return 'Moderate Impact';
   }
 };
 
 const getDomainTooltip = (domain: string): string => {
   switch (domain) {
-    case 'Joint Attention':
-      return 'DSM-5 A.1 & ICF b122:\n• Social-emotional reciprocity\n• Initiation of social interaction\n• Sharing of interests/emotions\n• Response to social approaches\n• Psychosocial functions';
-    case 'Social Reciprocity':
-      return 'DSM-5 A.1 & ICF d710:\n• Back-and-forth communication\n• Emotional engagement\n• Social imitation skills\n• Basic interpersonal interactions\n• Relationship maintenance';
-    case 'Verbal Communication':
-      return 'DSM-5 A.2 & ICF b167:\n• Expressive language skills\n• Conversation abilities\n• Language pragmatics\n• Mental functions of language\n• Speech patterns/prosody';
-    case 'Non-verbal Communication':
-      return 'DSM-5 A.2 & ICF b1671:\n• Gesture use and understanding\n• Facial expression range\n• Eye contact quality\n• Expression of language\n• Body language interpretation';
-    case 'Social Understanding':
-      return 'DSM-5 A.3 & ICF d720:\n• Relationship comprehension\n• Social context adaptation\n• Complex social interactions\n• Social inference abilities\n• Boundary awareness';
-    case 'Play Skills':
-      return 'DSM-5 A.3 & ICF d880:\n• Imaginative play development\n• Symbolic play abilities\n• Social play engagement\n• Engagement in play\n• Play flexibility';
+    case 'Repetitive Behaviors':
+      return 'DSM-5 B.1 & ICF b147:\n• Stereotyped movements\n• Motor mannerisms\n• Object manipulation\n• Repetitive speech\n• Psychomotor functions';
+    case 'Restricted Interests':
+      return 'DSM-5 B.3 & ICF b1301:\n• Interest intensity\n• Topic perseveration\n• Focus fixation\n• Motivation functions\n• Interest flexibility';
+    case 'Sensory Seeking':
+      return 'DSM-5 B.4 & ICF b250-b270:\n• Sensory exploration\n• Stimulation seeking\n• Sensory avoidance\n• Sensory functions\n• Environmental interaction';
+    case 'Routine Adherence':
+      return 'DSM-5 B.2 & ICF b1641:\n• Routine rigidity\n• Change resistance\n• Ritual behaviors\n• Organization of events\n• Schedule adherence';
+    case 'Flexibility':
+      return 'DSM-5 B.2 & ICF d175:\n• Cognitive flexibility\n• Adaptation ability\n• Problem solving\n• Solving problems\n• Alternative approaches';
+    case 'Activity Transitions':
+      return 'DSM-5 B.2 & ICF d230:\n• Transition management\n• Activity switching\n• Daily routine\n• Carrying out daily routine\n• Schedule changes';
     default:
-      return 'Rate social communication abilities in this domain';
+      return 'Rate behavioral patterns and their impact on daily functioning';
   }
 };
 
@@ -58,7 +58,7 @@ const getSliderBackground = (value: number) => {
   return `linear-gradient(to right, #4f46e5 ${percentage}%, #e5e7eb ${percentage}%)`;
 };
 
-export const SocialCommunicationGraph: React.FC<SocialCommunicationGraphProps> = ({ data }) => {
+export const BehaviorInterestsGraph: React.FC<BehaviorInterestsGraphProps> = ({ data }) => {
   if (!data?.domains) return null;
 
   const chartData = Object.values(data.domains).map(domain => ({
@@ -68,45 +68,43 @@ export const SocialCommunicationGraph: React.FC<SocialCommunicationGraphProps> =
   }));
 
   return (
-    <div className={styles.graphContainer}>
-      <ResponsiveContainer width="100%" height={250}>
-        <RadarChart data={chartData} margin={{ top: 5, right: 25, bottom: 5, left: 25 }}>
-          <PolarGrid 
-            gridType="polygon"
-            stroke="#e5e7eb"
-            strokeWidth={1}
-          />
-          <PolarAngleAxis 
-            dataKey="subject" 
-            tick={{ fontSize: 13, fill: '#374151', fontWeight: 500 }}
-            stroke="#94a3b8"
-            strokeWidth={1}
-          />
-          <PolarRadiusAxis 
-            angle={30} 
-            domain={[1, 5]} 
-            tickCount={5} 
-            tick={{ fontSize: 12, fill: '#374151' }}
-            stroke="#94a3b8"
-            strokeWidth={1}
-            scale="linear"
-            allowDataOverflow={false}
-          />
-          <Radar
-            name="Communication"
-            dataKey="A"
-            stroke="#10b981"
-            fill="#10b981"
-            fillOpacity={0.2}
-            strokeWidth={1.5}
-          />
-        </RadarChart>
-      </ResponsiveContainer>
-    </div>
+    <ResponsiveContainer width="100%" height={250}>
+      <RadarChart data={chartData} margin={{ top: 5, right: 25, bottom: 5, left: 25 }}>
+        <PolarGrid 
+          gridType="polygon"
+          stroke="#e5e7eb"
+          strokeWidth={1}
+        />
+        <PolarAngleAxis 
+          dataKey="subject" 
+          tick={{ fontSize: 13, fill: '#374151', fontWeight: 500 }}
+          stroke="#94a3b8"
+          strokeWidth={1}
+        />
+        <PolarRadiusAxis 
+          angle={30} 
+          domain={[1, 5]} 
+          tickCount={5} 
+          tick={{ fontSize: 12, fill: '#374151' }}
+          stroke="#94a3b8"
+          strokeWidth={1}
+          scale="linear"
+          allowDataOverflow={false}
+        />
+        <Radar
+          name="Behavior"
+          dataKey="A"
+          stroke="#f59e0b"
+          fill="#f59e0b"
+          fillOpacity={0.2}
+          strokeWidth={2}
+        />
+      </RadarChart>
+    </ResponsiveContainer>
   );
 };
 
-export const SocialCommunicationProfile: React.FC<SocialCommunicationProfileProps> = ({ data, onChange }) => {
+export const BehaviorInterestsProfile: React.FC<BehaviorInterestsProfileProps> = ({ data, onChange }) => {
   const [newObservation, setNewObservation] = useState('');
   const [selectedDomain, setSelectedDomain] = useState<string | null>(null);
 
@@ -115,12 +113,12 @@ export const SocialCommunicationProfile: React.FC<SocialCommunicationProfileProp
     if (!data?.domains) {
       onChange({
         domains: {
-          jointAttention: { name: 'Joint Attention', value: undefined, observations: [], label: 'Emerging' },
-          socialReciprocity: { name: 'Social Reciprocity', value: undefined, observations: [], label: 'Emerging' },
-          verbalCommunication: { name: 'Verbal Communication', value: undefined, observations: [], label: 'Emerging' },
-          nonverbalCommunication: { name: 'Non-verbal Communication', value: undefined, observations: [], label: 'Emerging' },
-          socialUnderstanding: { name: 'Social Understanding', value: undefined, observations: [], label: 'Emerging' },
-          playSkills: { name: 'Play Skills', value: undefined, observations: [], label: 'Emerging' },
+          repetitiveBehaviors: { name: 'Repetitive Behaviors', value: undefined, observations: [], label: 'Moderate Impact' },
+          restrictedInterests: { name: 'Restricted Interests', value: undefined, observations: [], label: 'Moderate Impact' },
+          sensorySeeking: { name: 'Sensory Seeking', value: undefined, observations: [], label: 'Moderate Impact' },
+          routineAdherence: { name: 'Routine Adherence', value: undefined, observations: [], label: 'Moderate Impact' },
+          flexibility: { name: 'Flexibility', value: undefined, observations: [], label: 'Moderate Impact' },
+          activityTransitions: { name: 'Activity Transitions', value: undefined, observations: [], label: 'Moderate Impact' },
         }
       });
     }
@@ -130,7 +128,7 @@ export const SocialCommunicationProfile: React.FC<SocialCommunicationProfileProp
     if (!data?.domains) return;
     
     const updatedData = {
-      type: 'socialCommunication',
+      type: 'behaviorInterests',
       domains: {
         ...data.domains,
         [domain]: {
@@ -147,7 +145,7 @@ export const SocialCommunicationProfile: React.FC<SocialCommunicationProfileProp
     if (!data?.domains || !newObservation.trim()) return;
     
     const updatedData = {
-      type: 'socialCommunication',
+      type: 'behaviorInterests',
       domains: {
         ...data.domains,
         [domain]: {

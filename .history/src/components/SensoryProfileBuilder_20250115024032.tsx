@@ -92,7 +92,7 @@ export const SensoryProfileGraph: React.FC<SensoryProfileGraphProps> = ({ data }
           stroke="#be185d"
           fill="#be185d"
           fillOpacity={0.2}
-          strokeWidth={1.5}
+          strokeWidth={2}
         />
       </RadarChart>
     </ResponsiveContainer>

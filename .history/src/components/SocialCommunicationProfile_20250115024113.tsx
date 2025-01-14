@@ -98,7 +98,7 @@ export const SocialCommunicationGraph: React.FC<SocialCommunicationGraphProps> =
             stroke="#10b981"
             fill="#10b981"
             fillOpacity={0.2}
-            strokeWidth={1.5}
+            strokeWidth={2}
           />
         </RadarChart>
       </ResponsiveContainer>
