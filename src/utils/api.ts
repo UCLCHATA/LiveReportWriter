@@ -150,26 +150,62 @@ export const submitToSheetyAPI = async (url: string, data: any): Promise<SheetyR
   return retryWithBackoff(submitFn);
 };
 
+// Helper function to create a JSONP request
+const createJSONPRequest = (url: string, chataId: string): Promise<any> => {
+  return new Promise((resolve, reject) => {
+    const callbackName = 'jsonp_callback_' + Math.round(100000 * Math.random());
+    let timeoutId: NodeJS.Timeout;
+
+    // Create callback function
+    (window as any)[callbackName] = (response: any) => {
+      if (timeoutId) clearTimeout(timeoutId);
+      cleanup();
+      resolve(response);
+    };
+
+    // Create script element
+    const script = document.createElement('script');
+    const urlWithParams = `${url}?callback=${callbackName}&chataId=${encodeURIComponent(chataId)}`;
+    script.src = urlWithParams;
+
+    // Add error handling
+    script.onerror = () => {
+      cleanup();
+      reject(new Error('Script load failed'));
+    };
+
+    // Set timeout
+    timeoutId = setTimeout(() => {
+      cleanup();
+      reject(new Error('Request timed out'));
+    }, 180000); // 3 minutes timeout
+
+    // Cleanup function
+    const cleanup = () => {
+      document.head.removeChild(script);
+      delete (window as any)[callbackName];
+      if (timeoutId) clearTimeout(timeoutId);
+    };
+
+    // Add script to document
+    document.head.appendChild(script);
+    console.log(`Making Apps Script JSONP call to: ${urlWithParams}`);
+  });
+};
+
 export const makeAppsScriptCall = async (url: string, chataId?: string): Promise<AppsScriptResponse> => {
   const callFn = async () => {
     if (!chataId) {
       throw new Error('CHATA ID is required');
     }
 
-    const response = await fetch(url, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json'
-      },
-      body: JSON.stringify({ chataId })
-    });
-
-    if (!response.ok) {
-      throw new Error(`HTTP error! status: ${response.status}`);
+    try {
+      const response = await createJSONPRequest(url, chataId);
+      return response;
+    } catch (error) {
+      console.error('JSONP request failed:', error);
+      throw error;
     }
-
-    const data = await response.json();
-    return data;
   };
 
   try {

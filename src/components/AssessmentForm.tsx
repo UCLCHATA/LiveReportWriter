@@ -7,25 +7,22 @@ import {
   Star, 
   Lightbulb,
   MessageSquare,
-  Zap,
-  Award,
-  Brain,
-  Sparkles,
-  Target,
   Search,
-  AlertTriangle,
-  Dumbbell,
-  ThumbsUp,
   HelpCircle,
   X
 } from 'lucide-react';
 import styles from './AssessmentForm.module.css';
 import html2canvas from 'html2canvas';
 import { SubmissionOverlay } from './SubmissionOverlay';
-import { R3_FORM_API, APPS_SCRIPT_URLS } from '../config/api';
-import { makeAppsScriptCall, submitToSheetyAPI } from '../utils/api';
+import { APPS_SCRIPT_URL } from '../config/api';
+import { makeAppsScriptCall } from '../utils/api';
 import { submitFormData } from '../services/formSubmission';
 import { Milestone } from '../types';
+import { 
+  AlertTriangle, 
+  Dumbbell, 
+  ThumbsUp
+} from 'lucide-react';
 
 interface WordCountState {
   count: number;
@@ -532,8 +529,6 @@ export const AssessmentForm: React.FC<AssessmentFormProps> = ({
               },
               summary: {
                 type: 'summary',
-                progress: 100,
-                isComplete: true,
                 lastUpdated: new Date().toISOString()
               }
             },

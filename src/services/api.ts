@@ -1,14 +1,10 @@
+import { APPS_SCRIPT_URLS } from '../config/api';
+
 export const SHEETY_API_ID = 'd9da852d0370030da19c227582af6f3a';
 export const SHEETY_PROJECT = 'chataLiveData';
 export const SHEETY_BASE_URL = `https://api.sheety.co/${SHEETY_API_ID}/${SHEETY_PROJECT}`;
 export const ALL_URL_API = `${SHEETY_BASE_URL}/allUrl`;
 export const R3_FORM_API = `${SHEETY_BASE_URL}/r3Form`;
-
-export const APPS_SCRIPT_URLS = {
-    template: 'https://script.google.com/macros/s/AKfycbwYyyaje5rAmTXvE3ApMPjp8qwKCBWMFA1WxOoV2s_Dy4FohDb6siAMutybl1A2QTGDIQ/exec',
-    analysis: 'https://script.google.com/macros/s/AKfycby2ykbSfpqB5TwkZEFd57TdUJfCpe7SSSz0Ct30tcSo-8l5ButjAbM527luEGvHI7JD/exec',
-    report: 'https://script.google.com/macros/s/AKfycby99LABGexgJxnuuBjFJytq8mwy3xqX9_OjUlXsYTNDtpZSzlMBbXwokPt8ZNgYWVE/exec'
-};
 
 export interface ChataData {
     id: string;
@@ -95,39 +91,164 @@ export async function submitFormData(formData: any) {
     return response.json();
 }
 
-export async function submitToSheetyAPI(url: string, data: any) {
-    // Ensure milestone data is properly formatted
-    if (data.r3Form && data.r3Form.Milestone_Timeline_Data) {
-        // Log the milestone data being sent
-        console.log('Sending milestone data:', data.r3Form.Milestone_Timeline_Data);
-    }
+interface SheetyResponse {
+  success: boolean;
+  error?: string;
+  r3Form?: {
+    id: string;
+    chataId: string;
+    timestamp: string;
+    [key: string]: any;
+  };
+}
 
-    const response = await fetch(url, {
+interface ChunkMetadata {
+  total_chunks: number;
+  chunk_index: number;
+  image_type: string;
+}
+
+const retryWithBackoff = async <T>(
+  fn: () => Promise<T>,
+  maxRetries: number = 3,
+  baseDelay: number = 1000
+): Promise<T> => {
+  let lastError: Error;
+  
+  for (let attempt = 0; attempt < maxRetries; attempt++) {
+    try {
+      return await fn();
+    } catch (err) {
+      lastError = err instanceof Error ? err : new Error(String(err));
+      if (attempt === maxRetries - 1) throw lastError;
+      
+      const delay = baseDelay * Math.pow(2, attempt);
+      console.log(`Retry attempt ${attempt + 1}/${maxRetries} after ${delay}ms`);
+      await new Promise(resolve => setTimeout(resolve, delay));
+    }
+  }
+  
+  throw lastError!;
+};
+
+export const submitToSheetyAPI = async (url: string, data: any): Promise<SheetyResponse> => {
+  const submitFn = async () => {
+    try {
+      // Ensure data is properly formatted for Sheety
+      if (!data.r3Form) {
+        console.error('Invalid data structure: missing r3Form root property');
+        throw new Error('Data must be wrapped in r3Form object');
+      }
+
+      // Check if this is a chunk submission
+      const isChunk = data.r3Form.total_chunks !== undefined;
+      
+      // Format the data appropriately
+      const formattedData = {
+        r3Form: Object.entries(data.r3Form).reduce((acc, [key, value]) => {
+          // Handle empty strings and null values
+          const formattedValue = value === null || value === undefined ? '' : value;
+          return {
+            ...acc,
+            [key]: formattedValue
+          };
+        }, {} as Record<string, any>)
+      };
+
+      // Log the request (masking sensitive data)
+      const logSafeData = {
+        ...formattedData,
+        r3Form: {
+          ...formattedData.r3Form,
+          // Mask any base64 image data in the log
+          ...Object.entries(formattedData.r3Form).reduce((acc, [key, value]) => ({
+            ...acc,
+            [key]: typeof value === 'string' && value.length > 1000 ? '[BASE64_DATA]' : value
+          }), {})
+        }
+      };
+
+      console.log('Sheety API Request:', {
+        url,
         method: 'POST',
+        isChunk,
         headers: {
+          'Content-Type': 'application/json',
+          'Authorization': 'Bearer CHATAI'
+        },
+        body: logSafeData
+      });
+
+      // Make the request with a timeout
+      const controller = new AbortController();
+      const timeout = setTimeout(() => controller.abort(), 30000); // 30 second timeout
+
+      try {
+        const response = await fetch(url, {
+          method: 'POST',
+          headers: {
             'Content-Type': 'application/json',
             'Authorization': 'Bearer CHATAI'
-        },
-        body: JSON.stringify(data)
-    });
+          },
+          body: JSON.stringify(formattedData),
+          signal: controller.signal
+        });
 
-    if (!response.ok) {
-        const errorText = await response.text();
-        console.error('Sheety API error:', {
+        clearTimeout(timeout);
+
+        const responseText = await response.text();
+        console.log('Raw Sheety API Response:', responseText);
+
+        let jsonResponse;
+        try {
+          jsonResponse = JSON.parse(responseText);
+          console.log('Parsed Sheety API Response:', jsonResponse);
+        } catch (e) {
+          console.error('Failed to parse Sheety API response:', {
+            responseText,
+            error: e instanceof Error ? e.message : 'Unknown error'
+          });
+          throw new Error(`Invalid JSON response from Sheety API: ${responseText}`);
+        }
+
+        if (!response.ok) {
+          // Special handling for payload too large errors
+          if (response.status === 413) {
+            throw new Error('Payload too large. Please reduce the size of the data being sent.');
+          }
+          
+          console.error('Sheety API Error:', {
             status: response.status,
             statusText: response.statusText,
-            error: errorText,
-            sentData: {
-                ...data,
-                r3Form: {
-                    ...data.r3Form,
-                    milestoneImage: data.r3Form.milestoneImage ? '[BASE64_IMAGE]' : '',
-                    combinedGraphImage: data.r3Form.combinedGraphImage ? '[BASE64_IMAGE]' : ''
-                }
-            }
-        });
-        throw new Error(`Sheety API error: ${response.status} ${response.statusText}`);
-    }
+            response: jsonResponse,
+            requestData: logSafeData
+          });
+          throw new Error(`Sheety API submission failed: ${response.status} ${response.statusText}`);
+        }
 
-    return response.json();
-} 
+        // Log successful submission details
+        console.log('Sheety API Success:', {
+          status: response.status,
+          rowId: jsonResponse?.r3Form?.id,
+          isChunk,
+          response: jsonResponse
+        });
+
+        return jsonResponse;
+      } finally {
+        clearTimeout(timeout);
+      }
+    } catch (error: unknown) {
+      if (error instanceof Error && error.name === 'AbortError') {
+        throw new Error('Request timed out after 30 seconds');
+      }
+      console.error('Sheety API submission error:', {
+        error: error instanceof Error ? error.message : 'Unknown error',
+        stack: error instanceof Error ? error.stack : undefined
+      });
+      throw error;
+    }
+  };
+
+  return retryWithBackoff(submitFn);
+}; 

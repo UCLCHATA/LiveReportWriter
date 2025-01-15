@@ -1,1 +1,5 @@
-node_modules
+.history/
+.DS_Store
+node_modules/
+dist/
+.env

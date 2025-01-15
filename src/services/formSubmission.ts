@@ -1,6 +1,6 @@
-import { submitToSheetyAPI } from '../utils/api';
+import { submitToSheetyAPI, R3_FORM_API } from '../services/api';
 import { GlobalFormState, Milestone, AssessmentDomainBase } from '../types';
-import { R3_FORM_API } from '../config/api';
+import { APPS_SCRIPT_URLS } from '../config/api';
 import html2canvas from 'html2canvas';
 
 interface Assessment {
@@ -28,6 +28,25 @@ interface SheetyFormData {
   assessmentLogData?: string;
   chataId?: string;
   timestamp?: string;
+  appScriptUrl?: string;
+}
+
+interface ReportGenerationResponse {
+  success: boolean;
+  error?: string;
+  templateUrl: string;
+  downloadUrl: string;
+  documentTitle: string;
+  progress: {
+    status: string;
+    message: string;
+    step: number;
+    totalSteps: number;
+    details: {
+      documentUrl: string;
+      timestamp: string;
+    };
+  };
 }
 
 const toCamelCase = (str: string): string => {
@@ -307,6 +326,172 @@ const splitBase64Image = (base64Data: string, includeFlag: boolean): string[] =>
   return chunks;
 };
 
+const generateReport = async (rawData: any): Promise<ReportGenerationResponse> => {
+    return new Promise((resolve, reject) => {
+        const callbackName = 'callback_' + Math.round(100000 * Math.random());
+        let timeoutId: number;
+        let script: HTMLScriptElement;
+        let redirectAttempts = 0;
+        const MAX_REDIRECT_ATTEMPTS = 3;
+
+        console.log('Initializing report generation with:', {
+            callbackName,
+            chataId: rawData.chataId,
+            timestamp: rawData.timestamp
+        });
+
+        // Create cleanup function
+        const cleanup = (reason: string) => {
+            console.log(`Cleaning up report generation (Reason: ${reason})`, {
+                timeoutExists: !!timeoutId,
+                scriptExists: !!script,
+                scriptInDOM: script?.parentNode != null,
+                callbackExists: !!(window as any)[callbackName]
+            });
+            
+            if (timeoutId) clearTimeout(timeoutId);
+            if (script && script.parentNode) {
+                script.parentNode.removeChild(script);
+            }
+            delete (window as any)[callbackName];
+        };
+
+        // Create callback function
+        (window as any)[callbackName] = (response: ReportGenerationResponse) => {
+            console.log('JSONP callback received response:', {
+                success: response.success,
+                hasTemplateUrl: !!response.templateUrl,
+                hasDownloadUrl: !!response.downloadUrl,
+                documentTitle: response.documentTitle,
+                progress: response.progress
+            });
+            
+            cleanup('Callback received');
+            
+            if (response.success) {
+                // Handle successful response
+                if (response.templateUrl) {
+                    console.log('Opening report in new tab:', response.templateUrl);
+                    window.open(response.templateUrl, '_blank');
+                }
+                
+                // Create email link if download URL is available
+                if (response.downloadUrl) {
+                    console.log('Creating email link with download URL:', response.downloadUrl);
+                    const emailSubject = `Report for ${rawData.childFirstName || 'Assessment'}`;
+                    const emailBody = `Please find the assessment report attached.\n\nDownload link: ${response.downloadUrl}`;
+                    const emailLink = document.createElement('a');
+                    emailLink.href = `mailto:?subject=${encodeURIComponent(emailSubject)}&body=${encodeURIComponent(emailBody)}`;
+                    emailLink.click();
+                }
+                
+                resolve(response);
+            } else {
+                const error = new Error(response.error || 'Unknown error');
+                console.error('JSONP callback received error:', error);
+                reject(error);
+            }
+        };
+
+        const handleRedirect = async (url: string) => {
+            redirectAttempts++;
+            console.log(`Handling redirect attempt ${redirectAttempts}/${MAX_REDIRECT_ATTEMPTS}:`, {
+                originalUrl: reportGenerationUrl,
+                redirectUrl: url
+            });
+
+            if (redirectAttempts > MAX_REDIRECT_ATTEMPTS) {
+                const error = new Error(`Exceeded maximum redirect attempts (${MAX_REDIRECT_ATTEMPTS})`);
+                console.error('Redirect limit exceeded:', error);
+                cleanup('Redirect limit exceeded');
+                reject(error);
+                return;
+            }
+
+            try {
+                // Instead of creating a new script, fetch the content directly
+                console.log('Fetching redirected content directly:', url);
+                const response = await fetch(url);
+                const content = await response.text();
+                
+                console.log('Received content from redirect:', {
+                    length: content.length,
+                    preview: content.substring(0, 100)
+                });
+
+                // Create a new script with the content
+                const newScript = document.createElement('script');
+                newScript.textContent = content;
+                console.log('Creating new script element with fetched content');
+
+                // Add error handling for the new script
+                newScript.onerror = (error) => {
+                    console.error('Script execution failed:', error);
+                    cleanup('Script execution error');
+                    reject(new Error('Failed to execute script content'));
+                };
+
+                // Add the script to the document
+                document.head.appendChild(newScript);
+                console.log('Added script with content to document head');
+            } catch (error) {
+                console.error('Error handling redirect:', error);
+                cleanup('Redirect handling error');
+                reject(new Error('Failed to handle redirect'));
+            }
+        };
+
+        // Create script element
+        script = document.createElement('script');
+        const reportGenerationUrl = `${APPS_SCRIPT_URLS.reportGeneration}?callback=${callbackName}&chataId=${encodeURIComponent(rawData.chataId)}&timestamp=${encodeURIComponent(rawData.timestamp)}`;
+        script.src = reportGenerationUrl;
+        console.log('Creating initial script element:', {
+            url: reportGenerationUrl,
+            callbackName
+        });
+
+        // Add error handling
+        script.onerror = async () => {
+            console.error('Initial script load failed, checking for redirects...');
+            cleanup('Initial script error');
+            
+            try {
+                console.log('Fetching URL to check for redirects:', reportGenerationUrl);
+                const response = await fetch(reportGenerationUrl);
+                console.log('Fetch response:', {
+                    status: response.status,
+                    statusText: response.statusText,
+                    redirected: response.redirected,
+                    redirectUrl: response.redirected ? response.url : 'N/A',
+                    type: response.type,
+                    headers: Array.from(response.headers.entries())
+                });
+                
+                if (response.redirected) {
+                    await handleRedirect(response.url);
+                } else {
+                    console.error('No redirect found in response');
+                    reject(new Error('Failed to load report generation script'));
+                }
+            } catch (error) {
+                console.error('Error checking for redirects:', error);
+                reject(new Error('Failed to check for redirects'));
+            }
+        };
+
+        // Set timeout (3 minutes)
+        timeoutId = window.setTimeout(() => {
+            console.error('Report generation timed out after 3 minutes');
+            cleanup('Timeout');
+            reject(new Error('Report generation timed out'));
+        }, 180000);
+
+        // Add script to document
+        document.head.appendChild(script);
+        console.log('Added initial script to document head');
+    });
+};
+
 export const submitFormData = async (data: FormSubmissionData) => {
   console.log('Submitting form data...');
   
@@ -320,24 +505,20 @@ export const submitFormData = async (data: FormSubmissionData) => {
   console.log('Image capture results:', {
     radarChart: {
       present: !!radarChartImage,
-      length: radarChartImage.length,
-      includeFlag: data.globalState.assessments.summary?.includeInReport,
-      expectedChunks: Math.ceil(radarChartImage.length / 25000)
+      length: radarChartImage?.length,
+      includeFlag: data.globalState.assessments.summary?.includeInReport
     },
     timeline: {
       present: !!timelineImage,
-      length: timelineImage.length,
-      includeFlag: data.globalState.assessments.milestones?.includeTimelineInReport,
-      expectedChunks: Math.ceil(timelineImage.length / 25000)
+      length: timelineImage?.length,
+      includeFlag: data.globalState.assessments.milestones?.includeTimelineInReport
     }
   });
 
-  // Format all data
-  const rawData = {
+  // Format base data
+  const formattedData = {
     // Metadata
     timestamp: new Date().toISOString(),
-    
-    // Clinician Data
     chataId: data.globalState.clinician?.chataId,
     clinicName: data.globalState.clinician?.clinicName,
     clinicianName: data.globalState.clinician?.name,
@@ -346,63 +527,6 @@ export const submitFormData = async (data: FormSubmissionData) => {
     childSecondName: data.globalState.clinician?.childSecondName,
     childAge: data.globalState.clinician?.childAge,
     childGender: data.globalState.clinician?.childGender,
-
-    // Sensory Profile Data
-    visualScore: formatDomainValue(data.globalState.assessments.sensoryProfile.domains.visual),
-    visualObservations: formatObservations(data.globalState.assessments.sensoryProfile.domains.visual?.observations),
-    auditoryScore: formatDomainValue(data.globalState.assessments.sensoryProfile.domains.auditory),
-    auditoryObservations: formatObservations(data.globalState.assessments.sensoryProfile.domains.auditory?.observations),
-    tactileScore: formatDomainValue(data.globalState.assessments.sensoryProfile.domains.tactile),
-    tactileObservations: formatObservations(data.globalState.assessments.sensoryProfile.domains.tactile?.observations),
-    vestibularScore: formatDomainValue(data.globalState.assessments.sensoryProfile.domains.vestibular),
-    vestibularObservations: formatObservations(data.globalState.assessments.sensoryProfile.domains.vestibular?.observations),
-    proprioceptiveScore: formatDomainValue(data.globalState.assessments.sensoryProfile.domains.proprioceptive),
-    proprioceptiveObservations: formatObservations(data.globalState.assessments.sensoryProfile.domains.proprioceptive?.observations),
-    oralScore: formatDomainValue(data.globalState.assessments.sensoryProfile.domains.oral),
-    oralObservations: formatObservations(data.globalState.assessments.sensoryProfile.domains.oral?.observations),
-
-    // Social Communication Data
-    jointAttentionScore: formatDomainValue(data.globalState.assessments.socialCommunication.domains.jointAttention),
-    jointAttentionObservations: formatObservations(data.globalState.assessments.socialCommunication.domains.jointAttention?.observations),
-    nonverbalCommunicationScore: formatDomainValue(data.globalState.assessments.socialCommunication.domains.nonverbalCommunication),
-    nonverbalCommunicationObservations: formatObservations(data.globalState.assessments.socialCommunication.domains.nonverbalCommunication?.observations),
-    verbalCommunicationScore: formatDomainValue(data.globalState.assessments.socialCommunication.domains.verbalCommunication),
-    verbalCommunicationObservations: formatObservations(data.globalState.assessments.socialCommunication.domains.verbalCommunication?.observations),
-    socialUnderstandingScore: formatDomainValue(data.globalState.assessments.socialCommunication.domains.socialUnderstanding),
-    socialUnderstandingObservations: formatObservations(data.globalState.assessments.socialCommunication.domains.socialUnderstanding?.observations),
-    playSkillsScore: formatDomainValue(data.globalState.assessments.socialCommunication.domains.playSkills),
-    playSkillsObservations: formatObservations(data.globalState.assessments.socialCommunication.domains.playSkills?.observations),
-    peerInteractionsScore: formatDomainValue(data.globalState.assessments.socialCommunication.domains.peerInteractions),
-    peerInteractionsObservations: formatObservations(data.globalState.assessments.socialCommunication.domains.peerInteractions?.observations),
-
-    // Behavior & Interests Data
-    repetitiveBehaviorsScore: formatDomainValue(data.globalState.assessments.behaviorInterests.domains.repetitiveBehaviors),
-    repetitiveBehaviorsObservations: formatObservations(data.globalState.assessments.behaviorInterests.domains.repetitiveBehaviors?.observations),
-    routinesRitualsScore: formatDomainValue(data.globalState.assessments.behaviorInterests.domains.routinesRituals),
-    routinesRitualsObservations: formatObservations(data.globalState.assessments.behaviorInterests.domains.routinesRituals?.observations),
-    specialInterestsScore: formatDomainValue(data.globalState.assessments.behaviorInterests.domains.specialInterests),
-    specialInterestsObservations: formatObservations(data.globalState.assessments.behaviorInterests.domains.specialInterests?.observations),
-    sensoryInterestsScore: formatDomainValue(data.globalState.assessments.behaviorInterests.domains.sensoryInterests),
-    sensoryInterestsObservations: formatObservations(data.globalState.assessments.behaviorInterests.domains.sensoryInterests?.observations),
-    emotionalRegulationScore: formatDomainValue(data.globalState.assessments.behaviorInterests.domains.emotionalRegulation),
-    emotionalRegulationObservations: formatObservations(data.globalState.assessments.behaviorInterests.domains.emotionalRegulation?.observations),
-    flexibilityScore: formatDomainValue(data.globalState.assessments.behaviorInterests.domains.flexibility),
-    flexibilityObservations: formatObservations(data.globalState.assessments.behaviorInterests.domains.flexibility?.observations),
-
-    // Milestone Data
-    milestoneTimelineData: formatMilestoneData(data.globalState.assessments.milestones.milestones),
-    historyOfConcerns: data.globalState.assessments.milestones.history,
-    ...(() => {
-      const chunks = splitBase64Image(timelineImage, !!data.globalState.assessments.milestones?.includeTimelineInReport);
-      console.log('Created milestone image chunks:', chunks.map((_, i) => `milestoneImageChunk${i + 1}`));
-      return chunks.reduce((acc, chunk, index) => ({
-        ...acc,
-        [`milestoneImageChunk${index + 1}`]: chunk
-      }), {});
-    })(),
-
-    // Assessment Log Data
-    assessmentLogData: formatAssessmentLog(data.globalState.assessments.assessmentLog.entries),
 
     // Form Data
     ascStatus: data.globalState.formData.ascStatus,
@@ -417,42 +541,73 @@ export const submitFormData = async (data: FormSubmissionData) => {
       .join(', '),
     additionalRemarks: data.globalState.formData.remarks,
     differentialDiagnosis: data.globalState.formData.differentialDiagnosis,
-
-    // Combined Graph Chunks
-    ...(() => {
-      const chunks = splitBase64Image(radarChartImage, !!data.globalState.assessments.summary?.includeInReport);
-      console.log('Created combined graph chunks:', chunks.map((_, i) => `combinedGraphImageChunk${i + 1}`));
-      return chunks.reduce((acc, chunk, index) => ({
-        ...acc,
-        [`combinedGraphImageChunk${index + 1}`]: chunk
-      }), {});
-    })()
   };
 
-  // Convert all values to strings before submission
-  const stringifiedData = Object.entries(rawData).reduce((acc, [key, value]) => {
-    console.log(`Processing field "${key}":`, {
-      type: typeof value,
-      length: typeof value === 'string' ? value.length : 'N/A',
-      preview: typeof value === 'string' ? value.slice(0, 100) + '...' : value
-    });
-    return {
-      ...acc,
-      [key]: ensureString(value)
-    };
-  }, {} as Record<string, string>);
+  // Process radar chart image
+  const radarChartChunks = radarChartImage ? 
+    splitBase64Image(radarChartImage, data.globalState.assessments.summary?.includeInReport || false) : 
+    [];
 
-  // Prepare the final payload
-  const payload = {
-    r3Form: stringifiedData
-  };
+  // Process timeline image
+  const timelineChunks = timelineImage ? 
+    splitBase64Image(timelineImage, data.globalState.assessments.milestones?.includeTimelineInReport || false) : 
+    [];
 
-  // Submit the data
   try {
-    console.log('Submitting form data to Sheety API. Payload keys:', Object.keys(stringifiedData));
-    const response = await submitToSheetyAPI(R3_FORM_API, payload);
-    console.log('Sheety API Response:', response);
-    return response;
+    // Submit base data first
+    const baseResponse = await submitToSheetyAPI(R3_FORM_API, {
+      r3Form: formattedData
+    });
+    console.log('Base data submitted successfully');
+
+    // Submit radar chart chunks
+    if (radarChartChunks.length > 0) {
+      console.log(`Submitting ${radarChartChunks.length} radar chart chunks...`);
+      for (let i = 0; i < radarChartChunks.length; i++) {
+        await submitToSheetyAPI(R3_FORM_API, {
+          r3Form: {
+            chataId: formattedData.chataId,
+            timestamp: formattedData.timestamp,
+            radarChartImage: radarChartChunks[i]
+          }
+        });
+        console.log(`Radar chart chunk ${i + 1}/${radarChartChunks.length} submitted`);
+        // Add a small delay between chunks
+        await new Promise(resolve => setTimeout(resolve, 500));
+      }
+    }
+
+    // Submit timeline chunks
+    if (timelineChunks.length > 0) {
+      console.log(`Submitting ${timelineChunks.length} timeline chunks...`);
+      for (let i = 0; i < timelineChunks.length; i++) {
+        await submitToSheetyAPI(R3_FORM_API, {
+          r3Form: {
+            chataId: formattedData.chataId,
+            timestamp: formattedData.timestamp,
+            timelineImage: timelineChunks[i]
+          }
+        });
+        console.log(`Timeline chunk ${i + 1}/${timelineChunks.length} submitted`);
+        // Add a small delay between chunks
+        await new Promise(resolve => setTimeout(resolve, 500));
+      }
+    }
+
+    // Generate report
+    const reportData = await generateReport(formattedData);
+    console.log('Report generation successful:', reportData);
+    
+    return {
+      ...baseResponse,
+      report: {
+        url: reportData.templateUrl,
+        downloadUrl: reportData.downloadUrl,
+        title: reportData.documentTitle,
+        status: reportData.progress.status,
+        message: reportData.progress.message
+      }
+    };
   } catch (error) {
     console.error('Error submitting form data:', error);
     throw error;
