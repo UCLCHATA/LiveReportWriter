@@ -24,7 +24,7 @@ interface CombinedRadarGraphProps {
 
 interface DataPoint {
   domain: string;
-  sensory?: number;
+  sensitivity?: number;
   social?: number;
   behavior?: number;
   fullMark: number;
@@ -35,74 +35,70 @@ export const CombinedRadarGraph: React.FC<CombinedRadarGraphProps> = ({
   socialData,
   behaviorData
 }) => {
-  console.log('CombinedRadarGraph - Received props:', {
-    sensoryData,
-    socialData,
-    behaviorData
-  });
-
   const processData = (): DataPoint[] => {
     const allDomains = new Set<string>();
     const dataPoints: { [key: string]: DataPoint } = {};
 
     // Process sensory domains
     if (sensoryData?.domains) {
-      console.log('Processing sensory domains:', sensoryData.domains);
       Object.entries(sensoryData.domains).forEach(([key, data]) => {
         const domain = data.name || key;
         allDomains.add(domain);
         if (!dataPoints[domain]) {
           dataPoints[domain] = { domain, fullMark: 5 };
         }
-        dataPoints[domain].sensory = data.value;
-        console.log(`Added sensory data for domain ${domain}:`, data.value);
+        if (typeof data.value === 'number') {
+          dataPoints[domain].sensitivity = data.value;
+        }
       });
     }
 
     // Process social domains
     if (socialData?.domains) {
-      console.log('Processing social domains:', socialData.domains);
       Object.entries(socialData.domains).forEach(([key, data]) => {
         const domain = data.name || key;
         allDomains.add(domain);
         if (!dataPoints[domain]) {
           dataPoints[domain] = { domain, fullMark: 5 };
         }
-        dataPoints[domain].social = data.value;
-        console.log(`Added social data for domain ${domain}:`, data.value);
+        if (typeof data.value === 'number') {
+          dataPoints[domain].social = data.value;
+        }
       });
     }
 
     // Process behavior domains
     if (behaviorData?.domains) {
-      console.log('Processing behavior domains:', behaviorData.domains);
       Object.entries(behaviorData.domains).forEach(([key, data]) => {
         const domain = data.name || key;
         allDomains.add(domain);
         if (!dataPoints[domain]) {
           dataPoints[domain] = { domain, fullMark: 5 };
         }
-        dataPoints[domain].behavior = data.value;
-        console.log(`Added behavior data for domain ${domain}:`, data.value);
+        if (typeof data.value === 'number') {
+          dataPoints[domain].behavior = data.value;
+        }
       });
     }
 
-    // Convert to array and ensure all values are numbers, starting from 1 instead of 0
+    // Convert to array and ensure all values are numbers
     const result = Array.from(allDomains).map(domain => ({
       ...dataPoints[domain],
-      sensory: dataPoints[domain].sensory || 1,
-      social: dataPoints[domain].social || 1,
-      behavior: dataPoints[domain].behavior || 1
+      sensitivity: typeof dataPoints[domain].sensitivity === 'number' ? dataPoints[domain].sensitivity : 0,
+      social: typeof dataPoints[domain].social === 'number' ? dataPoints[domain].social : 0,
+      behavior: typeof dataPoints[domain].behavior === 'number' ? dataPoints[domain].behavior : 0
     }));
 
-    console.log('Final processed data:', result);
     return result;
   };
 
   const data = processData();
-  console.log('Data ready for radar chart:', data);
+  
+  // Only render if we have data to show
+  if (data.length === 0) {
+    return null;
+  }
 
-  // Show graph even if there's no data, just with zero values
   return (
     <div className={styles.container}>
       <div className={styles.graphWrapper}>
@@ -119,17 +115,14 @@ export const CombinedRadarGraph: React.FC<CombinedRadarGraphProps> = ({
             <PolarAngleAxis 
               dataKey="domain"
               tick={({ x, y, payload, index, cx, cy }: any) => {
-                // Calculate normalized position relative to center
                 const dx = x - cx;
                 const dy = y - cy;
                 const theta = Math.atan2(dy, dx);
                 const deg = theta * 180 / Math.PI;
                 
-                // Identify vertical labels (top and bottom)
                 const isVertical = Math.abs(Math.abs(deg) - 90) < 10 || Math.abs(Math.abs(deg) - 270) < 10;
                 
                 if (isVertical) {
-                  // Special handling for Visual label
                   const isVisualLabel = payload.value === "Visual";
                   const isTop = isVisualLabel ? true : Math.abs(Math.abs(deg) - 270) < 10;
                   
@@ -148,7 +141,6 @@ export const CombinedRadarGraph: React.FC<CombinedRadarGraphProps> = ({
                   );
                 }
 
-                // For other labels
                 const isRightSide = x > cx;
                 const xOffset = isRightSide ? 10 : -10;
                 
@@ -169,8 +161,8 @@ export const CombinedRadarGraph: React.FC<CombinedRadarGraphProps> = ({
             />
             <PolarRadiusAxis 
               angle={30} 
-              domain={[1, 5]}
-              tickCount={5}
+              domain={[0, 5]}
+              tickCount={6}
               tick={{ fill: '#4b5563', fontSize: 12 }}
               allowDataOverflow={false}
               scale="linear"
@@ -179,24 +171,24 @@ export const CombinedRadarGraph: React.FC<CombinedRadarGraphProps> = ({
             <Radar
               name="Behavior & Interests"
               dataKey="behavior"
-              stroke="#f59e0b"
-              fill="#f59e0b"
+              stroke={behaviorData ? '#f59e0b' : 'transparent'}
+              fill={behaviorData ? '#f59e0b' : 'transparent'}
               fillOpacity={0.2}
             />
             
             <Radar
               name="Social Communication"
               dataKey="social"
-              stroke="#10b981"
-              fill="#10b981"
+              stroke={socialData ? '#10b981' : 'transparent'}
+              fill={socialData ? '#10b981' : 'transparent'}
               fillOpacity={0.2}
             />
             
             <Radar
               name="Sensory Profile"
-              dataKey="sensory"
-              stroke="#be185d"
-              fill="#be185d"
+              dataKey="sensitivity"
+              stroke={sensoryData ? '#be185d' : 'transparent'}
+              fill={sensoryData ? '#be185d' : 'transparent'}
               fillOpacity={0.2}
             />
             

@@ -100,7 +100,7 @@ const initialFormData: FormData = {
   recommendations: '',
   formProgress: 0,
   lastUpdated: new Date().toISOString(),
-  referralReason: '',
+  differentialDiagnosis: '',
   developmentalConcerns: '',
   medicalHistory: '',
   familyHistory: ''
@@ -115,7 +115,8 @@ const initialState: GlobalFormState = {
     childFirstName: '',
     childLastName: '',
     childAge: '',
-    childGender: ''
+    childGender: '',
+    chataId: ''
   },
   formData: initialFormData,
   assessments: {
@@ -277,7 +278,7 @@ const initialState: GlobalFormState = {
   status: 'draft'
 };
 
-// Add back validation function
+// Update validation function to check clinician info
 function isValidState(state: any): state is GlobalFormState {
   if (!state || typeof state !== 'object') return false;
   if (!state.formData || !state.assessments) return false;
@@ -286,6 +287,10 @@ function isValidState(state: any): state is GlobalFormState {
   const requiredProps = ['chataId', 'clinician', 'currentStep', 'lastUpdated', 'status'];
   if (!requiredProps.every(prop => prop in state)) return false;
 
+  // Validate clinician info
+  const clinicianProps = ['name', 'email', 'clinicName', 'chataId'];
+  if (!clinicianProps.every(prop => prop in state.clinician)) return false;
+  
   // Validate form data
   const formProps = ['status', 'formProgress', 'lastUpdated'];
   if (!formProps.every(prop => prop in state.formData)) return false;
@@ -401,6 +406,11 @@ export const useFormState = () => {
         ...initialState,
         ...parsed,
         chataId: existingChataId || parsed.chataId || '', // Prioritize existing Chata ID
+        clinician: {
+          ...initialState.clinician,
+          ...parsed.clinician,
+          chataId: existingChataId || parsed.chataId || parsed.clinician?.chataId || ''
+        },
         formData: {
           ...initialState.formData,
           ...parsed.formData,

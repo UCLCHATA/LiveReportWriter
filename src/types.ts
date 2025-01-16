@@ -20,7 +20,10 @@ export interface FormState {
   formProgress: number;
   lastUpdated: string;
   chartImage?: string;
-  differentialDiagnosis?: string;
+  differentialDiagnosis: string;
+  developmentalConcerns: string;
+  medicalHistory: string;
+  familyHistory: string;
 }
 
 interface AssessmentBase {

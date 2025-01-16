@@ -10,10 +10,6 @@ export interface ClinicianInfo {
 }
 
 export interface FormData {
-  referralReason: string;
-  developmentalConcerns: string;
-  medicalHistory: string;
-  familyHistory: string;
   status: 'draft' | 'submitted';
   ascStatus: string;
   adhdStatus: string;
@@ -32,6 +28,11 @@ export interface FormData {
   recommendations: string;
   formProgress: number;
   lastUpdated: string;
+  chartImage?: string;
+  differentialDiagnosis: string;
+  developmentalConcerns: string;
+  medicalHistory: string;
+  familyHistory: string;
 }
 
 // Base interface for all assessment domains

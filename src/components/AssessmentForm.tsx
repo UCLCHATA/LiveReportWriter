@@ -1,29 +1,47 @@
 import React, { useEffect, useState, useCallback } from 'react';
 import { useFormState } from '../hooks/useFormState';
-import { 
-  ClipboardList, 
-  Activity, 
-  Users, 
-  Star, 
-  Lightbulb,
-  MessageSquare,
-  Zap,
-  Award,
-  Brain,
-  Sparkles,
-  Target,
-  Search,
-  AlertTriangle,
-  Dumbbell,
-  ThumbsUp,
-  HelpCircle,
-  X
-} from 'lucide-react';
-import styles from './AssessmentForm.module.css';
 import html2canvas from 'html2canvas';
+import { submitFormData } from '../services/api';
 import { SubmissionOverlay } from './SubmissionOverlay';
-import { R3_FORM_API, APPS_SCRIPT_URLS } from '../config/api';
-import { makeAppsScriptCall } from '../utils/api';
+import type { Stage } from './SubmissionOverlay';
+import type { AssessmentSummaryData } from '../types';
+import styles from './AssessmentForm.module.css';
+import { 
+  ClipboardList, Activity, Users, Star, Lightbulb,
+  MessageSquare, Zap, Award, Brain, Sparkles,
+  Target, Search, AlertTriangle, Dumbbell,
+  ThumbsUp, HelpCircle, X
+} from 'lucide-react';
+
+interface ClinicianInfo {
+  name: string;
+  email: string;
+  clinicName: string;
+  childFirstName: string;
+  childLastName: string;
+  childAge: string;
+  childGender: string;
+  chataId: string;
+}
+
+interface FormData {
+  status: 'draft' | 'submitted';
+  ascStatus: string;
+  adhdStatus: string;
+  clinicalObservations: string;
+  strengths: string;
+  priorityAreas: string;
+  recommendations: string;
+  referrals: Record<string, boolean>;
+  remarks: string;
+  differentialDiagnosis: string;
+  chartImage?: string;
+  lastUpdated?: string;
+  formProgress?: number;
+  developmentalConcerns: string;
+  medicalHistory: string;
+  familyHistory: string;
+}
 
 interface WordCountState {
   count: number;
@@ -101,6 +119,23 @@ const TextAreaWithOverlay: React.FC<{
   );
 };
 
+type SubmissionStage = 'submission' | 'waiting' | 'complete' | 'error';
+
+const getStageMessage = (stage: SubmissionStage) => {
+  switch (stage) {
+    case 'submission':
+      return 'Submitting form data...';
+    case 'waiting':
+      return 'Verifying submission...';
+    case 'complete':
+      return 'Form submitted successfully!';
+    case 'error':
+      return 'Error submitting form';
+    default:
+      return '';
+  }
+};
+
 export const AssessmentForm: React.FC<AssessmentFormProps> = ({ 
   onClear, 
   onProgressUpdate,
@@ -111,7 +146,7 @@ export const AssessmentForm: React.FC<AssessmentFormProps> = ({
   const lastProgress = React.useRef<number>(initialProgress);
   const [isInitialized, setIsInitialized] = useState(false);
   const [showSubmissionOverlay, setShowSubmissionOverlay] = useState(false);
-  const [submissionStage, setSubmissionStage] = useState<'submission' | 'waiting' | 'template' | 'analysis' | 'report' | 'email' | 'error'>('submission');
+  const [submissionStage, setSubmissionStage] = useState<SubmissionStage>('submission');
   const [submissionProgress, setSubmissionProgress] = useState(0);
   const [submissionDetails, setSubmissionDetails] = useState<{ documentUrl?: string; emailStatus?: string }>();
   
@@ -277,125 +312,58 @@ export const AssessmentForm: React.FC<AssessmentFormProps> = ({
 
   const handleStatusChange = async (newStatus: 'draft' | 'submitted') => {
     if (newStatus === 'submitted') {
-      // Validate essential fields
-      const requiredFields = {
-        'ASC Status': formData.ascStatus,
-        'ADHD Status': formData.adhdStatus,
-        'Clinical Observations': formData.clinicalObservations,
-        'Strengths & Abilities': formData.strengths,
-        'Priority Support Areas': formData.priorityAreas,
-        'Support Recommendations': formData.recommendations
-      };
-
-      const missingFields = Object.entries(requiredFields)
-        .filter(([_, value]) => !value || value.trim() === '')
-        .map(([key]) => key);
-
-      if (missingFields.length > 0) {
-        alert(`Please fill in the following required fields:\n${missingFields.join('\n')}`);
-        return;
-      }
-
       try {
-        setShowSubmissionOverlay(true);
         setSubmissionStage('submission');
-        setSubmissionProgress(10);
+        setSubmissionProgress(0);
 
-        // Capture the combined radar chart image if it exists
-        const combinedRadarChart = document.querySelector('.combined-radar-chart') as HTMLElement;
-        let chartImage = '';
-        
-        if (combinedRadarChart) {
-          const canvas = await html2canvas(combinedRadarChart);
-          chartImage = canvas.toDataURL('image/png');
+        // Get the include flag from the assessment summary
+        const summaryData = globalState.assessments?.summary as AssessmentSummaryData;
+        const includeInReport = summaryData?.includeInReport || false;
+
+        // Capture the combined radar chart only if it should be included
+        let chartImage = null;
+        if (includeInReport) {
+          const chartContainer = document.querySelector('.combined-radar-chart') as HTMLElement;
+          if (chartContainer) {
+            const canvas = await html2canvas(chartContainer);
+            const base64Image = canvas.toDataURL('image/png');
+            
+            // Split base64 image into chunks if needed
+            const chunkSize = 32000; // Adjust based on Sheety's limits
+            const imageData = base64Image.split(',')[1];
+            chartImage = {
+              include: true,
+              chunk1: imageData.slice(0, chunkSize) || '',
+              chunk2: imageData.slice(chunkSize, 2 * chunkSize) || '',
+              chunk3: imageData.slice(2 * chunkSize) || ''
+            };
+          }
         }
-        
-        // Update form data with the chart image if it exists
-    updateFormData({ 
-          status: newStatus,
-          ...(chartImage && { chartImage })
-        });
 
         setSubmissionProgress(30);
         setSubmissionStage('waiting');
 
-        // Submit form data
-        const response = await fetch(R3_FORM_API, {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json'
-          },
-          body: JSON.stringify({
-            r3Form: {
-              chataId: globalState.clinician?.chataId,
-              name: globalState.clinician?.childName,
-              timestamp: new Date().toISOString(),
-              asc: formData.ascStatus,
-              adhd: formData.adhdStatus,
-              observations: formData.clinicalObservations,
-              strengths: formData.strengths,
-              supportareas: formData.priorityAreas,
-              recommendations: formData.recommendations,
-              referrals: Object.entries(formData.referrals)
-                .filter(([_, value]) => value)
-                .map(([key]) => key)
-                .join(', '),
-              ...(formData.remarks && { remarks: formData.remarks }),
-              ...(formData.differentialDiagnosis && { differential: formData.differentialDiagnosis })
-            }
-          })
-        });
+        // Submit form data using the enhanced API service
+        const formDataToSubmit = {
+          ...formData,
+          assessments: globalState.assessments,
+          clinician: globalState.clinician,
+          chataId: globalState.clinician?.chataId || '',
+          includeImages: includeInReport,
+          radarChartImage: chartImage || { include: false },
+          milestoneTimelineData: JSON.stringify(globalState.assessments.milestones?.milestones || []),
+          historyOfConcerns: formData.developmentalConcerns || '',
+          assessmentLogData: JSON.stringify(globalState.assessments.assessmentLog || {})
+        };
 
-        if (!response.ok) {
-          throw new Error('Form submission failed');
-        }
+        await submitFormData(formDataToSubmit);
 
-        setSubmissionProgress(50);
-        setSubmissionStage('template');
-
-        // Template stage
-        const templateResult = await makeAppsScriptCall(APPS_SCRIPT_URLS.template, globalState.clinician?.chataId);
-        if (!templateResult.success) {
-          throw new Error(`Template stage failed: ${templateResult.error || 'Unknown error'}`);
-        }
-
-        setSubmissionProgress(70);
-        setSubmissionStage('analysis');
-
-        // Analysis stage
-        const analysisResult = await makeAppsScriptCall(APPS_SCRIPT_URLS.analysis, globalState.clinician?.chataId);
-        if (!analysisResult.success) {
-          throw new Error(`Analysis stage failed: ${analysisResult.error || 'Unknown error'}`);
-        }
-
-        setSubmissionProgress(90);
-        setSubmissionStage('report');
-
-        // Report generation stage
-        const result = await makeAppsScriptCall(APPS_SCRIPT_URLS.report, globalState.clinician?.chataId);
-        if (result?.success && result.progress?.details) {
-          const { documentUrl, emailStatus } = result.progress.details;
-          
-          setSubmissionProgress(100);
-          setSubmissionStage('email');
-          setSubmissionDetails({
-            documentUrl,
-            emailStatus: emailStatus.sent ? 
-              `Email sent to ${emailStatus.recipientEmail}` : 
-              `Email sending failed: ${emailStatus.error}`
-          });
-
-          if (documentUrl) {
-            window.open(documentUrl, '_blank');
-          }
-        } else {
-          throw new Error('Invalid response format from report generation');
-        }
+        setSubmissionProgress(100);
+        setSubmissionStage('complete');
 
       } catch (error) {
         console.error('Form submission error:', error);
         setSubmissionStage('error');
-        // Keep the overlay visible for error state
       }
     } else {
       updateFormData({ status: newStatus });
@@ -505,303 +473,305 @@ export const AssessmentForm: React.FC<AssessmentFormProps> = ({
   };
 
   return (
-    <div className={`${styles.formContainer} ${styles.active}`}>
-      <div className={styles.formContent}>
-        {/* Status & Referrals Section */}
-        <div className={styles.combinedSection}>
-          <div className={styles.sectionHeader}>
-            <ClipboardList className={styles.sectionIcon} size={18} />
-            <h3>Status & Referrals</h3>
-          </div>
-          
-          <div className={styles.statusGroup}>
-            <div className={styles.formGroup}>
-              <label>ASC Status</label>
-              <select 
-                className={`${styles.statusDropdown} ${
-                  formData.ascStatus === 'Confirmed' ? styles.confirmed : ''
-                }`}
-                value={formData.ascStatus || ''}
-                onChange={(e) => updateFormData({ ascStatus: e.target.value })}
-              >
-                <option value="">--</option>
-                <option value="Confirmed">Confirmed</option>
-                <option value="Suspected">Suspected</option>
-                <option value="Ruled Out">Ruled Out</option>
-              </select>
-            </div>
-            
-            <div className={styles.formGroup}>
-              <label>ADHD Status</label>
-              <select 
-                value={formData.adhdStatus} 
-                onChange={handleInputChange('adhdStatus')}
-              >
-                <option value="">--</option>
-                <option value="confirmed">Confirmed</option>
-                <option value="suspected">Suspected</option>
-                <option value="ruled-out">Ruled Out</option>
-              </select>
-            </div>
-
-            <div className={styles.formGroup}>
-              <label>Differential Considerations</label>
-              <input
-                type="text"
-                className={styles.differentialInput}
-                placeholder="Note any differential diagnostic considerations..."
-                value={formData.differentialDiagnosis || ''}
-                onChange={handleInputChange('differentialDiagnosis')}
-              />
-            </div>
-          </div>
-
-          <div className={styles.referralsSection}>
-            <div className={styles.sectionHeader}>
-              <Users className={styles.sectionIcon} size={18} />
-              <h3>Referrals</h3>
-            </div>
-            <div className={styles.referralsGrid}>
-              <div className={styles.referralCheckbox}>
-                <input
-                  type="checkbox"
-                  id="speech"
-                  checked={formData.referrals.speech}
-                  onChange={handleCheckboxChange('speech')}
-                />
-                <label htmlFor="speech">Speech & Language</label>
-              </div>
-              <div className={styles.referralCheckbox}>
-                <input
-                  type="checkbox"
-                  id="educational"
-                  checked={formData.referrals.educational}
-                  onChange={handleCheckboxChange('educational')}
-                />
-                <label htmlFor="educational">Educational Psychology</label>
-              </div>
-              <div className={styles.referralCheckbox}>
-                <input
-                  type="checkbox"
-                  id="sleep"
-                  checked={formData.referrals.sleep}
-                  onChange={handleCheckboxChange('sleep')}
-                />
-                <label htmlFor="sleep">Sleep Support</label>
-              </div>
-              <div className={styles.referralCheckbox}>
-                <input
-                  type="checkbox"
-                  id="occupational"
-                  checked={formData.referrals.occupational}
-                  onChange={handleCheckboxChange('occupational')}
-                />
-                <label htmlFor="occupational">Occupational Therapy</label>
-              </div>
-              <div className={styles.referralCheckbox}>
-                <input
-                  type="checkbox"
-                  id="mental"
-                  checked={formData.referrals.mental}
-                  onChange={handleCheckboxChange('mental')}
-                />
-                <label htmlFor="mental">Mental Health</label>
-              </div>
-              <div className={styles.referralCheckbox}>
-                <input
-                  type="checkbox"
-                  id="other"
-                  checked={formData.referrals.other}
-                  onChange={handleCheckboxChange('other')}
-                />
-                <label htmlFor="other">Other</label>
-              </div>
-            </div>
-            <div className={styles.remarksRow}>
-              <input
-                type="text"
-                className={styles.remarksInput}
-                placeholder="Additional notes or remarks..."
-                value={formData.remarks}
-                onChange={handleInputChange('remarks')}
-              />
-            </div>
-          </div>
-        </div>
-
-        {/* Text Areas Grid */}
-        <div className={styles.textAreasGrid}>
-          <div className={styles.gridColumn}>
-            <div className={styles.formSection}>
-              <div className={styles.sectionHeader}>
-                <Search className={styles.sectionIcon} size={18} />
-                <h3>Clinical Observations</h3>
-                <div className={styles.tooltipContainer}>
-                  <HelpCircle className={styles.helpIcon} size={16} />
-                  <div className={styles.tooltip}>
-                    <ul>
-                      <li>Social engagement patterns</li>
-                      <li>Communication style</li>
-                      <li>Response to activities</li>
-                      <li>Behavioral patterns</li>
-                      <li>Notable strengths/challenges</li>
-                    </ul>
-                  </div>
-                </div>
-              </div>
-              <TextAreaWithOverlay
-                value={formData.clinicalObservations}
-                name="clinicalObservations"
-                placeholder="• Social engagement patterns
-• Communication style
-• Response to activities
-• Behavioral patterns
-• Notable strengths/challenges"
-                onChange={handleInputChange('clinicalObservations')}
-                onFocus={handleTextAreaFocus('clinicalObservations')}
-                onBlur={handleTextAreaBlur}
-                onKeyDown={handleTextAreaKeyDown}
-                onDoubleClick={() => handleSectionDoubleClick(
-                  'clinicalObservations',
-                  formData.clinicalObservations
-                )}
-              />
-              <div className={`${styles.wordCount} ${styles[getWordCountState(formData.clinicalObservations)]}`}>
-                {getWordCountText(formData.clinicalObservations)}
-              </div>
-            </div>
-            <div className={styles.formSection}>
-              <div className={styles.sectionHeader}>
-                <AlertTriangle className={styles.sectionIcon} size={18} />
-                <h3>Priority Support Areas</h3>
-                <div className={styles.tooltipContainer}>
-                  <HelpCircle className={styles.helpIcon} size={16} />
-                  <div className={styles.tooltip}>
-                    <ul>
-                      <li>Assessment data patterns</li>
-                      <li>Family priorities</li>
-                      <li>School observations</li>
-                      <li>Clinical observations</li>
-                    </ul>
-                  </div>
-                </div>
-              </div>
-              <TextAreaWithOverlay
-                value={formData.priorityAreas}
-                name="priorityAreas"
-                placeholder="• Assessment data patterns
-• Family priorities
-• School observations
-• Clinical observations"
-                onChange={handleInputChange('priorityAreas')}
-                onFocus={handleTextAreaFocus('priorityAreas')}
-                onBlur={handleTextAreaBlur}
-                onKeyDown={handleTextAreaKeyDown}
-                onDoubleClick={() => handleSectionDoubleClick(
-                  'priorityAreas',
-                  formData.priorityAreas
-                )}
-              />
-              <div className={`${styles.wordCount} ${styles[getWordCountState(formData.priorityAreas)]}`}>
-                {getWordCountText(formData.priorityAreas)}
-              </div>
-            </div>
-          </div>
-          <div className={styles.gridColumn}>
-            <div className={styles.formSection}>
-              <div className={styles.sectionHeader}>
-                <Dumbbell className={styles.sectionIcon} size={18} />
-                <h3>Strengths & Abilities</h3>
-                <div className={styles.tooltipContainer}>
-                  <HelpCircle className={styles.helpIcon} size={16} />
-                  <div className={styles.tooltip}>
-                    <ul>
-                      <li>Memory (e.g., Strong recall of sequences)</li>
-                      <li>Visual (e.g., Pattern recognition)</li>
-                      <li>Physical (e.g., Fine motor skills)</li>
-                      <li>Social (e.g., Empathy, sharing)</li>
-                    </ul>
-                  </div>
-                </div>
-              </div>
-              <TextAreaWithOverlay
-                value={formData.strengths}
-                name="strengths"
-                placeholder="• Memory (e.g., Strong recall of sequences)
-• Visual (e.g., Pattern recognition)
-• Physical (e.g., Fine motor skills)
-• Social (e.g., Empathy, sharing)"
-                onChange={handleInputChange('strengths')}
-                onFocus={handleTextAreaFocus('strengths')}
-                onBlur={handleTextAreaBlur}
-                onKeyDown={handleTextAreaKeyDown}
-                onDoubleClick={() => handleSectionDoubleClick(
-                  'strengths',
-                  formData.strengths
-                )}
-              />
-              <div className={`${styles.wordCount} ${styles[getWordCountState(formData.strengths)]}`}>
-                {getWordCountText(formData.strengths)}
-              </div>
-            </div>
-            <div className={styles.formSection}>
-              <div className={styles.sectionHeader}>
-                <ThumbsUp className={styles.sectionIcon} size={18} />
-                <h3>Support Recommendations</h3>
-                <div className={styles.tooltipContainer}>
-                  <HelpCircle className={styles.helpIcon} size={16} />
-                  <div className={styles.tooltip}>
-                    <ul>
-                      <li>Strength-based strategies</li>
-                      <li>Practical implementation</li>
-                      <li>Home/school alignment</li>
-                      <li>Support services coordination</li>
-                    </ul>
-                  </div>
-                </div>
-              </div>
-              <TextAreaWithOverlay
-                value={formData.recommendations}
-                name="recommendations"
-                placeholder="• Strength-based strategies
-• Practical implementation
-• Home/school alignment
-• Support services coordination"
-                onChange={handleInputChange('recommendations')}
-                onFocus={handleTextAreaFocus('recommendations')}
-                onBlur={handleTextAreaBlur}
-                onKeyDown={handleTextAreaKeyDown}
-                onDoubleClick={() => handleSectionDoubleClick(
-                  'recommendations',
-                  formData.recommendations
-                )}
-              />
-              <div className={`${styles.wordCount} ${styles[getWordCountState(formData.recommendations)]}`}>
-                {getWordCountText(formData.recommendations)}
-              </div>
-            </div>
-          </div>
-        </div>
-
-        <div className={styles.buttonGroup}>
-          <button className={styles.clearButton} onClick={handleClear}>
-            Clear Form
-          </button>
-          <button 
-            className={styles.submitButton} 
-            onClick={() => handleStatusChange('submitted')}
-          >
-            Submit Assessment
-          </button>
-        </div>
-      </div>
+    <div className={styles.formContainer}>
       <SubmissionOverlay
         isVisible={showSubmissionOverlay}
         currentStage={submissionStage}
         progress={submissionProgress}
         details={submissionDetails}
-        onClose={submissionStage === 'error' || submissionStage === 'email' ? () => setShowSubmissionOverlay(false) : undefined}
+        onClose={submissionStage === 'error' ? () => setShowSubmissionOverlay(false) : undefined}
       />
+      <div className={`${styles.formContainer} ${styles.active}`}>
+        <div className={styles.formContent}>
+          {/* Status & Referrals Section */}
+          <div className={styles.combinedSection}>
+            <div className={styles.sectionHeader}>
+              <ClipboardList className={styles.sectionIcon} size={18} />
+              <h3>Status & Referrals</h3>
+            </div>
+            
+            <div className={styles.statusGroup}>
+              <div className={styles.formGroup}>
+                <label>ASC Status</label>
+                <select 
+                  className={`${styles.statusDropdown} ${
+                    formData.ascStatus === 'Confirmed' ? styles.confirmed : ''
+                  }`}
+                  value={formData.ascStatus || ''}
+                  onChange={(e) => updateFormData({ ascStatus: e.target.value })}
+                >
+                  <option value="">--</option>
+                  <option value="Confirmed">Confirmed</option>
+                  <option value="Suspected">Suspected</option>
+                  <option value="Ruled Out">Ruled Out</option>
+                </select>
+              </div>
+              
+              <div className={styles.formGroup}>
+                <label>ADHD Status</label>
+                <select 
+                  value={formData.adhdStatus} 
+                  onChange={handleInputChange('adhdStatus')}
+                >
+                  <option value="">--</option>
+                  <option value="confirmed">Confirmed</option>
+                  <option value="suspected">Suspected</option>
+                  <option value="ruled-out">Ruled Out</option>
+                </select>
+              </div>
+
+              <div className={styles.formGroup}>
+                <label>Differential Considerations</label>
+                <input
+                  type="text"
+                  className={styles.differentialInput}
+                  placeholder="Note any differential diagnostic considerations..."
+                  value={formData.differentialDiagnosis || ''}
+                  onChange={handleInputChange('differentialDiagnosis')}
+                />
+              </div>
+            </div>
+
+            <div className={styles.referralsSection}>
+              <div className={styles.sectionHeader}>
+                <Users className={styles.sectionIcon} size={18} />
+                <h3>Referrals</h3>
+              </div>
+              <div className={styles.referralsGrid}>
+                <div className={styles.referralCheckbox}>
+                  <input
+                    type="checkbox"
+                    id="speech"
+                    checked={formData.referrals.speech}
+                    onChange={handleCheckboxChange('speech')}
+                  />
+                  <label htmlFor="speech">Speech & Language</label>
+                </div>
+                <div className={styles.referralCheckbox}>
+                  <input
+                    type="checkbox"
+                    id="educational"
+                    checked={formData.referrals.educational}
+                    onChange={handleCheckboxChange('educational')}
+                  />
+                  <label htmlFor="educational">Educational Psychology</label>
+                </div>
+                <div className={styles.referralCheckbox}>
+                  <input
+                    type="checkbox"
+                    id="sleep"
+                    checked={formData.referrals.sleep}
+                    onChange={handleCheckboxChange('sleep')}
+                  />
+                  <label htmlFor="sleep">Sleep Support</label>
+                </div>
+                <div className={styles.referralCheckbox}>
+                  <input
+                    type="checkbox"
+                    id="occupational"
+                    checked={formData.referrals.occupational}
+                    onChange={handleCheckboxChange('occupational')}
+                  />
+                  <label htmlFor="occupational">Occupational Therapy</label>
+                </div>
+                <div className={styles.referralCheckbox}>
+                  <input
+                    type="checkbox"
+                    id="mental"
+                    checked={formData.referrals.mental}
+                    onChange={handleCheckboxChange('mental')}
+                  />
+                  <label htmlFor="mental">Mental Health</label>
+                </div>
+                <div className={styles.referralCheckbox}>
+                  <input
+                    type="checkbox"
+                    id="other"
+                    checked={formData.referrals.other}
+                    onChange={handleCheckboxChange('other')}
+                  />
+                  <label htmlFor="other">Other</label>
+                </div>
+              </div>
+              <div className={styles.remarksRow}>
+                <input
+                  type="text"
+                  className={styles.remarksInput}
+                  placeholder="Additional notes or remarks..."
+                  value={formData.remarks}
+                  onChange={handleInputChange('remarks')}
+                />
+              </div>
+            </div>
+          </div>
+
+          {/* Text Areas Grid */}
+          <div className={styles.textAreasGrid}>
+            <div className={styles.gridColumn}>
+              <div className={styles.formSection}>
+                <div className={styles.sectionHeader}>
+                  <Search className={styles.sectionIcon} size={18} />
+                  <h3>Clinical Observations</h3>
+                  <div className={styles.tooltipContainer}>
+                    <HelpCircle className={styles.helpIcon} size={16} />
+                    <div className={styles.tooltip}>
+                      <ul>
+                        <li>Social engagement patterns</li>
+                        <li>Communication style</li>
+                        <li>Response to activities</li>
+                        <li>Behavioral patterns</li>
+                        <li>Notable strengths/challenges</li>
+                      </ul>
+                    </div>
+                  </div>
+                </div>
+                <TextAreaWithOverlay
+                  value={formData.clinicalObservations}
+                  name="clinicalObservations"
+                  placeholder="• Social engagement patterns
+• Communication style
+• Response to activities
+• Behavioral patterns
+• Notable strengths/challenges"
+                  onChange={handleInputChange('clinicalObservations')}
+                  onFocus={handleTextAreaFocus('clinicalObservations')}
+                  onBlur={handleTextAreaBlur}
+                  onKeyDown={handleTextAreaKeyDown}
+                  onDoubleClick={() => handleSectionDoubleClick(
+                    'clinicalObservations',
+                    formData.clinicalObservations
+                  )}
+                />
+                <div className={`${styles.wordCount} ${styles[getWordCountState(formData.clinicalObservations)]}`}>
+                  {getWordCountText(formData.clinicalObservations)}
+                </div>
+              </div>
+              <div className={styles.formSection}>
+                <div className={styles.sectionHeader}>
+                  <AlertTriangle className={styles.sectionIcon} size={18} />
+                  <h3>Priority Support Areas</h3>
+                  <div className={styles.tooltipContainer}>
+                    <HelpCircle className={styles.helpIcon} size={16} />
+                    <div className={styles.tooltip}>
+                      <ul>
+                        <li>Assessment data patterns</li>
+                        <li>Family priorities</li>
+                        <li>School observations</li>
+                        <li>Clinical observations</li>
+                      </ul>
+                    </div>
+                  </div>
+                </div>
+                <TextAreaWithOverlay
+                  value={formData.priorityAreas}
+                  name="priorityAreas"
+                  placeholder="• Assessment data patterns
+• Family priorities
+• School observations
+• Clinical observations"
+                  onChange={handleInputChange('priorityAreas')}
+                  onFocus={handleTextAreaFocus('priorityAreas')}
+                  onBlur={handleTextAreaBlur}
+                  onKeyDown={handleTextAreaKeyDown}
+                  onDoubleClick={() => handleSectionDoubleClick(
+                    'priorityAreas',
+                    formData.priorityAreas
+                  )}
+                />
+                <div className={`${styles.wordCount} ${styles[getWordCountState(formData.priorityAreas)]}`}>
+                  {getWordCountText(formData.priorityAreas)}
+                </div>
+              </div>
+            </div>
+            <div className={styles.gridColumn}>
+              <div className={styles.formSection}>
+                <div className={styles.sectionHeader}>
+                  <Dumbbell className={styles.sectionIcon} size={18} />
+                  <h3>Strengths & Abilities</h3>
+                  <div className={styles.tooltipContainer}>
+                    <HelpCircle className={styles.helpIcon} size={16} />
+                    <div className={styles.tooltip}>
+                      <ul>
+                        <li>Memory (e.g., Strong recall of sequences)</li>
+                        <li>Visual (e.g., Pattern recognition)</li>
+                        <li>Physical (e.g., Fine motor skills)</li>
+                        <li>Social (e.g., Empathy, sharing)</li>
+                      </ul>
+                    </div>
+                  </div>
+                </div>
+                <TextAreaWithOverlay
+                  value={formData.strengths}
+                  name="strengths"
+                  placeholder="• Memory (e.g., Strong recall of sequences)
+• Visual (e.g., Pattern recognition)
+• Physical (e.g., Fine motor skills)
+• Social (e.g., Empathy, sharing)"
+                  onChange={handleInputChange('strengths')}
+                  onFocus={handleTextAreaFocus('strengths')}
+                  onBlur={handleTextAreaBlur}
+                  onKeyDown={handleTextAreaKeyDown}
+                  onDoubleClick={() => handleSectionDoubleClick(
+                    'strengths',
+                    formData.strengths
+                  )}
+                />
+                <div className={`${styles.wordCount} ${styles[getWordCountState(formData.strengths)]}`}>
+                  {getWordCountText(formData.strengths)}
+                </div>
+              </div>
+              <div className={styles.formSection}>
+                <div className={styles.sectionHeader}>
+                  <ThumbsUp className={styles.sectionIcon} size={18} />
+                  <h3>Support Recommendations</h3>
+                  <div className={styles.tooltipContainer}>
+                    <HelpCircle className={styles.helpIcon} size={16} />
+                    <div className={styles.tooltip}>
+                      <ul>
+                        <li>Strength-based strategies</li>
+                        <li>Practical implementation</li>
+                        <li>Home/school alignment</li>
+                        <li>Support services coordination</li>
+                      </ul>
+                    </div>
+                  </div>
+                </div>
+                <TextAreaWithOverlay
+                  value={formData.recommendations}
+                  name="recommendations"
+                  placeholder="• Strength-based strategies
+• Practical implementation
+• Home/school alignment
+• Support services coordination"
+                  onChange={handleInputChange('recommendations')}
+                  onFocus={handleTextAreaFocus('recommendations')}
+                  onBlur={handleTextAreaBlur}
+                  onKeyDown={handleTextAreaKeyDown}
+                  onDoubleClick={() => handleSectionDoubleClick(
+                    'recommendations',
+                    formData.recommendations
+                  )}
+                />
+                <div className={`${styles.wordCount} ${styles[getWordCountState(formData.recommendations)]}`}>
+                  {getWordCountText(formData.recommendations)}
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div className={styles.buttonGroup}>
+            <button className={styles.clearButton} onClick={handleClear}>
+              Clear Form
+            </button>
+            <button 
+              className={styles.submitButton} 
+              onClick={() => handleStatusChange('submitted')}
+            >
+              Submit Assessment
+            </button>
+          </div>
+        </div>
+      </div>
 
       {showModal && (
         <div className={styles.modal}>

@@ -72,8 +72,8 @@ export const SensoryProfileGraph: React.FC<SensoryProfileGraphProps> = ({ data }
         />
         <PolarRadiusAxis 
           angle={30} 
-          domain={[1, 5]} 
-          tickCount={5} 
+          domain={[0, 5]} 
+          tickCount={6} 
           tick={{ fontSize: 11 }}
           scale="linear"
           allowDataOverflow={false}
