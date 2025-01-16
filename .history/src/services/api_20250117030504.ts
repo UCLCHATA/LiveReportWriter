@@ -400,43 +400,6 @@ function formatFormData(formData: any) {
   return formatted;
 }
 
-// Helper functions for formatting scores
-function formatSensoryScores(profile: any) {
-  if (!profile?.domains) return {};
-  return {
-    visual: `${profile.domains.visual.value}/5`,
-    auditory: `${profile.domains.auditory.value}/5`,
-    tactile: `${profile.domains.tactile.value}/5`,
-    vestibular: `${profile.domains.vestibular.value}/5`,
-    proprioceptive: `${profile.domains.proprioceptive.value}/5`,
-    oral: `${profile.domains.oral.value}/5`
-  };
-}
-
-function formatSocialScores(profile: any) {
-  if (!profile?.domains) return {};
-  return {
-    jointAttention: `${profile.domains.jointAttention.value}/5`,
-    nonverbalCommunication: `${profile.domains.nonverbalCommunication.value}/5`,
-    verbalCommunication: `${profile.domains.verbalCommunication.value}/5`,
-    socialUnderstanding: `${profile.domains.socialUnderstanding.value}/5`,
-    playSkills: `${profile.domains.playSkills.value}/5`,
-    peerInteractions: `${profile.domains.peerInteractions.value}/5`
-  };
-}
-
-function formatBehaviorScores(profile: any) {
-  if (!profile?.domains) return {};
-  return {
-    repetitiveBehaviors: `${profile.domains.repetitiveBehaviors.value}/5`,
-    routinesRituals: `${profile.domains.routinesRituals.value}/5`,
-    specialInterests: `${profile.domains.specialInterests.value}/5`,
-    sensoryInterests: `${profile.domains.sensoryInterests.value}/5`,
-    emotionalRegulation: `${profile.domains.emotionalRegulation.value}/5`,
-    flexibility: `${profile.domains.flexibility.value}/5`
-  };
-}
-
 // Submit form data to Sheety with separate image submissions
 export async function submitFormData(formData: any): Promise<SheetyResponse> {
     try {

@@ -37,10 +37,39 @@ export const getStorageKey = (chataId: string = '') => {
 
 // Add function to check all storage locations for a Chata ID
 const findChataIdInStorage = (): string | null => {
-  // Only check URL parameter
+  // Check URL first
   const urlParams = new URLSearchParams(window.location.search);
   const chataIdFromUrl = urlParams.get('chataId');
-  return chataIdFromUrl;
+  if (chataIdFromUrl) return chataIdFromUrl;
+
+  // Check assessment data
+  const assessmentData = localStorage.getItem(ASSESSMENT_KEY);
+  if (assessmentData) {
+    try {
+      const parsed = JSON.parse(assessmentData);
+      if (parsed.chataId) return parsed.chataId;
+    } catch (error) {
+      console.error('Error parsing assessment data:', error);
+    }
+  }
+
+  // Check form storage
+  for (let i = 0; i < localStorage.length; i++) {
+    const key = localStorage.key(i);
+    if (key?.startsWith(STORAGE_KEY_PREFIX)) {
+      try {
+        const data = localStorage.getItem(key);
+        if (data) {
+          const parsed = JSON.parse(data);
+          if (parsed.chataId) return parsed.chataId;
+        }
+      } catch (error) {
+        console.error('Error checking storage key:', key, error);
+      }
+    }
+  }
+
+  return null;
 };
 
 const SAVE_DELAY = 3000; // Increase to 3 seconds
@@ -86,7 +115,8 @@ const initialState: GlobalFormState = {
     childFirstName: '',
     childLastName: '',
     childAge: '',
-    childGender: ''
+    childGender: '',
+    chataId: ''
   },
   formData: initialFormData,
   assessments: {
@@ -248,7 +278,7 @@ const initialState: GlobalFormState = {
   status: 'draft'
 };
 
-// Add back validation function
+// Update validation function to check clinician info
 function isValidState(state: any): state is GlobalFormState {
   if (!state || typeof state !== 'object') return false;
   if (!state.formData || !state.assessments) return false;
@@ -257,6 +287,10 @@ function isValidState(state: any): state is GlobalFormState {
   const requiredProps = ['chataId', 'clinician', 'currentStep', 'lastUpdated', 'status'];
   if (!requiredProps.every(prop => prop in state)) return false;
 
+  // Validate clinician info
+  const clinicianProps = ['name', 'email', 'clinicName', 'chataId'];
+  if (!clinicianProps.every(prop => prop in state.clinician)) return false;
+  
   // Validate form data
   const formProps = ['status', 'formProgress', 'lastUpdated'];
   if (!formProps.every(prop => prop in state.formData)) return false;
@@ -344,38 +378,39 @@ export const useFormState = () => {
   // Load initial state from localStorage first
   const [globalState, setGlobalState] = useState<GlobalFormState>(() => {
     try {
-      // Get CHATA ID only from URL
-      const currentChataId = findChataIdInStorage();
+      // First, try to find a Chata ID from any storage location
+      const existingChataId = findChataIdInStorage();
       
-      // If we're in a new form context or no CHATA ID, clear everything
-      if (window.location.pathname.includes('/new') || !currentChataId) {
+      // If we're in a new form context, clear everything
+      if (window.location.pathname.includes('/new')) {
         clearStorage();
         return initialState;
       }
       
-      // Get storage key for current CHATA ID only
-      const storageKey = getStorageKey(currentChataId);
+      // Get the appropriate storage key
+      const storageKey = getStorageKey(existingChataId || '');
       const saved = localStorage.getItem(storageKey);
       
       if (!saved) {
-        return { ...initialState, chataId: currentChataId };
+        return existingChataId ? { ...initialState, chataId: existingChataId } : initialState;
       }
       
       const parsed = JSON.parse(saved);
       if (!isValidState(parsed)) {
-        return { ...initialState, chataId: currentChataId };
+        // Even if state is invalid, preserve any Chata ID we found
+        return { ...initialState, chataId: existingChataId || parsed?.chataId || '' };
       }
       
-      // Only restore if CHATA ID matches
-      if (parsed.chataId !== currentChataId) {
-        return { ...initialState, chataId: currentChataId };
-      }
-      
-      // Restore state with current CHATA ID
+      // Ensure we preserve Chata ID and all progress values
       const restoredState: GlobalFormState = {
         ...initialState,
         ...parsed,
-        chataId: currentChataId,
+        chataId: existingChataId || parsed.chataId || '', // Prioritize existing Chata ID
+        clinician: {
+          ...initialState.clinician,
+          ...parsed.clinician,
+          chataId: existingChataId || parsed.chataId || parsed.clinician?.chataId || ''
+        },
         formData: {
           ...initialState.formData,
           ...parsed.formData,
@@ -451,8 +486,8 @@ export const useFormState = () => {
       return restoredState;
     } catch (error) {
       console.error(`❌ [${hookId.current}] Failed to restore state in ${componentName.current}:`, error);
-      const currentChataId = findChataIdInStorage();
-      return currentChataId ? { ...initialState, chataId: currentChataId } : initialState;
+      const existingChataId = findChataIdInStorage();
+      return existingChataId ? { ...initialState, chataId: existingChataId } : initialState;
     }
   });
 

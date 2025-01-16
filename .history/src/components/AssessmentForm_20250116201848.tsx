@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useCallback, useRef } from 'react';
+import React, { useEffect, useState, useCallback } from 'react';
 import { useFormState } from '../hooks/useFormState';
 import html2canvas from 'html2canvas';
 import { submitFormData } from '../services/api';
@@ -12,7 +12,6 @@ import {
   Target, Search, AlertTriangle, Dumbbell,
   ThumbsUp, HelpCircle, X
 } from 'lucide-react';
-import { SubmissionService } from '../services/submissionService';
 
 interface ClinicianInfo {
   name: string;
@@ -158,12 +157,6 @@ export const AssessmentForm: React.FC<AssessmentFormProps> = ({
     content: '',
     field: ''
   });
-
-  const chartRef = useRef<HTMLDivElement>(null);
-
-  // Get the include flag from the assessment summary
-  const summaryData = globalState.assessments?.summary as AssessmentSummaryData;
-  const includeInReport = summaryData?.includeInReport || false;
 
   // Initialize with saved progress
   useEffect(() => {
@@ -331,37 +324,37 @@ export const AssessmentForm: React.FC<AssessmentFormProps> = ({
           throw new Error('No CHATA ID found in URL');
         }
 
-        // Log the current state before submission
-        console.log('Current state before submission:', {
-          assessments: globalState.assessments ? 'present' : 'missing',
-          sensoryProfile: globalState.assessments?.sensoryProfile ? 'present' : 'missing',
-          socialCommunication: globalState.assessments?.socialCommunication ? 'present' : 'missing',
-          behaviorInterests: globalState.assessments?.behaviorInterests ? 'present' : 'missing',
-          milestones: globalState.assessments?.milestones ? 'present' : 'missing',
-          assessmentLog: globalState.assessments?.assessmentLog ? 'present' : 'missing'
-        });
+        // Capture the combined radar chart if it exists and is included
+        let chartImage;
+        if (includeInReport && chartRef.current) {
+          const canvas = await html2canvas(chartRef.current, {
+            scale: 0.75,
+            logging: false,
+            useCORS: true,
+            backgroundColor: null
+          });
+          chartImage = canvas.toDataURL('image/jpeg', 0.7);
+        }
 
         setSubmissionProgress(50);
 
-        // Submit form data using the SubmissionService
-        const result = await SubmissionService.submit(
-          globalState, 
-          includeInReport,
-          chartRef.current
-        );
+        // Submit form data using the enhanced API service
+        const formDataToSubmit = {
+          ...formData,
+          assessments: globalState.assessments,
+          clinician: globalState.clinician,
+          chataId: currentChataId, // Use the current CHATA ID from URL
+          includeImages: includeInReport,
+          radarChartImage: chartImage ? { data: chartImage, include: true } : { include: false },
+          milestoneTimelineData: JSON.stringify(globalState.assessments.milestones?.milestones || []),
+          historyOfConcerns: formData.developmentalConcerns || '',
+          assessmentLogData: JSON.stringify(globalState.assessments.assessmentLog || {})
+        };
 
-        if (!result.success) {
-          throw new Error(result.error || 'Submission failed');
-        }
+        await submitFormData(formDataToSubmit);
 
         setSubmissionProgress(100);
         setSubmissionStage('complete');
-
-        // Update form status after successful submission
-        updateFormData({ 
-          status: newStatus,
-          lastUpdated: new Date().toISOString()
-        });
 
       } catch (error) {
         console.error('Form submission error:', error);

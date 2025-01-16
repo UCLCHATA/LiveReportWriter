@@ -320,3 +320,5 @@ class FormPersistenceService {
 }
 
 export const formPersistence = new FormPersistenceService(); 
+
+export const formPersistence = new FormPersistenceService(); 

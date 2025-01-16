@@ -344,11 +344,7 @@ export const AssessmentForm: React.FC<AssessmentFormProps> = ({
         setSubmissionProgress(50);
 
         // Submit form data using the SubmissionService
-        const result = await SubmissionService.submit(
-          globalState, 
-          includeInReport,
-          chartRef.current
-        );
+        const result = await SubmissionService.submit(globalState, includeInReport);
 
         if (!result.success) {
           throw new Error(result.error || 'Submission failed');

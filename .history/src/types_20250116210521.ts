@@ -61,7 +61,7 @@ export interface Assessment {
   lastModified?: string;
 }
 
-export function isAssessment(data: any): data is Assessment {
+export function isAssessmentEntry(data: any): data is AssessmentEntry {
   return (
     data &&
     typeof data.id === 'string' &&
@@ -69,8 +69,7 @@ export function isAssessment(data: any): data is Assessment {
     (data.date === undefined || typeof data.date === 'string') &&
     (data.notes === undefined || typeof data.notes === 'string') &&
     (data.status === undefined || ['pending', 'completed', 'scheduled'].includes(data.status)) &&
-    typeof data.color === 'string' &&
-    typeof data.category === 'string'
+    (data.result === undefined || typeof data.result === 'string')
   );
 }
 
@@ -79,9 +78,9 @@ export function isAssessmentLogData(data: any): data is AssessmentLogData {
     data &&
     data.type === 'assessmentLog' &&
     Array.isArray(data.selectedAssessments) &&
-    data.selectedAssessments.every(isAssessment) &&
+    data.selectedAssessments.every(isAssessmentEntry) &&
     typeof data.entries === 'object' &&
-    Object.values(data.entries).every(isAssessment) &&
+    Object.values(data.entries).every(isAssessmentEntry) &&
     typeof data.progress === 'number' &&
     typeof data.isComplete === 'boolean'
   );

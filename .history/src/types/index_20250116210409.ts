@@ -1,5 +1,3 @@
-import type { FormState } from '../types';
-
 export interface ClinicianInfo {
   name: string;
   email: string;

@@ -1,5 +1,3 @@
-import type { FormState } from '../types';
-
 export interface ClinicianInfo {
   name: string;
   email: string;
@@ -152,8 +150,8 @@ export interface AssessmentData {
 export interface GlobalFormState {
   chataId: string;
   clinician: ClinicianInfo;
-  formData: FormState;
-  assessments: Required<AssessmentData>;
+  formData: FormData;
+  assessments: AssessmentData;
   currentStep: number;
   lastUpdated: string;
   status: 'draft' | 'submitted';

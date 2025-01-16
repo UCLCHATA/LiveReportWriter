@@ -12,7 +12,6 @@ import {
   Target, Search, AlertTriangle, Dumbbell,
   ThumbsUp, HelpCircle, X
 } from 'lucide-react';
-import { SubmissionService } from '../services/submissionService';
 
 interface ClinicianInfo {
   name: string;
@@ -341,27 +340,50 @@ export const AssessmentForm: React.FC<AssessmentFormProps> = ({
           assessmentLog: globalState.assessments?.assessmentLog ? 'present' : 'missing'
         });
 
+        // Capture the combined radar chart if it exists and is included
+        let chartImage;
+        if (includeInReport && chartRef.current) {
+          const canvas = await html2canvas(chartRef.current, {
+            scale: 0.75,
+            logging: false,
+            useCORS: true,
+            backgroundColor: null
+          });
+          chartImage = canvas.toDataURL('image/jpeg', 0.7);
+        }
+
         setSubmissionProgress(50);
 
-        // Submit form data using the SubmissionService
-        const result = await SubmissionService.submit(
-          globalState, 
-          includeInReport,
-          chartRef.current
-        );
+        // Submit form data using the enhanced API service
+        const formDataToSubmit = {
+          ...formData,
+          assessments: globalState.assessments,
+          clinician: globalState.clinician,
+          chataId: currentChataId,
+          includeImages: includeInReport,
+          radarChartImage: chartImage ? { data: chartImage, include: true } : { include: false },
+          milestoneTimelineData: JSON.stringify(globalState.assessments?.milestones?.milestones || []),
+          historyOfConcerns: globalState.assessments?.milestones?.historyOfConcerns || '',
+          assessmentLogData: JSON.stringify(globalState.assessments?.assessmentLog || {})
+        };
 
-        if (!result.success) {
-          throw new Error(result.error || 'Submission failed');
-        }
+        // Log the prepared submission data
+        console.log('Prepared submission data:', {
+          chataId: formDataToSubmit.chataId,
+          hasAssessments: !!formDataToSubmit.assessments,
+          hasSensoryProfile: !!formDataToSubmit.assessments?.sensoryProfile,
+          hasSocialCommunication: !!formDataToSubmit.assessments?.socialCommunication,
+          hasBehaviorInterests: !!formDataToSubmit.assessments?.behaviorInterests,
+          milestoneDataLength: formDataToSubmit.milestoneTimelineData.length,
+          assessmentLogDataLength: formDataToSubmit.assessmentLogData.length,
+          includeImages: formDataToSubmit.includeImages,
+          hasRadarChart: formDataToSubmit.radarChartImage.include
+        });
+
+        await submitFormData(formDataToSubmit);
 
         setSubmissionProgress(100);
         setSubmissionStage('complete');
-
-        // Update form status after successful submission
-        updateFormData({ 
-          status: newStatus,
-          lastUpdated: new Date().toISOString()
-        });
 
       } catch (error) {
         console.error('Form submission error:', error);

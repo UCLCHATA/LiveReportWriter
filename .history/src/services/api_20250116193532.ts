@@ -36,7 +36,7 @@ function formatSensoryScore(domain: any): string {
     if (!domain?.value) return 'Skipped';
     const score = domain.value;
     const label = domain.label || '';
-    return `${score}/5`;
+    return `${label} ${score}/5`;
 }
 
 // Helper to format social communication score
@@ -44,7 +44,7 @@ function formatSocialScore(domain: any): string {
     if (!domain?.value) return 'Skipped';
     const score = domain.value;
     const label = domain.label || '';
-    return `${score}/5`;
+    return `${label} ${score}/5`;
 }
 
 // Helper to format behavior score
@@ -52,7 +52,7 @@ function formatBehaviorScore(domain: any): string {
     if (!domain?.value) return 'Skipped';
     const score = domain.value;
     const label = domain.label || '';
-    return `${score}/5`;
+    return `${label} ${score}/5`;
 }
 
 // Helper to format milestone data
@@ -186,255 +186,123 @@ function chunkImageData(base64Data: string): { chunk1: string, chunk2: string, c
 
 // Helper to format form data
 function formatFormData(formData: any) {
-  console.group('📦 Preparing submission data by component:');
-  
-  // Clinical Modal Data
-  console.log('👤 Clinical Information:', {
-    clinicName: formData.clinicianInfo?.clinicName,
-    clinicianName: formData.clinicianInfo?.name,
-    clinicianEmail: formData.clinicianInfo?.email,
-    childInfo: {
-      firstName: formData.clinicianInfo?.childFirstName,
-      secondName: formData.clinicianInfo?.childSecondName,
-      age: formData.clinicianInfo?.childAge,
-      gender: formData.clinicianInfo?.childGender
-    }
-  });
+    // Get current timestamp if not provided
+    const timestamp = formData.timestamp || new Date().toISOString();
+    
+    // Extract profile data
+    const sensoryProfile = formData.assessments?.sensoryProfile?.domains || {};
+    const socialProfile = formData.assessments?.socialCommunication?.domains || {};
+    const behaviorProfile = formData.assessments?.behaviorInterests?.domains || {};
 
-  // Assessment Form Data
-  console.log('📝 Assessment Form Texts:', {
-    clinicalObservations: formData.clinicalObservations?.substring(0, 100) + '...',
-    recommendations: formData.recommendations?.substring(0, 100) + '...',
-    differentialDiagnosis: formData.differentialDiagnosis?.substring(0, 100) + '...',
-    supportAreas: formData.supportAreas?.substring(0, 100) + '...'
-  });
+    // Format referrals
+    const referrals = Object.entries(formData.referrals || {})
+        .filter(([_, value]) => value)
+        .map(([key]) => key)
+        .join(', ');
 
-  // Component Data
-  const sensoryScores = formatSensoryScores(formData.assessments?.sensoryProfile);
-  console.log('🎯 Sensory Profile Scores:', sensoryScores);
+    // Format milestone data using the new formatter
+    const milestoneData = formData.assessments?.milestones?.milestones || [];
+    const formattedMilestoneData = formatMilestoneData(milestoneData);
 
-  const socialScores = formatSocialScores(formData.assessments?.socialCommunication);
-  console.log('🤝 Social Communication Scores:', socialScores);
+    // Get history of concerns from milestone component
+    const historyOfConcerns = formData.assessments?.milestones?.historyOfConcerns || '';
 
-  const behaviorScores = formatBehaviorScores(formData.assessments?.behaviorInterests);
-  console.log('🔄 Behavior Interests Scores:', behaviorScores);
+    // Format assessment log data using the new formatter
+    const assessmentLogData = formatAssessmentLogData(formData.assessments?.assessmentLog);
 
-  console.log('📅 Milestone Data:', {
-    timelineEntries: formData.milestoneTimelineData ? 
-      `${JSON.parse(formData.milestoneTimelineData).length} entries` : 'No entries',
-    historyOfConcerns: formData.historyOfConcerns?.substring(0, 100) + '...'
-  });
-
-  console.log('📊 Assessment Log:', {
-    entries: formData.assessmentLogData ? 
-      `${JSON.parse(formData.assessmentLogData).length} entries` : 'No entries'
-  });
-
-  console.log('🖼️ Images:', {
-    radarChartIncluded: Boolean(formData.radarChartImage),
-    milestoneTimelineIncluded: Boolean(formData.milestoneTimelineImage)
-  });
-
-  console.groupEnd();
-
-  // Get current timestamp if not provided
-  const timestamp = formData.timestamp || new Date().toISOString();
-  
-  // Extract profile data - ensure we're accessing the correct path
-  const sensoryProfile = formData.assessments?.sensoryProfile?.domains || {};
-  const socialProfile = formData.assessments?.socialCommunication?.domains || {};
-  const behaviorProfile = formData.assessments?.behaviorInterests?.domains || {};
-
-  // Log the extracted profiles for debugging
-  console.log('Extracted profile data:', {
-    sensoryDomains: Object.keys(sensoryProfile),
-    socialDomains: Object.keys(socialProfile),
-    behaviorDomains: Object.keys(behaviorProfile)
-  });
-
-  // Format referrals
-  const referrals = Object.entries(formData.referrals || {})
-      .filter(([_, value]) => value)
-      .map(([key]) => key)
-      .join(', ');
-
-  // Format milestone data
-  const milestoneData = formData.milestoneTimelineData || '[]';
-  console.log('Milestone data:', {
-    isString: typeof milestoneData === 'string',
-    length: milestoneData.length
-  });
-
-  // Get history of concerns
-  const historyOfConcerns = formData.historyOfConcerns || '';
-
-  // Format assessment log data
-  const assessmentLogData = formData.assessmentLogData || '{}';
-  console.log('Assessment log data:', {
-    isString: typeof assessmentLogData === 'string',
-    length: assessmentLogData.length
-  });
-
-  const formatted = {
-    r3Form: {
-      // Timestamp and Clinician Info
-      timestamp,
-      chataId: formData.chataId || '',
-      clinicName: formData.clinician?.clinicName || '',
-      clinicianName: formData.clinician?.name || '',
-      clinicianEmail: formData.clinician?.email || '',
-      childFirstname: formData.clinician?.childFirstName || '',
-      childSecondname: formData.clinician?.childLastName || '',
-      childAge: formData.clinician?.childAge || '',
-      childGender: formData.clinician?.childGender || '',
-      
-      // Sensory Profile
-      visualScore: formatSensoryScore(sensoryProfile.visual),
-      visualObservations: sensoryProfile.visual?.observations?.join(', ') || '',
-      auditoryScore: formatSensoryScore(sensoryProfile.auditory),
-      auditoryObservations: sensoryProfile.auditory?.observations?.join(', ') || '',
-      tactileScore: formatSensoryScore(sensoryProfile.tactile),
-      tactileObservations: sensoryProfile.tactile?.observations?.join(', ') || '',
-      vestibularScore: formatSensoryScore(sensoryProfile.vestibular),
-      vestibularObservations: sensoryProfile.vestibular?.observations?.join(', ') || '',
-      proprioceptiveScore: formatSensoryScore(sensoryProfile.proprioceptive),
-      proprioceptiveObservations: sensoryProfile.proprioceptive?.observations?.join(', ') || '',
-      oralScore: formatSensoryScore(sensoryProfile.oral),
-      oralObservations: sensoryProfile.oral?.observations?.join(', ') || '',
-      
-      // Social Communication Profile
-      jointAttentionScore: formatSocialScore(socialProfile.jointAttention),
-      jointAttentionObservations: socialProfile.jointAttention?.observations?.join(', ') || '',
-      nonverbalCommunicationScore: formatSocialScore(socialProfile.nonverbalCommunication),
-      nonverbalCommunicationObservations: socialProfile.nonverbalCommunication?.observations?.join(', ') || '',
-      verbalCommunicationScore: formatSocialScore(socialProfile.verbalCommunication),
-      verbalCommunicationObservations: socialProfile.verbalCommunication?.observations?.join(', ') || '',
-      socialUnderstandingScore: formatSocialScore(socialProfile.socialUnderstanding),
-      socialUnderstandingObservations: socialProfile.socialUnderstanding?.observations?.join(', ') || '',
-      playSkillsScore: formatSocialScore(socialProfile.playSkills),
-      playSkillsObservations: socialProfile.playSkills?.observations?.join(', ') || '',
-      peerInteractionsScore: formatSocialScore(socialProfile.peerInteractions),
-      peerInteractionsObservations: socialProfile.peerInteractions?.observations?.join(', ') || '',
-      
-      // Behavior Interests Profile
-      repetitiveBehaviorsScore: formatBehaviorScore(behaviorProfile.repetitiveBehaviors),
-      repetitiveBehaviorsObservations: behaviorProfile.repetitiveBehaviors?.observations?.join(', ') || '',
-      routinesRitualsScore: formatBehaviorScore(behaviorProfile.routinesRituals),
-      routinesRitualsObservations: behaviorProfile.routinesRituals?.observations?.join(', ') || '',
-      specialInterestsScore: formatBehaviorScore(behaviorProfile.specialInterests),
-      specialInterestsObservations: behaviorProfile.specialInterests?.observations?.join(', ') || '',
-      sensoryInterestsScore: formatBehaviorScore(behaviorProfile.sensoryInterests),
-      sensoryInterestsObservations: behaviorProfile.sensoryInterests?.observations?.join(', ') || '',
-      emotionalRegulationScore: formatBehaviorScore(behaviorProfile.emotionalRegulation),
-      emotionalRegulationObservations: behaviorProfile.emotionalRegulation?.observations?.join(', ') || '',
-      flexibilityScore: formatBehaviorScore(behaviorProfile.flexibility),
-      flexibilityObservations: behaviorProfile.flexibility?.observations?.join(', ') || '',
-      
-      // Timeline and History
-      milestoneTimelineData: milestoneData,
-      historyOfConcerns: historyOfConcerns,
-      assessmentLogData: assessmentLogData,
-      
-      // Clinical Assessment
-      ascStatus: formData.ascStatus || '',
-      adhdStatus: formData.adhdStatus || '',
-      clinicalObservations: formData.clinicalObservations || '',
-      strengthsAbilities: formData.strengths || '',
-      prioritySupportAreas: formData.priorityAreas || '',
-      supportRecommendations: formData.recommendations || '',
-      referrals,
-      additionalRemarks: formData.remarks || '',
-      differentialDiagnosis: formData.differentialDiagnosis || '',
-      
-      // Images (only if include flag is true)
-      ...(formData.includeImages ? {
-        milestoneImageChunk1: formData.milestoneImage?.chunk1 || '',
-        milestoneImageChunk2: formData.milestoneImage?.chunk2 || '',
-        milestoneImageChunk3: formData.milestoneImage?.chunk3 || '',
-        combinedGraphImageChunk1: formData.radarChartImage?.chunk1 || '',
-        combinedGraphImageChunk2: formData.radarChartImage?.chunk2 || '',
-        combinedGraphImageChunk3: formData.radarChartImage?.chunk3 || ''
-      } : {
-        milestoneImageChunk1: '{{NOT INCLUDE}}',
-        milestoneImageChunk2: '{{NOT INCLUDE}}',
-        milestoneImageChunk3: '{{NOT INCLUDE}}',
-        combinedGraphImageChunk1: '{{NOT INCLUDE}}',
-        combinedGraphImageChunk2: '{{NOT INCLUDE}}',
-        combinedGraphImageChunk3: '{{NOT INCLUDE}}'
-      }),
-      
-      // Status
-      status: 'submitted',
-      submissionDate: new Date().toISOString()
-    }
-  };
-
-  // Log the formatted data for debugging
-  console.log('Formatted form data:', {
-    sensoryScores: {
-      visual: formatted.r3Form.visualScore,
-      auditory: formatted.r3Form.auditoryScore,
-      tactile: formatted.r3Form.tactileScore,
-      vestibular: formatted.r3Form.vestibularScore,
-      proprioceptive: formatted.r3Form.proprioceptiveScore,
-      oral: formatted.r3Form.oralScore
-    },
-    socialScores: {
-      jointAttention: formatted.r3Form.jointAttentionScore,
-      nonverbalCommunication: formatted.r3Form.nonverbalCommunicationScore,
-      verbalCommunication: formatted.r3Form.verbalCommunicationScore,
-      socialUnderstanding: formatted.r3Form.socialUnderstandingScore,
-      playSkills: formatted.r3Form.playSkillsScore,
-      peerInteractions: formatted.r3Form.peerInteractionsScore
-    },
-    behaviorScores: {
-      repetitiveBehaviors: formatted.r3Form.repetitiveBehaviorsScore,
-      routinesRituals: formatted.r3Form.routinesRitualsScore,
-      specialInterests: formatted.r3Form.specialInterestsScore,
-      sensoryInterests: formatted.r3Form.sensoryInterestsScore,
-      emotionalRegulation: formatted.r3Form.emotionalRegulationScore,
-      flexibility: formatted.r3Form.flexibilityScore
-    }
-  });
-
-  return formatted;
-}
-
-// Helper functions for formatting scores
-function formatSensoryScores(profile: any) {
-  if (!profile?.domains) return {};
-  return {
-    visual: `${profile.domains.visual.value}/5`,
-    auditory: `${profile.domains.auditory.value}/5`,
-    tactile: `${profile.domains.tactile.value}/5`,
-    vestibular: `${profile.domains.vestibular.value}/5`,
-    proprioceptive: `${profile.domains.proprioceptive.value}/5`,
-    oral: `${profile.domains.oral.value}/5`
-  };
-}
-
-function formatSocialScores(profile: any) {
-  if (!profile?.domains) return {};
-  return {
-    jointAttention: `${profile.domains.jointAttention.value}/5`,
-    nonverbalCommunication: `${profile.domains.nonverbalCommunication.value}/5`,
-    verbalCommunication: `${profile.domains.verbalCommunication.value}/5`,
-    socialUnderstanding: `${profile.domains.socialUnderstanding.value}/5`,
-    playSkills: `${profile.domains.playSkills.value}/5`,
-    peerInteractions: `${profile.domains.peerInteractions.value}/5`
-  };
-}
-
-function formatBehaviorScores(profile: any) {
-  if (!profile?.domains) return {};
-  return {
-    repetitiveBehaviors: `${profile.domains.repetitiveBehaviors.value}/5`,
-    routinesRituals: `${profile.domains.routinesRituals.value}/5`,
-    specialInterests: `${profile.domains.specialInterests.value}/5`,
-    sensoryInterests: `${profile.domains.sensoryInterests.value}/5`,
-    emotionalRegulation: `${profile.domains.emotionalRegulation.value}/5`,
-    flexibility: `${profile.domains.flexibility.value}/5`
-  };
+    return {
+        r3Form: {
+            // Timestamp and Clinician Info
+            timestamp,
+            chataId: formData.chataId || formData.clinician?.chataId || '',
+            clinicName: formData.clinician?.clinicName || '',
+            clinicianName: formData.clinician?.name || '',
+            clinicianEmail: formData.clinician?.email || '',
+            childFirstname: formData.clinician?.childFirstName || '',
+            childSecondname: formData.clinician?.childLastName || '',
+            childAge: formData.clinician?.childAge || '',
+            childGender: formData.clinician?.childGender || '',
+            
+            // Sensory Profile
+            visualScore: formatSensoryScore(sensoryProfile.visual),
+            visualObservations: sensoryProfile.visual?.observations?.join(', ') || '',
+            auditoryScore: formatSensoryScore(sensoryProfile.auditory),
+            auditoryObservations: sensoryProfile.auditory?.observations?.join(', ') || '',
+            tactileScore: formatSensoryScore(sensoryProfile.tactile),
+            tactileObservations: sensoryProfile.tactile?.observations?.join(', ') || '',
+            vestibularScore: formatSensoryScore(sensoryProfile.vestibular),
+            vestibularObservations: sensoryProfile.vestibular?.observations?.join(', ') || '',
+            proprioceptiveScore: formatSensoryScore(sensoryProfile.proprioceptive),
+            proprioceptiveObservations: sensoryProfile.proprioceptive?.observations?.join(', ') || '',
+            oralScore: formatSensoryScore(sensoryProfile.oral),
+            oralObservations: sensoryProfile.oral?.observations?.join(', ') || '',
+            
+            // Social Communication Profile
+            jointAttentionScore: formatSocialScore(socialProfile.jointAttention),
+            jointAttentionObservations: socialProfile.jointAttention?.observations?.join(', ') || '',
+            nonverbalCommunicationScore: formatSocialScore(socialProfile.nonverbalCommunication),
+            nonverbalCommunicationObservations: socialProfile.nonverbalCommunication?.observations?.join(', ') || '',
+            verbalCommunicationScore: formatSocialScore(socialProfile.verbalCommunication),
+            verbalCommunicationObservations: socialProfile.verbalCommunication?.observations?.join(', ') || '',
+            socialUnderstandingScore: formatSocialScore(socialProfile.socialUnderstanding),
+            socialUnderstandingObservations: socialProfile.socialUnderstanding?.observations?.join(', ') || '',
+            playSkillsScore: formatSocialScore(socialProfile.playSkills),
+            playSkillsObservations: socialProfile.playSkills?.observations?.join(', ') || '',
+            peerInteractionsScore: formatSocialScore(socialProfile.peerInteractions),
+            peerInteractionsObservations: socialProfile.peerInteractions?.observations?.join(', ') || '',
+            
+            // Behavior Interests Profile
+            repetitiveBehaviorsScore: formatBehaviorScore(behaviorProfile.repetitiveBehaviors),
+            repetitiveBehaviorsObservations: behaviorProfile.repetitiveBehaviors?.observations?.join(', ') || '',
+            routinesRitualsScore: formatBehaviorScore(behaviorProfile.routinesRituals),
+            routinesRitualsObservations: behaviorProfile.routinesRituals?.observations?.join(', ') || '',
+            specialInterestsScore: formatBehaviorScore(behaviorProfile.specialInterests),
+            specialInterestsObservations: behaviorProfile.specialInterests?.observations?.join(', ') || '',
+            sensoryInterestsScore: formatBehaviorScore(behaviorProfile.sensoryInterests),
+            sensoryInterestsObservations: behaviorProfile.sensoryInterests?.observations?.join(', ') || '',
+            emotionalRegulationScore: formatBehaviorScore(behaviorProfile.emotionalRegulation),
+            emotionalRegulationObservations: behaviorProfile.emotionalRegulation?.observations?.join(', ') || '',
+            flexibilityScore: formatBehaviorScore(behaviorProfile.flexibility),
+            flexibilityObservations: behaviorProfile.flexibility?.observations?.join(', ') || '',
+            
+            // Timeline and History
+            milestoneTimelineData: formattedMilestoneData,
+            historyOfConcerns: historyOfConcerns,
+            assessmentLogData: assessmentLogData,
+            
+            // Clinical Assessment
+            ascStatus: formData.ascStatus || '',
+            adhdStatus: formData.adhdStatus || '',
+            clinicalObservations: formData.clinicalObservations || '',
+            strengthsAbilities: formData.strengths || '',
+            prioritySupportAreas: formData.priorityAreas || '',
+            supportRecommendations: formData.recommendations || '',
+            referrals,
+            additionalRemarks: formData.remarks || '',
+            differentialDiagnosis: formData.differentialDiagnosis || '',
+            
+            // Images (only if include flag is true)
+            ...(formData.includeImages ? {
+                milestoneImageChunk1: formData.milestoneImage?.chunk1 || '',
+                milestoneImageChunk2: formData.milestoneImage?.chunk2 || '',
+                milestoneImageChunk3: formData.milestoneImage?.chunk3 || '',
+                combinedGraphImageChunk1: formData.radarChartImage?.chunk1 || '',
+                combinedGraphImageChunk2: formData.radarChartImage?.chunk2 || '',
+                combinedGraphImageChunk3: formData.radarChartImage?.chunk3 || ''
+            } : {
+                milestoneImageChunk1: '{{NOT INCLUDE}}',
+                milestoneImageChunk2: '{{NOT INCLUDE}}',
+                milestoneImageChunk3: '{{NOT INCLUDE}}',
+                combinedGraphImageChunk1: '{{NOT INCLUDE}}',
+                combinedGraphImageChunk2: '{{NOT INCLUDE}}',
+                combinedGraphImageChunk3: '{{NOT INCLUDE}}'
+            }),
+            
+            // Status
+            status: 'submitted',
+            submissionDate: new Date().toISOString()
+        }
+    };
 }
 
 // Submit form data to Sheety with separate image submissions

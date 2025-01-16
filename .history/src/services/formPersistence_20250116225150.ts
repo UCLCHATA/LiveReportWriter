@@ -20,7 +20,6 @@ const STORAGE_KEY = 'r3_assessment_forms';
 const BACKUP_KEY = 'r3_assessment_forms_backup';
 const AUTO_SAVE_DELAY = 2000; // 2 seconds
 const MAX_RECOVERY_ATTEMPTS = 3;
-const MAX_STORED_FORMS = 2; // Only keep current and last form
 
 class FormPersistenceService {
   private autoSaveDebounced: ReturnType<typeof debounce>;
@@ -41,7 +40,6 @@ class FormPersistenceService {
     
     if (this.currentChataId) {
       console.log('Initializing form service for CHATA ID:', this.currentChataId);
-      this.cleanupOldForms();
     }
   }
 
@@ -49,8 +47,12 @@ class FormPersistenceService {
   initializeNewForm(chataId: string): void {
     console.log('Initializing new form with CHATA ID:', chataId);
     
-    // Before setting new CHATA ID, preserve the most recent form
-    this.preserveLatestFormAndCleanup();
+    // Instead of clearing all storage, only clear if there's a matching CHATA ID
+    const existingForm = this.getForm(chataId);
+    if (existingForm) {
+      const key = this.getStorageKey(chataId);
+      localStorage.removeItem(key);
+    }
     
     // Set the new CHATA ID
     this.currentChataId = chataId;
@@ -59,77 +61,6 @@ class FormPersistenceService {
     const url = new URL(window.location.href);
     url.searchParams.set('chataId', chataId);
     window.history.replaceState({}, '', url.toString());
-  }
-
-  private preserveLatestFormAndCleanup(): void {
-    // Get all forms
-    const forms = this.getAllForms();
-    
-    // Sort by lastUpdated timestamp
-    forms.sort((a, b) => b.lastUpdated - a.lastUpdated);
-    
-    // Keep only the most recent form if it exists
-    if (forms.length > 0) {
-      const latestForm = forms[0];
-      console.log('Preserving latest form:', {
-        chataId: latestForm.chataId,
-        lastUpdated: new Date(latestForm.lastUpdated).toISOString()
-      });
-      
-      // Clear all storage first
-      this.clearAllStorage();
-      
-      // Save back only the latest form
-      const key = this.getStorageKey(latestForm.chataId);
-      localStorage.setItem(key, JSON.stringify(latestForm));
-    } else {
-      this.clearAllStorage();
-    }
-  }
-
-  private getAllForms(): FormData[] {
-    const forms: FormData[] = [];
-    
-    for (let i = 0; i < localStorage.length; i++) {
-      const key = localStorage.key(i);
-      if (key?.startsWith(this.STORAGE_PREFIX)) {
-        try {
-          const data = localStorage.getItem(key);
-          if (data) {
-            forms.push(JSON.parse(data));
-          }
-        } catch (error) {
-          console.error('Error parsing form data:', error);
-        }
-      }
-    }
-    
-    return forms;
-  }
-
-  private cleanupOldForms(): void {
-    const forms = this.getAllForms();
-    
-    // Sort by lastUpdated timestamp
-    forms.sort((a, b) => b.lastUpdated - a.lastUpdated);
-    
-    // Keep only current form and most recent form
-    const formsToKeep = forms.slice(0, MAX_STORED_FORMS);
-    
-    // Clear all storage first
-    this.clearAllStorage();
-    
-    // Save back only the forms to keep
-    formsToKeep.forEach(form => {
-      const key = this.getStorageKey(form.chataId);
-      localStorage.setItem(key, JSON.stringify(form));
-    });
-    
-    console.log('Cleaned up forms:', {
-      totalForms: forms.length,
-      keptForms: formsToKeep.length,
-      keptChataIds: formsToKeep.map(f => f.chataId)
-    });
   }
 
   private clearAllStorage(): void {
@@ -168,8 +99,16 @@ class FormPersistenceService {
       }
 
       const form = JSON.parse(data);
+      
+      // Validate clinician info structure
+      if (!form.clinicianInfo || !form.clinicianInfo.name || !form.clinicianInfo.email || !form.clinicianInfo.clinicName) {
+        console.error('Invalid clinician info in stored form:', form);
+        return null;
+      }
+
       console.log('Retrieved form for CHATA ID:', {
         chataId: this.currentChataId,
+        clinicianName: form.clinicianInfo.name,
         lastUpdated: new Date(form.lastUpdated).toISOString()
       });
       
@@ -214,7 +153,13 @@ class FormPersistenceService {
       return;
     }
 
-    // Update the form with current timestamp and increment version
+    // Validate clinician info before saving
+    if (!form.clinicianInfo || !form.clinicianInfo.name || !form.clinicianInfo.email || !form.clinicianInfo.clinicName) {
+      console.error('Invalid clinician info in form:', form);
+      return;
+    }
+
+    // Update the form with current timestamp
     const updatedForm = {
       ...form,
       isDirty: true,
@@ -225,6 +170,7 @@ class FormPersistenceService {
     this.setStoredForm(updatedForm);
     console.log('Saved form data:', {
       chataId: form.chataId,
+      clinicianName: form.clinicianInfo.name,
       timestamp: new Date(updatedForm.lastUpdated).toISOString(),
       version: updatedForm.version
     });
@@ -297,6 +243,30 @@ class FormPersistenceService {
     }
   }
 
+  getAllUnsubmittedForms(): FormData[] {
+    // Get all forms from storage
+    const forms: FormData[] = [];
+    
+    for (let i = 0; i < localStorage.length; i++) {
+      const key = localStorage.key(i);
+      if (key?.startsWith(this.STORAGE_PREFIX)) {
+        try {
+          const data = localStorage.getItem(key);
+          if (data) {
+            const form = JSON.parse(data);
+            if (!form.isSubmitted) {
+              forms.push(form);
+            }
+          }
+        } catch (error) {
+          console.error('Error parsing form data:', error);
+        }
+      }
+    }
+    
+    return forms;
+  }
+
   getFormByClinicianAndChild(clinicianName: string, childFirstName?: string): FormData | null {
     // First check current form if we have a CHATA ID
     if (this.currentChataId) {
@@ -310,11 +280,10 @@ class FormPersistenceService {
     }
 
     // If no current form matches or no CHATA ID, check all unsubmitted forms
-    const forms = this.getAllForms();
+    const forms = this.getAllUnsubmittedForms();
     return forms.find(form => 
       form.clinicianInfo.name === clinicianName && 
-      (!childFirstName || form.clinicianInfo.childFirstName === childFirstName) &&
-      !form.isSubmitted
+      (!childFirstName || form.clinicianInfo.childFirstName === childFirstName)
     ) || null;
   }
 }

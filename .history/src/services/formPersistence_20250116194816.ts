@@ -20,7 +20,6 @@ const STORAGE_KEY = 'r3_assessment_forms';
 const BACKUP_KEY = 'r3_assessment_forms_backup';
 const AUTO_SAVE_DELAY = 2000; // 2 seconds
 const MAX_RECOVERY_ATTEMPTS = 3;
-const MAX_STORED_FORMS = 2; // Only keep current and last form
 
 class FormPersistenceService {
   private autoSaveDebounced: ReturnType<typeof debounce>;
@@ -41,115 +40,34 @@ class FormPersistenceService {
     
     if (this.currentChataId) {
       console.log('Initializing form service for CHATA ID:', this.currentChataId);
-      this.cleanupOldForms();
+      // Clear any old data for this CHATA ID
+      this.clearAllStorageExcept(this.currentChataId);
     }
   }
 
-  // Call this when creating a new form after clinician modal
-  initializeNewForm(chataId: string): void {
-    console.log('Initializing new form with CHATA ID:', chataId);
-    
-    // Before setting new CHATA ID, preserve the most recent form
-    this.preserveLatestFormAndCleanup();
-    
-    // Set the new CHATA ID
-    this.currentChataId = chataId;
-    
-    // Update URL with new CHATA ID
-    const url = new URL(window.location.href);
-    url.searchParams.set('chataId', chataId);
-    window.history.replaceState({}, '', url.toString());
+  // New method to get storage key for specific CHATA ID
+  private getStorageKey(chataId: string): string {
+    return `${this.STORAGE_PREFIX}${chataId}`;
   }
 
-  private preserveLatestFormAndCleanup(): void {
-    // Get all forms
-    const forms = this.getAllForms();
+  // New method to clear all storage except current CHATA ID
+  private clearAllStorageExcept(currentChataId: string): void {
+    console.log('Clearing all storage except:', currentChataId);
     
-    // Sort by lastUpdated timestamp
-    forms.sort((a, b) => b.lastUpdated - a.lastUpdated);
-    
-    // Keep only the most recent form if it exists
-    if (forms.length > 0) {
-      const latestForm = forms[0];
-      console.log('Preserving latest form:', {
-        chataId: latestForm.chataId,
-        lastUpdated: new Date(latestForm.lastUpdated).toISOString()
-      });
-      
-      // Clear all storage first
-      this.clearAllStorage();
-      
-      // Save back only the latest form
-      const key = this.getStorageKey(latestForm.chataId);
-      localStorage.setItem(key, JSON.stringify(latestForm));
-    } else {
-      this.clearAllStorage();
-    }
-  }
-
-  private getAllForms(): FormData[] {
-    const forms: FormData[] = [];
-    
-    for (let i = 0; i < localStorage.length; i++) {
-      const key = localStorage.key(i);
-      if (key?.startsWith(this.STORAGE_PREFIX)) {
-        try {
-          const data = localStorage.getItem(key);
-          if (data) {
-            forms.push(JSON.parse(data));
-          }
-        } catch (error) {
-          console.error('Error parsing form data:', error);
-        }
-      }
-    }
-    
-    return forms;
-  }
-
-  private cleanupOldForms(): void {
-    const forms = this.getAllForms();
-    
-    // Sort by lastUpdated timestamp
-    forms.sort((a, b) => b.lastUpdated - a.lastUpdated);
-    
-    // Keep only current form and most recent form
-    const formsToKeep = forms.slice(0, MAX_STORED_FORMS);
-    
-    // Clear all storage first
-    this.clearAllStorage();
-    
-    // Save back only the forms to keep
-    formsToKeep.forEach(form => {
-      const key = this.getStorageKey(form.chataId);
-      localStorage.setItem(key, JSON.stringify(form));
-    });
-    
-    console.log('Cleaned up forms:', {
-      totalForms: forms.length,
-      keptForms: formsToKeep.length,
-      keptChataIds: formsToKeep.map(f => f.chataId)
-    });
-  }
-
-  private clearAllStorage(): void {
-    console.log('Clearing all form storage');
+    // Clear main storage
+    const currentKey = this.getStorageKey(currentChataId);
     
     // Get all keys from localStorage
     for (let i = 0; i < localStorage.length; i++) {
       const key = localStorage.key(i);
-      if (key?.startsWith(this.STORAGE_PREFIX)) {
-        console.log('Removing storage:', key);
+      if (key && key.startsWith(this.STORAGE_PREFIX) && key !== currentKey) {
+        console.log('Removing old storage:', key);
         localStorage.removeItem(key);
       }
     }
     
     // Clear backup
     localStorage.removeItem(BACKUP_KEY);
-  }
-
-  private getStorageKey(chataId: string): string {
-    return `${this.STORAGE_PREFIX}${chataId}`;
   }
 
   private getStoredForm(): FormData | null {
@@ -205,16 +123,19 @@ class FormPersistenceService {
       return;
     }
 
-    // Ensure form.chataId matches currentChataId
-    if (form.chataId !== this.currentChataId) {
+    // Validate CHATA ID matches current URL
+    const urlParams = new URLSearchParams(window.location.search);
+    const urlChataId = urlParams.get('chataId');
+    
+    if (form.chataId !== urlChataId) {
       console.error('CHATA ID mismatch during save:', {
         formChataId: form.chataId,
-        currentChataId: this.currentChataId
+        urlChataId
       });
       return;
     }
 
-    // Update the form with current timestamp and increment version
+    // Update the form with current timestamp
     const updatedForm = {
       ...form,
       isDirty: true,
@@ -223,11 +144,6 @@ class FormPersistenceService {
     };
     
     this.setStoredForm(updatedForm);
-    console.log('Saved form data:', {
-      chataId: form.chataId,
-      timestamp: new Date(updatedForm.lastUpdated).toISOString(),
-      version: updatedForm.version
-    });
   }
 
   getForm(chataId: string): FormData | null {
@@ -236,16 +152,26 @@ class FormPersistenceService {
       return null;
     }
 
-    // Ensure requested CHATA ID matches current
-    if (chataId !== this.currentChataId) {
+    // Validate CHATA ID matches current URL
+    const urlParams = new URLSearchParams(window.location.search);
+    const urlChataId = urlParams.get('chataId');
+    
+    if (chataId !== urlChataId) {
       console.error('CHATA ID mismatch during get:', {
         requestedChataId: chataId,
-        currentChataId: this.currentChataId
+        urlChataId
       });
       return null;
     }
 
-    return this.getStoredForm();
+    const form = this.getStoredForm();
+    
+    // Only return form if it exists and hasn't been submitted
+    if (form && !form.isSubmitted) {
+      return form;
+    }
+    
+    return null;
   }
 
   markAsSubmitted(chataId: string): void {
@@ -297,6 +223,30 @@ class FormPersistenceService {
     }
   }
 
+  getAllUnsubmittedForms(): FormData[] {
+    // Get all forms from storage
+    const forms: FormData[] = [];
+    
+    for (let i = 0; i < localStorage.length; i++) {
+      const key = localStorage.key(i);
+      if (key?.startsWith(this.STORAGE_PREFIX)) {
+        try {
+          const data = localStorage.getItem(key);
+          if (data) {
+            const form = JSON.parse(data);
+            if (!form.isSubmitted) {
+              forms.push(form);
+            }
+          }
+        } catch (error) {
+          console.error('Error parsing form data:', error);
+        }
+      }
+    }
+    
+    return forms;
+  }
+
   getFormByClinicianAndChild(clinicianName: string, childFirstName?: string): FormData | null {
     // First check current form if we have a CHATA ID
     if (this.currentChataId) {
@@ -310,11 +260,10 @@ class FormPersistenceService {
     }
 
     // If no current form matches or no CHATA ID, check all unsubmitted forms
-    const forms = this.getAllForms();
+    const forms = this.getAllUnsubmittedForms();
     return forms.find(form => 
       form.clinicianInfo.name === clinicianName && 
-      (!childFirstName || form.clinicianInfo.childFirstName === childFirstName) &&
-      !form.isSubmitted
+      (!childFirstName || form.clinicianInfo.childFirstName === childFirstName)
     ) || null;
   }
 }

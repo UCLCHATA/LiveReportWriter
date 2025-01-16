@@ -19,6 +19,7 @@ import type {
   isAssessmentLogData,
   FormData
 } from '../types/index';
+import { formPersistence } from '../services/formPersistence';
 
 // Constants
 const STORAGE_KEY_PREFIX = 'chata-form';
@@ -330,6 +331,17 @@ const cleanupOldDrafts = () => {
   }
 };
 
+// Add clinician info validation function
+const isValidClinicianInfo = (info: any): info is ClinicianInfo => {
+  return (
+    info &&
+    typeof info === 'object' &&
+    typeof info.name === 'string' && info.name.length > 0 &&
+    typeof info.email === 'string' && info.email.length > 0 &&
+    typeof info.clinicName === 'string' && info.clinicName.length > 0
+  );
+};
+
 export const useFormState = () => {
   const saveTimeoutRef = useRef<NodeJS.Timeout | null>(null);
   const hookId = useRef(`hook-${++hookInstanceCount}`);
@@ -366,8 +378,8 @@ export const useFormState = () => {
         return { ...initialState, chataId: currentChataId };
       }
       
-      // Only restore if CHATA ID matches
-      if (parsed.chataId !== currentChataId) {
+      // Only restore if CHATA ID matches and clinician info is valid
+      if (parsed.chataId !== currentChataId || !isValidClinicianInfo(parsed.clinician)) {
         return { ...initialState, chataId: currentChataId };
       }
       
@@ -376,6 +388,10 @@ export const useFormState = () => {
         ...initialState,
         ...parsed,
         chataId: currentChataId,
+        clinician: {
+          ...initialState.clinician,
+          ...parsed.clinician
+        },
         formData: {
           ...initialState.formData,
           ...parsed.formData,
@@ -597,11 +613,28 @@ export const useFormState = () => {
 
   const setClinicianInfo = useCallback((info: ClinicianInfo) => {
     setGlobalState(prev => {
+      // Validate clinician info before updating
+      if (!isValidClinicianInfo(info)) {
+        console.error('Invalid clinician info:', info);
+        return prev;
+      }
+
       const newState = {
         ...prev,
         clinician: info,
         chataId: info.chataId || prev.chataId
       };
+
+      // Save to form persistence service
+      if (info.chataId) {
+        formPersistence.saveForm({
+          chataId: info.chataId,
+          clinicianInfo: info,
+          lastUpdated: Date.now(),
+          isSubmitted: false
+        });
+      }
+
       saveState(newState);
       return newState;
     });

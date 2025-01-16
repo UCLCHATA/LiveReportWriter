@@ -1,5 +1,3 @@
-import type { FormState } from '../types';
-
 export interface ClinicianInfo {
   name: string;
   email: string;
@@ -38,18 +36,12 @@ export interface FormData {
 }
 
 // Base interface for all assessment domains
-export interface AssessmentDomainBase<T = string> {
+export interface AssessmentDomainBase {
   name: string;
   value: number;
   observations: string[];
-  label: T;
+  label: 'low' | 'medium' | 'high' | 'skipped';
 }
-
-export interface SensoryDomain extends AssessmentDomainBase<"Significantly Under-responsive" | "Under-responsive" | "Typical" | "Over-responsive" | "Significantly Over-responsive"> {}
-
-export interface SocialCommunicationDomain extends AssessmentDomainBase<"Age Appropriate" | "Subtle Differences" | "Emerging" | "Limited" | "Significantly Limited"> {}
-
-export interface BehaviorDomain extends AssessmentDomainBase<"Not Present" | "Minimal Impact" | "Moderate Impact" | "Significant Impact" | "Severe Impact"> {}
 
 export interface SensoryProfileData {
   type: 'sensoryProfile';
@@ -152,8 +144,8 @@ export interface AssessmentData {
 export interface GlobalFormState {
   chataId: string;
   clinician: ClinicianInfo;
-  formData: FormState;
-  assessments: Required<AssessmentData>;
+  formData: FormData;
+  assessments: AssessmentData;
   currentStep: number;
   lastUpdated: string;
   status: 'draft' | 'submitted';
