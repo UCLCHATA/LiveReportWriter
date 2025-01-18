@@ -298,24 +298,26 @@ class FormPersistenceService {
   }
 
   getFormByClinicianAndChild(clinicianName: string, childFirstName?: string): FormData | null {
-    // First check current form if we have a CHATA ID
-    if (this.currentChataId) {
-      const currentForm = this.getStoredForm();
-      if (currentForm && 
-          currentForm.clinicianInfo.name === clinicianName && 
-          (!childFirstName || currentForm.clinicianInfo.childFirstName === childFirstName) && 
-          !currentForm.isSubmitted) {
-        return currentForm;
-      }
-    }
-
-    // If no current form matches or no CHATA ID, check all unsubmitted forms
+    // Get all forms
     const forms = this.getAllForms();
+    
+    // Find first unsubmitted form matching the clinician and child name
     return forms.find(form => 
       form.clinicianInfo.name === clinicianName && 
       (!childFirstName || form.clinicianInfo.childFirstName === childFirstName) &&
       !form.isSubmitted
     ) || null;
+  }
+
+  restoreForm(clinicianName: string, childFirstName?: string): FormData | null {
+    const form = this.getFormByClinicianAndChild(clinicianName, childFirstName);
+    if (form) {
+      // Set as current form
+      this.currentChataId = form.chataId;
+      this.saveForm(form);
+      return form;
+    }
+    return null;
   }
 }
 
