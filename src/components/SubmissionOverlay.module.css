@@ -46,6 +46,9 @@
   line-height: 1;
   border-radius: 4px;
   transition: all 0.2s;
+  position: absolute;
+  top: 1rem;
+  right: 1rem;
 }
 
 .closeButton:hover {
@@ -55,6 +58,12 @@
 
 .content {
   padding: 1.5rem;
+  background: white;
+  border-radius: 12px;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+  width: 90%;
+  max-width: 500px;
+  text-align: center;
 }
 
 .stageIndicator {
@@ -220,6 +229,78 @@
   padding: 0.5rem;
   background: #f0fdf4;
   border-radius: 4px;
+}
+
+.stage {
+  color: #374151;
+  font-size: 1rem;
+  margin-top: 1rem;
+}
+
+.retryButton {
+  margin-top: 1rem;
+  padding: 0.5rem 1rem;
+  background: #4f46e5;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+.retryButton:hover {
+  background: #4338ca;
+}
+
+/* Success Message Styles */
+.successMessage {
+  text-align: center;
+  padding: 1rem;
+}
+
+.successMessage h3 {
+  color: #059669;
+  font-size: 1.5rem;
+  margin-bottom: 1rem;
+}
+
+.successMessage p {
+  color: #374151;
+  font-size: 1rem;
+  line-height: 1.5;
+  margin-bottom: 0.75rem;
+}
+
+.successMessage .note {
+  color: #6b7280;
+  font-size: 0.875rem;
+  margin-top: 1rem;
+}
+
+.successMessage .note a {
+  color: #4f46e5;
+  text-decoration: none;
+}
+
+.successMessage .note a:hover {
+  text-decoration: underline;
+}
+
+.clearButton {
+  margin-top: 1.5rem;
+  padding: 0.75rem 1.5rem;
+  background: #4f46e5;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  font-size: 1rem;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.clearButton:hover {
+  background: #4338ca;
+  transform: translateY(-1px);
 }
 
 /* Animations */

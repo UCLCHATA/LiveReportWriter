@@ -33,7 +33,17 @@ export const SubmissionOverlay: React.FC<SubmissionOverlayProps> = ({
       case 'waiting':
         return 'Waiting for data sync...';
       case 'complete':
-        return 'Form submitted successfully! You will receive an email once the report is ready.';
+        return (
+          <div className={styles.successMessage}>
+            <h3>Form Submitted Successfully!</h3>
+            <p>Your data has been saved and your report is now being generated.</p>
+            <p>You will receive your report via email within 10 minutes.</p>
+            <p className={styles.note}>If you do not receive your report, please contact <a href="mailto:uclchata@gmail.com">uclchata@gmail.com</a></p>
+            <button onClick={onClose} className={styles.clearButton}>
+              Clear Form to Create Another Report
+            </button>
+          </div>
+        );
       case 'error':
         return 'An error occurred during submission. Please try again.';
       default:
