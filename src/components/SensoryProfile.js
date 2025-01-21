@@ -1,0 +1,5 @@
+import { jsx as _jsx, jsxs as _jsxs } from "react/jsx-runtime";
+import styles from './AssessmentCarousel.module.css';
+export const SensoryProfile = () => {
+    return (_jsxs("div", { className: styles.carouselContainer, children: [_jsxs("header", { className: styles.carouselHeader, children: [_jsx("button", { className: styles.navButton, children: _jsx("span", { children: "\u2190" }) }), _jsxs("div", { className: styles.titleSection, children: [_jsx("h2", { className: styles.title, children: "Sensory Profile" }), _jsxs("button", { className: styles.toolkitButton, children: [_jsx("span", { children: "\u2139\uFE0F" }), _jsx("span", { children: "Toolkit" })] })] }), _jsx("div", { className: styles.carouselIndicators, children: [1, 2, 3, 4, 5].map((_, index) => (_jsx("div", { className: `${styles.indicator} ${index === 0 ? styles.indicatorActive : ''}` }, index))) }), _jsx("button", { className: styles.navButton, children: _jsx("span", { children: "\u2192" }) })] }), _jsx("div", { className: styles.carouselContent })] }));
+};
