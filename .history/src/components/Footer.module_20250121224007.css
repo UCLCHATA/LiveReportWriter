@@ -1,0 +1,52 @@
+.footer {
+  background-color: #333;
+  color: #fff;
+  padding: 1rem;
+  position: relative;
+  z-index: 20;
+  height: 60px;
+  display: flex;
+  align-items: center;
+}
+
+.footerContent {
+  max-width: 1200px;
+  margin: 0 auto;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+  padding: 0 2rem;
+}
+
+.footerLogos {
+  display: flex;
+  gap: 2rem;
+  align-items: center;
+}
+
+.footerLogo {
+  height: 35px;
+  width: auto;
+  object-fit: contain;
+}
+
+.uclLogo {
+  filter: brightness(0) invert(1);
+}
+
+.nhsLogo {
+  /* No filter needed for NHS logo since it's already white */
+  filter: none;
+}
+
+.footerText {
+  text-align: right;
+  font-size: 0.9rem;
+}
+
+.contactText {
+  font-size: 0.8rem;
+  color: #ccc;
+  margin-top: 0.25rem;
+} 
