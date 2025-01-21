@@ -1,4 +1,4 @@
-import { ClinicianInfo } from './types/index';
+import { ClinicianInfo, AssessmentLogData, AssessmentData, AssessmentSummaryData } from './types/index';
 
 export interface FormState {
   status: 'draft' | 'submitted';
@@ -12,6 +12,12 @@ export interface FormState {
     mental: boolean;
     other: boolean;
   };
+  componentProgress: {
+    [key: string]: {
+      progress: number;
+      isComplete: boolean;
+    }
+  };
   remarks: string;
   clinicalObservations: string;
   priorityAreas: string;
@@ -20,7 +26,10 @@ export interface FormState {
   formProgress: number;
   lastUpdated: string;
   chartImage?: string;
-  differentialDiagnosis?: string;
+  differentialDiagnosis: string;
+  developmentalConcerns: string;
+  medicalHistory: string;
+  familyHistory: string;
 }
 
 interface AssessmentBase {
@@ -45,6 +54,7 @@ export interface BehaviorDomain extends AssessmentDomainBase {
   label: "Not Present" | "Minimal Impact" | "Moderate Impact" | "Significant Impact" | "Severe Impact";
 }
 
+<<<<<<< HEAD
 export interface SensoryProfileData {
   type: 'sensoryProfile';
   domains: {
@@ -216,6 +226,8 @@ export interface GlobalState {
   assessments: AssessmentData;
 }
 
+=======
+>>>>>>> fix-deployment
 export interface Assessment {
   id: string;
   name: string;
@@ -229,12 +241,63 @@ export interface Assessment {
   lastModified?: string;
 }
 
+export function isAssessment(data: any): data is Assessment {
+  return (
+    data &&
+    typeof data.id === 'string' &&
+    typeof data.name === 'string' &&
+    (data.date === undefined || typeof data.date === 'string') &&
+    (data.notes === undefined || typeof data.notes === 'string') &&
+    (data.status === undefined || ['pending', 'completed', 'scheduled'].includes(data.status)) &&
+    typeof data.color === 'string' &&
+    typeof data.category === 'string'
+  );
+}
+
+export function isAssessmentLogData(data: any): data is AssessmentLogData {
+  return (
+    data &&
+    data.type === 'assessmentLog' &&
+    Array.isArray(data.selectedAssessments) &&
+    data.selectedAssessments.every(isAssessment) &&
+    typeof data.entries === 'object' &&
+    Object.values(data.entries).every(isAssessment) &&
+    typeof data.progress === 'number' &&
+    typeof data.isComplete === 'boolean'
+  );
+}
+
 export interface GlobalFormState {
-  formData: FormState;
-  assessments: Required<AssessmentData>;
-  clinician: ClinicianInfo;
-  chataId: string;
-  currentStep: number;
-  lastUpdated: string;
-  status: 'draft' | 'submitted';
+    chataId: string;
+    clinician?: {
+        name: string;
+        email: string;
+        clinicName: string;
+        childFirstName: string;
+        childLastName: string;
+        childAge: string;
+        childGender: string;
+    };
+    formData: {
+        ascStatus: string;
+        adhdStatus: string;
+        clinicalObservations: string;
+        strengths: string;
+        priorityAreas: string;
+        recommendations: string;
+        remarks?: string;
+        differentialDiagnosis?: string;
+        referrals?: Record<string, boolean>;
+        [key: string]: any;
+    };
+    assessments?: {
+        sensoryProfile?: any;
+        socialCommunication?: any;
+        behaviorInterests?: any;
+        milestones?: {
+            milestones: any[];
+            historyOfConcerns?: string;
+        };
+        assessmentLog?: Record<string, any>;
+    };
 } 

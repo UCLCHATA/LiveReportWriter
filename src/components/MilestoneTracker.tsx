@@ -377,6 +377,23 @@ interface HistoryTextBoxProps {
 }
 
 const HistoryTextBox: React.FC<HistoryTextBoxProps> = ({ value, onChange }) => {
+  const [localValue, setLocalValue] = useState(value || '');
+
+  // Update local value when prop changes
+  useEffect(() => {
+    setLocalValue(value || '');
+  }, [value]);
+
+  const handleChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
+    setLocalValue(e.target.value);
+  };
+
+  const handleBlur = () => {
+    if (localValue !== value) {
+      onChange(localValue);
+    }
+  };
+
   const placeholderText = `Document history of concerns, including:
 • Age when parents first noticed differences
 • Early signs (e.g., limited eye contact, delayed babbling)
@@ -386,25 +403,17 @@ const HistoryTextBox: React.FC<HistoryTextBoxProps> = ({ value, onChange }) => {
 • Impact on daily activities and routines
 • Family history of developmental conditions`;
 
-  const handleChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
-    onChange(e.target.value);
-  };
-
   return (
     <div className={styles.historyBox}>
       <h3>History of Concerns</h3>
       <div className={styles.textareaWrapper}>
         <textarea
-          value={value || ''}
+          value={localValue}
           onChange={handleChange}
+          onBlur={handleBlur}
           placeholder={placeholderText}
           className={styles.historyTextarea}
         />
-        <div className={styles.tooltip}>
-          <div className={styles.tooltipContent}>
-            {placeholderText}
-          </div>
-        </div>
       </div>
     </div>
   );
@@ -539,18 +548,14 @@ export const MilestoneTracker: React.FC<{
   }, []);
 
   const handleHistoryChange = useCallback((text: string) => {
-    if (!shouldSave()) return;
-    
     const updatedData = {
       type: 'milestoneTracker',
       milestones,
       history: text,
       lastUpdated: new Date().toISOString()
     };
-    
-    lastSaveRef.current = Date.now();
     onChange(updatedData);
-  }, [milestones, onChange, shouldSave]);
+  }, [milestones, onChange]);
 
   const handleDragEnd = useCallback((event: DragEndEvent) => {
     const { active, over } = event;
@@ -688,6 +693,60 @@ export const MilestoneTracker: React.FC<{
     return null;
   };
 
+<<<<<<< HEAD
+=======
+  const handleIncludeInReportToggle = async () => {
+    setIncludeInReport(prev => !prev);
+    
+    if (!includeInReport) {
+      try {
+        const timelineImage = await captureTimelineImage();
+        if (timelineImage) {
+          // Create a temporary link element
+          const link = document.createElement('a');
+          link.href = timelineImage;
+          link.download = 'Developmental timeline.png';
+          
+          // Show dialog to user
+          const userConfirmed = window.confirm('The image will be downloaded. Please save it and manually add it to your generated report.');
+          
+          if (userConfirmed) {
+            // Trigger download
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+          }
+        }
+      } catch (error) {
+        console.error('Error capturing timeline image:', error);
+      }
+    }
+  };
+
+  useEffect(() => {
+    const updateData = async () => {
+      if (includeInReport) {
+        const timelineImage = await captureTimelineImage();
+        onChange({
+          ...data,
+          timelineImage,
+          includeTimelineInReport: true,
+          lastUpdated: new Date().toISOString()
+        });
+      } else {
+        onChange({
+          ...data,
+          timelineImage: null,
+          includeTimelineInReport: false,
+          lastUpdated: new Date().toISOString()
+        });
+      }
+    };
+
+    updateData();
+  }, [includeInReport, onChange, data]);
+
+>>>>>>> fix-deployment
   // Debounce the mark complete/undo handler
   const handleMarkComplete = useCallback(
     debounce((milestone: Milestone, isComplete: boolean) => {
@@ -814,32 +873,10 @@ export const MilestoneTracker: React.FC<{
         </div>
       </DndContext>
       
-      <div className={styles.historyBox}>
-        <h3>History of Concerns</h3>
-        <div className={styles.textareaWrapper}>
-          <textarea
-            value={historyText}
-            onChange={(e) => handleHistoryChange(e.target.value)}
-            placeholder={`Document history of concerns, including:
-• Age when parents first noticed differences
-• Early signs (e.g., limited eye contact, delayed babbling)
-• Response to name and social engagement
-• Changes in development patterns
-• Environmental factors and adaptations
-• Impact on daily activities and routines
-• Family history of developmental conditions`}
-            className={styles.historyTextarea}
-            title={`Document history of concerns, including:
-• Age when parents first noticed differences
-• Early signs (e.g., limited eye contact, delayed babbling)
-• Response to name and social engagement
-• Changes in development patterns
-• Environmental factors and adaptations
-• Impact on daily activities and routines
-• Family history of developmental conditions`}
-          />
-        </div>
-      </div>
+      <HistoryTextBox
+        value={historyText}
+        onChange={handleHistoryChange}
+      />
     </div>
   );
 });

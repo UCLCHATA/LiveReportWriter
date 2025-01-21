@@ -1,4 +1,8 @@
+import type { FormState } from '../types';
+
+// Base types
 export interface ClinicianInfo {
+<<<<<<< HEAD
   chataId: string;
   clinicName: string;
   name: string;
@@ -24,13 +28,18 @@ export interface AppsScriptResponse {
       };
     };
   };
+=======
+  clinicianName: string;
+  clinicianEmail: string;
+  clinicName: string;
+  childFirstName: string;
+  childSecondName: string;
+  childAge: string;
+  childGender: string;
+>>>>>>> fix-deployment
 }
 
 export interface FormData {
-  referralReason: string;
-  developmentalConcerns: string;
-  medicalHistory: string;
-  familyHistory: string;
   status: 'draft' | 'submitted';
   ascStatus: string;
   adhdStatus: string;
@@ -49,6 +58,7 @@ export interface FormData {
   recommendations: string;
   formProgress: number;
   lastUpdated: string;
+<<<<<<< HEAD
   differentialDiagnosis?: string;
   milestones?: Milestone[];
   milestoneHistory?: string;
@@ -59,56 +69,48 @@ export interface FormData {
   combinedGraphImage?: string;
   includeMilestoneImage?: boolean;
   includeRadarChart?: boolean;
+=======
+  chartImage?: string;
+  differentialDiagnosis: string;
+  developmentalConcerns: string;
+  medicalHistory: string;
+  familyHistory: string;
+  componentProgress: Record<string, { progress: number; isComplete: boolean }>;
+>>>>>>> fix-deployment
 }
 
-// Base interface for all assessment domains
-export interface AssessmentDomainBase {
+// Assessment types
+export interface AssessmentDomainBase<T = string> {
+  value?: number;
+  label?: T;
+  notes?: string;
+  observations?: string[];
+}
+
+export type SensoryDomain = AssessmentDomainBase<"Significantly Under-responsive" | "Under-responsive" | "Typical" | "Over-responsive" | "Significantly Over-responsive">;
+export type SocialCommunicationDomain = AssessmentDomainBase<"Age Appropriate" | "Subtle Differences" | "Emerging" | "Limited" | "Significantly Limited">;
+export type BehaviorDomain = AssessmentDomainBase<"Not Present" | "Minimal Impact" | "Moderate Impact" | "Significant Impact" | "Severe Impact">;
+
+export interface Assessment {
+  id: string;
   name: string;
-  value: number;
-  observations: string[];
-  label: string;
+  value?: number;
+  label?: string;
+  notes?: string;
+  observations?: string[];
+  domains?: Record<string, AssessmentDomainBase>;
 }
 
 export interface SensoryProfileData {
-  type: 'sensoryProfile';
-  domains: {
-    visual: AssessmentDomainBase;
-    auditory: AssessmentDomainBase;
-    tactile: AssessmentDomainBase;
-    vestibular: AssessmentDomainBase;
-    proprioceptive: AssessmentDomainBase;
-    oral: AssessmentDomainBase;
-  };
-  progress: number;
-  isComplete: boolean;
+  domains: Record<string, SensoryDomain>;
 }
 
 export interface SocialCommunicationData {
-  type: 'socialCommunication';
-  domains: {
-    jointAttention: AssessmentDomainBase;
-    nonverbalCommunication: AssessmentDomainBase;
-    verbalCommunication: AssessmentDomainBase;
-    socialUnderstanding: AssessmentDomainBase;
-    playSkills: AssessmentDomainBase;
-    peerInteractions: AssessmentDomainBase;
-  };
-  progress: number;
-  isComplete: boolean;
+  domains: Record<string, SocialCommunicationDomain>;
 }
 
 export interface BehaviorInterestsData {
-  type: 'behaviorInterests';
-  domains: {
-    repetitiveBehaviors: AssessmentDomainBase;
-    routinesRituals: AssessmentDomainBase;
-    specialInterests: AssessmentDomainBase;
-    sensoryInterests: AssessmentDomainBase;
-    emotionalRegulation: AssessmentDomainBase;
-    flexibility: AssessmentDomainBase;
-  };
-  progress: number;
-  isComplete: boolean;
+  domains: Record<string, BehaviorDomain>;
 }
 
 export interface Milestone {
@@ -133,8 +135,12 @@ export interface MilestoneTrackerData {
   formProgress: number;
   isComplete: boolean;
   lastUpdated: string;
+<<<<<<< HEAD
   timelineImage?: string;
   includeTimelineInReport?: boolean;
+=======
+  historyOfConcerns?: string;
+>>>>>>> fix-deployment
 }
 
 export interface AssessmentEntry {
@@ -145,14 +151,13 @@ export interface AssessmentEntry {
 }
 
 export interface AssessmentLogData {
-  type: 'assessmentLog';
-  selectedAssessments: string[];
-  entries: Record<string, AssessmentEntry>;
-  progress: number;
-  isComplete: boolean;
+  date?: string;
+  notes?: string;
+  status?: string;
 }
 
 export interface AssessmentSummaryData {
+<<<<<<< HEAD
   type: 'summary';
   progress: number;
   isComplete: boolean;
@@ -202,6 +207,26 @@ export interface GlobalFormState {
     milestones: MilestoneTrackerData;
     summary?: AssessmentSummaryData;
   };
+=======
+  notes?: string;
+  recommendations?: string[];
+}
+
+export interface AssessmentData {
+  sensoryProfile?: SensoryProfileData;
+  socialCommunication?: SocialCommunicationData;
+  behaviorInterests?: BehaviorInterestsData;
+  milestones?: any[];
+  assessmentLog?: Record<string, any>;
+  summary?: any;
+}
+
+export interface GlobalFormState {
+  chataId: string;
+  clinician: Partial<ClinicianInfo>;
+  formData: FormData;
+  assessments: Required<AssessmentData>;
+>>>>>>> fix-deployment
   currentStep: number;
   lastUpdated: string;
   status: 'draft' | 'submitted';

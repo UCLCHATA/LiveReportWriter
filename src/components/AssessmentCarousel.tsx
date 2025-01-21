@@ -14,6 +14,7 @@ import developmentIcon from '../assets/development-icon.png';
 import assessmentIcon from '../assets/assessment-icon.png';
 import summaryIcon from '../assets/summary-icon.png';
 import type { 
+<<<<<<< HEAD
   FormState, 
   AssessmentData, 
   SensoryProfileData,
@@ -21,6 +22,13 @@ import type {
   BehaviorInterestsData,
   AssessmentDomainBase,
   AssessmentSummaryData
+=======
+  AssessmentData,
+  SensoryDomain,
+  SocialCommunicationDomain,
+  BehaviorDomain,
+  AssessmentDomainBase
+>>>>>>> fix-deployment
 } from '../types';
 import styles from './AssessmentCarousel.module.css';
 import { assessmentTools } from './AssessmentLogger';
@@ -293,79 +301,102 @@ export const AssessmentCarousel: React.FC<AssessmentCarouselProps> = React.memo(
   }, [MIN_SAVE_INTERVAL]);
 
   const handleMarkComplete = useCallback((toolId: keyof AssessmentData) => {
-    setCompletionStates(prev => {
-      const newState = {
-        ...prev,
-        [toolId]: {
-          ...prev[toolId],
-          isComplete: true,
-          autoDetected: false
-        }
-      };
-      
-      // Update the assessment state
-      updateAssessment(toolId, { 
-        isComplete: true,
-        lastUpdated: new Date().toISOString()
-      });
-      
-      return newState;
+    if (!globalState) return;
+
+    // First update the assessment state
+    updateAssessment(toolId, { 
+      ...globalState.assessments[toolId],
+      isComplete: true,
+      lastUpdated: new Date().toISOString()
     });
-  }, [updateAssessment]);
+    
+    // Then update the completion state
+    setCompletionStates(prev => ({
+      ...prev,
+      [toolId]: {
+        ...prev[toolId],
+        isComplete: true,
+        autoDetected: false,
+        progress: 100 // Force progress to 100% when marked complete
+      }
+    }));
+
+    // Trigger confetti animation
+    confetti({
+      particleCount: 100,
+      spread: 70,
+      origin: { y: 0.6 }
+    });
+  }, [updateAssessment, globalState]);
 
   const handleMarkIncomplete = useCallback((toolId: keyof AssessmentData) => {
-    setCompletionStates(prev => {
-      const newState = {
-        ...prev,
-        [toolId]: {
-          ...prev[toolId],
-          isComplete: false,
-          autoDetected: false
-        }
-      };
-      
-      // Update the assessment state
-      updateAssessment(toolId, { 
-        isComplete: false,
-        lastUpdated: new Date().toISOString()
-      });
-      
-      return newState;
+    if (!globalState) return;
+
+    // Calculate actual progress before marking incomplete
+    const currentProgress = calculateProgress(globalState.assessments[toolId]);
+    
+    // First update the assessment state
+    updateAssessment(toolId, { 
+      ...globalState.assessments[toolId],
+      isComplete: false,
+      lastUpdated: new Date().toISOString()
     });
-  }, [updateAssessment]);
+    
+    // Then update the completion state
+    setCompletionStates(prev => ({
+      ...prev,
+      [toolId]: {
+        ...prev[toolId],
+        isComplete: false,
+        autoDetected: false,
+        progress: currentProgress // Restore actual progress
+      }
+    }));
+  }, [updateAssessment, calculateProgress, globalState]);
 
   // Update progress when component changes
   useEffect(() => {
     const currentTool = tools[currentIndex];
+    if (!currentTool || !globalState) return;
+
     const component = globalState.assessments[currentTool.id];
     const progress = calculateProgress(component);
+    const isComplete = component?.isComplete || false;
     
-    // Only update if progress has changed
-    if (progress !== completionStates[currentTool.id]?.progress) {
+    // Only update if progress or completion state has changed
+    if (progress !== completionStates[currentTool.id]?.progress || 
+        isComplete !== completionStates[currentTool.id]?.isComplete) {
       setCompletionStates(prev => ({
         ...prev,
         [currentTool.id]: {
           ...prev[currentTool.id],
-          progress,
-          autoDetected: progress >= 100 && !prev[currentTool.id].isComplete
+          progress: isComplete ? 100 : progress, // If complete, force 100%
+          isComplete,
+          autoDetected: false // Never auto-detect completion
         }
       }));
     }
-  }, [currentIndex, globalState.assessments, tools]);
+  }, [currentIndex, globalState, calculateProgress, completionStates]);
 
   // Separate effect for total progress calculation with reduced frequency
   useEffect(() => {
-    const totalProgress = Math.floor(
-      Object.values(completionStates).reduce(
-        (acc, state) => {
-          const componentContribution = state.isComplete ? 10 : Math.min(Math.floor(state.progress / 10), 10);
-          return acc + componentContribution;
-        },
-        0
-      )
-    );
+    const debouncedProgressUpdate = debounce(() => {
+      const totalProgress = Math.floor(
+        Object.values(completionStates).reduce(
+          (acc, state) => {
+            const componentContribution = state.isComplete ? 10 : Math.min(Math.floor(state.progress / 10), 10);
+            return acc + componentContribution;
+          },
+          0
+        )
+      );
+      // Convert to percentage of total (this is 50% of total progress)
+      const scaledProgress = Math.min(50, (totalProgress / 50) * 50);
+      handleProgressUpdate(scaledProgress);
+    }, 500);
 
-    handleProgressUpdate(totalProgress);
+    debouncedProgressUpdate();
+    return () => debouncedProgressUpdate.cancel();
   }, [completionStates, handleProgressUpdate]);
 
   const handleNext = () => {
@@ -383,8 +414,48 @@ export const AssessmentCarousel: React.FC<AssessmentCarouselProps> = React.memo(
     const newIncludeState = !includeInReport;
     setIncludeInReport(newIncludeState);
     
+<<<<<<< HEAD
     // Update the assessment state with just the include flag
     const summaryData: AssessmentSummaryData = {
+=======
+    // If including in report, capture and download the chart
+    if (!includeInReport) {
+      try {
+        const chartElement = document.querySelector('.combined-radar-chart') as HTMLElement;
+        if (chartElement) {
+          const canvas = await html2canvas(chartElement, {
+            backgroundColor: null,
+            scale: 2,
+            logging: false,
+            allowTaint: true,
+            useCORS: true
+          });
+          const chartImage = canvas.toDataURL('image/png');
+          
+          // Create a temporary link element
+          const link = document.createElement('a');
+          link.href = chartImage;
+          link.download = 'ASD Profile chart.png';
+          
+          // Show dialog to user
+          const userConfirmed = window.confirm('The image will be downloaded. Please save it and manually add it to your generated report.');
+          
+          if (userConfirmed) {
+            // Trigger download
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+          }
+        }
+      } catch (error) {
+        console.error('Error capturing chart image:', error);
+      }
+    }
+
+    // Update the assessment state to include the inclusion status
+    updateAssessment('summary', {
+      includeInReport: !includeInReport,
+>>>>>>> fix-deployment
       type: 'summary',
       includeInReport: newIncludeState,
       lastUpdated: new Date().toISOString()

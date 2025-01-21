@@ -84,11 +84,17 @@ export const SocialCommunicationGraph: React.FC<SocialCommunicationGraphProps> =
           />
           <PolarRadiusAxis 
             angle={30} 
+<<<<<<< HEAD
             domain={[1, 5]} 
             tickCount={5} 
             tick={{ fontSize: 12, fill: '#374151' }}
             stroke="#94a3b8"
             strokeWidth={1}
+=======
+            domain={[0, 5]} 
+            tickCount={6}
+            tick={{ fontSize: 11 }}
+>>>>>>> fix-deployment
             scale="linear"
             allowDataOverflow={false}
           />

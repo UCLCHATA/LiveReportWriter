@@ -58,13 +58,14 @@ export const SensoryProfileGraph: React.FC<SensoryProfileGraphProps> = ({ data }
 
   const radarData = Object.values(data.domains).map(domain => ({
     domain: domain.name,
-    sensitivity: domain.value,
+    sensitivity: domain.value || 0,
     fullMark: 5
   }));
 
   return (
     <ResponsiveContainer width="100%" height={250}>
       <RadarChart data={radarData} margin={{ top: 5, right: 25, bottom: 5, left: 25 }}>
+<<<<<<< HEAD
         <PolarGrid 
           gridType="polygon"
           stroke="#e5e7eb"
@@ -83,16 +84,42 @@ export const SensoryProfileGraph: React.FC<SensoryProfileGraphProps> = ({ data }
           tick={{ fontSize: 12, fill: '#374151' }}
           stroke="#94a3b8"
           strokeWidth={1}
+=======
+        <PolarGrid gridType="polygon" stroke="#e5e7eb" />
+        <PolarAngleAxis 
+          dataKey="domain" 
+          tick={{ fontSize: 12, fill: '#4b5563' }}
+          axisLine={{ stroke: '#e5e7eb' }}
+        />
+        <PolarRadiusAxis 
+          angle={30} 
+          domain={[0, 5]} 
+          tickCount={6} 
+          tick={{ fontSize: 11, fill: '#6b7280' }}
+          axisLine={false}
+>>>>>>> fix-deployment
           scale="linear"
-          allowDataOverflow={false}
+          orientation="middle"
+          type="number"
         />
         <Radar
           name="Sensitivity"
           dataKey="sensitivity"
+<<<<<<< HEAD
           stroke="#be185d"
           fill="#be185d"
           fillOpacity={0.2}
           strokeWidth={1.5}
+=======
+          stroke="#4f46e5"
+          fill="#4f46e5"
+          fillOpacity={0.4}
+          dot={false}
+          isAnimationActive={true}
+          animationBegin={0}
+          animationDuration={500}
+          animationEasing="ease-out"
+>>>>>>> fix-deployment
         />
       </RadarChart>
     </ResponsiveContainer>
