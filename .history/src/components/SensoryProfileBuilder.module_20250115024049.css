@@ -1,0 +1,285 @@
+/* Sensory Profile */
+.sensoryProfile {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+}
+
+.profileHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding-bottom: 0.5rem;
+  border-bottom: 1px solid #e9ecef;
+}
+
+.profileHeader h2 {
+  margin: 0;
+  font-size: 1.25rem;
+  font-weight: 600;
+}
+
+.helpIcon {
+  color: #6b7280;
+  cursor: help;
+}
+
+.profileContent {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+  overflow: visible;
+}
+
+.radarContainer {
+  background: white;
+  padding: 0.5rem;
+  border-radius: 6px;
+  height: 260px;
+  min-height: 260px;
+  flex: 0 0 auto;
+}
+
+.slidersGrid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 1rem;
+  padding: 0.5rem;
+  height: auto;
+  align-content: start;
+  overflow: visible !important;
+}
+
+.domainSlider {
+  background: white;
+  padding: 0.75rem;
+  border-radius: 6px;
+  border: 1px solid #e5e7eb;
+  position: relative;
+  overflow: visible;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+}
+
+.sliderHeader {
+  display: flex;
+  align-items: center;
+  margin-bottom: 0.5rem;
+  padding-bottom: 0.25rem;
+  border-bottom: 1px solid #e5e7eb;
+  gap: 0.5rem;
+}
+
+.domainName {
+  font-weight: 500;
+  color: #333;
+  font-size: 0.9rem;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.sensitivityLabel {
+  font-size: 0.8rem;
+  color: #6c757d;
+  margin-left: auto;
+  margin-right: 0.5rem;
+}
+
+.sensitivitySlider {
+  width: 100%;
+  margin: 0.5rem 0;
+  -webkit-appearance: none;
+  height: 4px;
+  background: #e5e7eb;
+  border-radius: 2px;
+  outline: none;
+}
+
+.sensitivitySlider::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  background: #be185d;
+  cursor: pointer;
+  border: 2px solid white;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
+}
+
+.sensitivitySlider::-moz-range-thumb {
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  background: #be185d;
+  cursor: pointer;
+  border: 2px solid white;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
+}
+
+.observations {
+  margin-top: 0.5rem;
+  padding-top: 0.5rem;
+  border-top: 1px solid #e5e7eb;
+}
+
+.observationItem {
+  background: white;
+  padding: 0.375rem;
+  border-radius: 4px;
+  margin-bottom: 0.25rem;
+  font-size: 0.8rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  position: relative;
+}
+
+.addObservation {
+  display: flex;
+  gap: 0.25rem;
+  margin-top: 0.25rem;
+}
+
+.addObservation input {
+  flex: 1;
+  padding: 0.375rem;
+  border: 1px solid #dee2e6;
+  border-radius: 4px;
+  font-size: 0.8rem;
+  height: 32px;
+  min-height: 32px;
+  resize: none;
+}
+
+.addObservation input:focus {
+  border-color: #4f46e5;
+  background-color: rgba(79, 70, 229, 0.05);
+  box-shadow: 0 0 0 2px rgba(79, 70, 229, 0.1);
+  outline: none;
+}
+
+.addObservation textarea {
+  flex: 1;
+  padding: 0.375rem;
+  border: 1px solid #dee2e6;
+  border-radius: 4px;
+  font-size: 0.8rem;
+  min-height: 32px;
+  resize: none;
+  overflow: hidden;
+  transition: all 0.2s ease;
+  font-family: inherit;
+}
+
+.addObservation textarea:focus {
+  border-color: #be185d;
+  background-color: rgba(190, 24, 93, 0.05);
+  box-shadow: 0 0 0 2px rgba(190, 24, 93, 0.1);
+  outline: none;
+}
+
+.addObservation button {
+  padding: 0.375rem 0.75rem;
+  background: #4b5563;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: background 0.2s;
+  font-size: 0.8rem;
+}
+
+.addObservation button:hover {
+  background: #374151;
+}
+
+.deleteObservation {
+  opacity: 0;
+  background: none;
+  border: none;
+  color: #666;
+  font-size: 1.2rem;
+  padding: 0 0.25rem;
+  cursor: pointer;
+  transition: opacity 0.2s, color 0.2s;
+}
+
+.observationItem:hover .deleteObservation {
+  opacity: 1;
+}
+
+.deleteObservation:hover {
+  color: #dc2626;
+}
+
+/* Tooltip */
+.tooltipWrapper {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  overflow: visible;
+  z-index: 99999;
+}
+
+.tooltipContent {
+  display: none;
+  position: fixed;
+  background: rgba(17, 24, 39, 0.95);
+  color: white;
+  padding: 0.75rem;
+  border-radius: 6px;
+  font-size: 0.8rem;
+  width: max-content;
+  max-width: 300px;
+  white-space: pre-line;
+  z-index: 99999;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.3);
+  backdrop-filter: blur(4px);
+  pointer-events: none;
+}
+
+/* Left side tooltips - only handle horizontal positioning */
+.slidersGrid > div:nth-child(odd) .tooltipContent {
+  transform: translateX(20px);
+}
+
+/* Right side tooltips - only handle horizontal positioning */
+.slidersGrid > div:nth-child(even) .tooltipContent {
+  transform: translateX(-100%) translateX(-20px);
+}
+
+.tooltipWrapper:hover .tooltipContent {
+  display: block;
+}
+
+/* Ensure all containers allow overflow and proper stacking */
+.carouselContainer,
+.profileContent,
+.slidersGrid,
+.domainSlider,
+.sliderHeader {
+  position: relative;
+  overflow: visible !important;
+}
+
+/* Grid layout adjustments */
+.slidersGrid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 1rem;
+  padding: 0.5rem;
+  height: auto;
+  align-content: start;
+  overflow: visible !important;
+}
+
+/* Update font sizes for radar chart */
+:global(.recharts-polar-angle-axis-tick text) {
+  font-size: 14px !important;
+}
+
+:global(.recharts-polar-radius-axis-tick text) {
+  font-size: 12px !important;
+} 

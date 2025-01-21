@@ -1,0 +1,64 @@
+.container {
+  background: var(--card-background);
+  border-radius: 8px;
+  border: 1px solid var(--border-color);
+  overflow: hidden;
+}
+
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 1rem;
+  border-bottom: 1px solid var(--border-color);
+}
+
+.header h3 {
+  font-size: 1.25rem;
+  font-weight: 600;
+  margin: 0;
+}
+
+.header p {
+  color: var(--text-muted);
+  font-size: 0.875rem;
+  margin: 0.25rem 0 0;
+}
+
+.categorySelector {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.filterIcon {
+  color: var(--text-muted);
+  width: 1rem;
+  height: 1rem;
+}
+
+.content {
+  padding: 1rem;
+}
+
+.quickAddSection {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.quickAddItem {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0.75rem;
+  border: 1px solid var(--border-color);
+  border-radius: 8px;
+  transition: background-color 0.2s;
+}
+
+.quickAddItem:hover {
+  background: var(--hover-background);
+}
+
+/* Continue with other styles... */ 

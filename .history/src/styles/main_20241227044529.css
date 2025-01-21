@@ -1,0 +1,29 @@
+/* Global Styles */
+[Previous content remains exactly the same until the profile-content section...]
+
+.profile-content {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  padding: 0.5rem;
+}
+
+.radar-container {
+  background: white;
+  padding: 0.5rem;
+  border-radius: 6px;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+  height: 300px;
+  flex-shrink: 0; /* Prevents the chart from shrinking */
+}
+
+.sliders-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 0.5rem;
+  padding-top: 0.5rem;
+  overflow-y: auto; /* Allow scrolling for sliders */
+  max-height: calc(100% - 320px); /* Full height minus chart height and padding */
+}
+
+[Rest of the file remains exactly the same...] 

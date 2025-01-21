@@ -1,0 +1,47 @@
+/* Footer */
+footer {
+  background-color: #333;
+  color: #fff;
+  padding: 0.5rem;
+  text-align: center;
+  position: relative;
+  z-index: 20;
+}
+
+.footer-content {
+  max-width: 1200px;
+  margin: 0 auto;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 2rem;
+}
+
+.footer-logos {
+  display: flex;
+  gap: 2rem;
+  align-items: center;
+}
+
+/* Use the same logo styles as header */
+.footer-logos img {
+  height: 35px;
+  width: auto;
+  object-fit: contain;
+}
+
+/* UCL logo needs to be inverted to white */
+.footer-logos .ucl-logo {
+  filter: brightness(0) invert(1);
+}
+
+/* Footer Logo Fix */
+.footer-logo {
+  height: 30px;
+  width: auto;
+}
+
+.footer-logo.nhs-logo {
+  height: 30px;
+  filter: brightness(0) invert(1) !important;
+} 

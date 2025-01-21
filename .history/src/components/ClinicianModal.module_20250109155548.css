@@ -1,0 +1,316 @@
+.modalOverlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.5);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+}
+
+.modalContent {
+  background: white;
+  padding: 1.25rem;
+  border-radius: 8px;
+  width: 90%;
+  max-width: 600px;
+  max-height: 90vh;
+  overflow-y: auto;
+  position: relative;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+.formSection {
+  margin-bottom: 1rem;
+}
+
+.formSection h2 {
+  color: #111;
+  font-size: 1.1rem;
+  margin-bottom: 0.75rem;
+}
+
+.formSection h3 {
+  color: #333;
+  margin-bottom: 0.5rem;
+  font-size: 0.95rem;
+  border-bottom: 1px solid #eee;
+  padding-bottom: 0.35rem;
+}
+
+.formRow {
+  display: flex;
+  gap: 0.5rem;
+  margin-bottom: 0.5rem;
+}
+
+.formGroup {
+  flex: 1;
+  min-width: 0;
+}
+
+.compactField {
+  max-width: 180px;
+  min-width: 100px;
+}
+
+.compactField.clinicField {
+  max-width: 140px;
+}
+
+.compactField.emailField {
+  max-width: 220px;
+  min-width: 220px;
+}
+
+.compactField.genderField {
+  max-width: 110px;
+}
+
+.formGroup label {
+  display: block;
+  margin-bottom: 0.2rem;
+  color: #555;
+  font-weight: 500;
+  font-size: 0.8rem;
+}
+
+.formGroup input,
+.formGroup select {
+  width: 100%;
+  padding: 0.4rem 0.5rem;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  font-size: 0.85rem;
+  background-color: white;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  height: 32px;
+}
+
+.formGroup select {
+  padding-right: 24px;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%23666' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 4px center;
+  background-size: 16px;
+  appearance: none;
+}
+
+.formGroup input:focus,
+.formGroup select:focus {
+  outline: none;
+  border-color: #007bff;
+  box-shadow: 0 0 0 2px rgba(0, 123, 255, 0.25);
+}
+
+.gdprNotice {
+  font-size: 0.8rem;
+  color: #666;
+  background-color: #f8f9fa;
+  padding: 0.6rem;
+  border-radius: 4px;
+  margin-bottom: 0.75rem;
+  line-height: 1.3;
+  border-left: 3px solid #007bff;
+}
+
+.buttonGroup {
+  margin-top: 1.25rem;
+  display: flex;
+  justify-content: flex-end;
+  gap: 0.5rem;
+}
+
+.submitButton,
+.cancelButton {
+  padding: 0.4rem 0.75rem;
+  border: none;
+  border-radius: 4px;
+  font-size: 0.85rem;
+  cursor: pointer;
+  transition: background-color 0.2s;
+  height: 32px;
+  line-height: 1;
+}
+
+.submitButton {
+  background-color: #007bff;
+  color: white;
+}
+
+.submitButton:hover {
+  background-color: #0056b3;
+}
+
+.cancelButton {
+  background-color: #f8f9fa;
+  color: #212529;
+}
+
+.cancelButton:hover {
+  background-color: #e2e6ea;
+}
+
+.retrieveButton {
+  background-color: #4a5568 !important;
+  color: white !important;
+}
+
+.retrieveButton:hover {
+  background-color: #2d3748 !important;
+}
+
+.dialogOverlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.5);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 2000;
+}
+
+.dialogContent {
+  background: white;
+  padding: 1.5rem;
+  border-radius: 12px;
+  width: 90%;
+  max-width: 400px;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+  position: relative;
+  z-index: 2001;
+  text-align: center;
+}
+
+.dialogContent h3 {
+  font-size: 1.2rem;
+  margin-bottom: 0.75rem;
+}
+
+.closeButton {
+  position: absolute;
+  top: 0.75rem;
+  right: 0.75rem;
+  width: 24px;
+  height: 24px;
+  border: none;
+  background: none;
+  cursor: pointer;
+  padding: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #666;
+  font-size: 1.25rem;
+  transition: color 0.2s;
+}
+
+.closeButton:hover {
+  color: #333;
+}
+
+.error {
+  color: #dc3545;
+  font-size: 0.85rem;
+  margin-top: 0.5rem;
+}
+
+.blurryOverlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.8);
+  backdrop-filter: blur(4px);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1100;
+}
+
+.chataIdDisplay {
+  margin: 2rem 0;
+  padding: 1.5rem;
+  background-color: #f8f9fa;
+  border-radius: 8px;
+  border: 2px dashed #3498db;
+}
+
+.blinkingId {
+  font-size: 2rem;
+  font-weight: bold;
+  color: #2c3e50;
+  letter-spacing: 2px;
+  animation: blink 2s infinite;
+}
+
+@keyframes blink {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.5; }
+}
+
+.chataIdNote {
+  color: #7f8c8d;
+  font-size: 0.9rem;
+  margin: 1rem 0;
+}
+
+.writingAnimation {
+  width: 200px;
+  height: 200px;
+  margin: 1rem auto;
+}
+
+.segmentedInput {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  justify-content: center;
+  margin: 1.5rem 0;
+}
+
+.segment {
+  width: 4rem;
+  text-align: center;
+  padding: 0.75rem;
+  border: 1px solid #ddd;
+  border-radius: 6px;
+  font-size: 1.2rem;
+  text-transform: uppercase;
+}
+
+.segment:focus {
+  outline: none;
+  border-color: #3498db;
+  box-shadow: 0 0 0 2px rgba(52, 152, 219, 0.2);
+}
+
+.separator {
+  font-size: 1.5rem;
+  color: #95a5a6;
+  user-select: none;
+}
+
+@media (max-width: 640px) {
+  .formRow {
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+
+  .compactField {
+    max-width: none;
+  }
+
+  .modalContent {
+    padding: 1.25rem;
+  }
+}
+ 

@@ -1,0 +1,296 @@
+/* Global Styles */
+body {
+  margin: 0;
+  padding: 0;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+  background-color: #f5f5f5;
+}
+
+.app {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+/* Header Styles */
+header {
+  background-color: #fff;
+  padding: 1rem;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.logo-container {
+  width: 120px;
+  display: flex;
+  align-items: center;
+}
+
+.ucl-logo, .nhs-logo {
+  max-width: 100%;
+  height: auto;
+}
+
+.title-container {
+  text-align: center;
+  flex-grow: 1;
+  margin: 0 2rem;
+}
+
+h1 {
+  margin: 0;
+  font-size: 1.8rem;
+  color: #333;
+}
+
+.chata-id {
+  margin-top: 0.5rem;
+  font-size: 1rem;
+  color: #666;
+}
+
+/* Main Content */
+main {
+  flex: 1;
+  display: flex;
+  padding: 2rem;
+  gap: 2rem;
+}
+
+.left-panel {
+  flex: 1;
+  background: #fff;
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  padding: 1rem;
+}
+
+.right-panel {
+  flex: 2;
+  position: relative;
+}
+
+/* Form Styles */
+.form-container {
+  background: #fff;
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  padding: 2rem;
+  display: none;
+}
+
+.form-container.active {
+  display: block;
+}
+
+.create-report-button {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  padding: 1rem 2rem;
+  font-size: 1.2rem;
+  background-color: #007bff;
+  color: #fff;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+.create-report-button:hover {
+  background-color: #0056b3;
+}
+
+/* Modal Styles */
+.modal-backdrop {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.5);
+  display: none;
+}
+
+.modal-backdrop.active {
+  display: block;
+}
+
+.modal-container {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  background: #fff;
+  padding: 2rem;
+  border-radius: 8px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  display: none;
+  z-index: 1000;
+}
+
+.modal-container.active {
+  display: block;
+}
+
+/* Form Elements */
+.form-group {
+  margin-bottom: 1rem;
+}
+
+label {
+  display: block;
+  margin-bottom: 0.5rem;
+  color: #333;
+}
+
+input[type="text"],
+input[type="email"],
+select,
+textarea {
+  width: 100%;
+  padding: 0.5rem;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  font-size: 1rem;
+}
+
+.button-group {
+  margin-top: 1rem;
+  display: flex;
+  gap: 1rem;
+  justify-content: flex-end;
+}
+
+.submit-button,
+.clear-button {
+  padding: 0.5rem 1rem;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 1rem;
+  transition: background-color 0.2s;
+}
+
+.submit-button {
+  background-color: #28a745;
+  color: #fff;
+}
+
+.submit-button:hover {
+  background-color: #218838;
+}
+
+.clear-button {
+  background-color: #dc3545;
+  color: #fff;
+}
+
+.clear-button:hover {
+  background-color: #c82333;
+}
+
+.cancel-button {
+  background-color: #6c757d;
+  color: #fff;
+  padding: 0.5rem 1rem;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 1rem;
+}
+
+.cancel-button:hover {
+  background-color: #5a6268;
+}
+
+/* Footer */
+footer {
+  background-color: #333;
+  color: #fff;
+  padding: 1rem;
+  text-align: center;
+}
+
+.footer-content {
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+/* Helper Text Styles */
+textarea.text-area {
+  min-height: 150px;
+  color: #666;
+  font-size: 0.9rem;
+  line-height: 1.4;
+}
+
+textarea.text-area:focus {
+  color: #333;
+}
+
+/* Status and Referrals Sections */
+.status-section,
+.referrals-section {
+  margin-bottom: 2rem;
+  padding: 1rem;
+  background: #f8f9fa;
+  border-radius: 4px;
+}
+
+.status-group {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 1rem;
+}
+
+.referrals-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 1rem;
+}
+
+.referral-other-row {
+  grid-column: span 2;
+  display: flex;
+  gap: 1rem;
+  align-items: center;
+}
+
+.referral-other-input {
+  flex: 1;
+}
+
+/* Text Areas Grid */
+.middle-sections-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 1rem;
+  margin-bottom: 2rem;
+}
+
+.text-box-container {
+  background: #f8f9fa;
+  padding: 1rem;
+  border-radius: 4px;
+}
+
+.text-box-header {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-bottom: 0.5rem;
+}
+
+.text-box-header i {
+  color: #007bff;
+}
+
+/* Material Icons */
+.material-icons {
+  vertical-align: middle;
+  margin-right: 0.5rem;
+} 

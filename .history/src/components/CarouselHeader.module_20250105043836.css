@@ -1,0 +1,54 @@
+.header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 1rem;
+  background: white;
+  border-bottom: 1px solid #e5e7eb;
+}
+
+.title {
+  font-size: 1.25rem;
+  font-weight: 600;
+  color: #111827;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.icon {
+  width: 1.25rem;
+  height: 1.25rem;
+  color: #6b7280;
+}
+
+.actionButton {
+  position: absolute;
+  right: 1rem;
+  padding: 0.5rem 1rem;
+  border-radius: 0.375rem;
+  font-size: 0.875rem;
+  font-weight: 500;
+  display: flex;
+  align-items: center;
+  gap: 0.375rem;
+  transition: all 0.2s;
+}
+
+.markComplete {
+  background-color: #f3f4f6;
+  color: #374151;
+}
+
+.markComplete:hover {
+  background-color: #e5e7eb;
+}
+
+.complete {
+  background-color: #dcfce7;
+  color: #15803d;
+}
+
+.complete:hover {
+  background-color: #bbf7d0;
+} 

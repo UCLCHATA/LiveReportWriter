@@ -1,0 +1,89 @@
+:root {
+  /* Primary Colors - Component specific */
+  --sensory-color: #D94B89;
+  --social-color: #40916C;
+  --behavior-color: #F4A261;
+  --milestone-color: #6366F1;
+  --assessment-color: #0EA5E9;
+  --summary-color: #000000;
+  
+  /* Muted versions (30% opacity) */
+  --sensory-muted: rgba(217, 75, 137, 0.3);
+  --social-muted: rgba(64, 145, 108, 0.3);
+  --behavior-muted: rgba(244, 162, 97, 0.3);
+  --milestone-muted: rgba(99, 102, 241, 0.3);
+  --assessment-muted: rgba(14, 165, 233, 0.3);
+  --summary-muted: rgba(0, 0, 0, 0.3);
+  
+  /* Background tints (5% opacity) */
+  --sensory-bg: rgba(217, 75, 137, 0.05);
+  --social-bg: rgba(64, 145, 108, 0.05);
+  --behavior-bg: rgba(244, 162, 97, 0.05);
+  --milestone-bg: rgba(99, 102, 241, 0.05);
+  --assessment-bg: rgba(14, 165, 233, 0.05);
+  --summary-bg: rgba(0, 0, 0, 0.05);
+
+  /* Progress Colors */
+  --progress-low-start: #dc2626;
+  --progress-low-end: #ef4444;
+  --progress-medium-start: #eab308;
+  --progress-medium-end: #facc15;
+  --progress-high-start: #16a34a;
+  --progress-high-end: #22c55e;
+  --progress-complete-start: #15803d;
+  --progress-complete-end: #16a34a;
+
+  /* Milestone Status Colors */
+  --milestone-achieved: #4caf50;
+  --milestone-achieved-border: #388e3c;
+  --milestone-partial: #ff9800;
+  --milestone-partial-border: #f57c00;
+  --milestone-not-achieved: #f44336;
+  --milestone-not-achieved-border: #dc2626;
+
+  /* UI Colors */
+  --text-primary: #111827;
+  --text-secondary: #4b5563;
+  --text-muted: #6b7280;
+  --border-color: #e5e7eb;
+  --background-primary: #ffffff;
+  --background-secondary: #f3f4f6;
+  --background-muted: #f8f9fa;
+
+  /* Interactive Colors */
+  --primary-button: #4f46e5;
+  --primary-button-hover: #4338ca;
+  --danger-button: #dc2626;
+  --danger-button-hover: #b91c1c;
+  --success-button: #10b981;
+  --success-button-hover: #059669;
+
+  /* Animation Timings */
+  --transition-fast: 0.2s;
+  --transition-normal: 0.3s;
+  --transition-slow: 0.5s;
+
+  /* Shadows */
+  --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.05);
+  --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+  --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+
+  /* Z-index Layers */
+  --z-tooltip: 50;
+  --z-header: 100;
+  --z-modal: 1000;
+  --z-overlay: 1100;
+}
+
+/* Dark mode overrides */
+@media (prefers-color-scheme: dark) {
+  :root {
+    --text-primary: #f9fafb;
+    --text-secondary: #d1d5db;
+    --text-muted: #9ca3af;
+    --border-color: #374151;
+    --background-primary: #111827;
+    --background-secondary: #1f2937;
+    --background-muted: #374151;
+  }
+} 

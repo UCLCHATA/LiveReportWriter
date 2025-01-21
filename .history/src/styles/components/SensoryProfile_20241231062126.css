@@ -1,0 +1,132 @@
+/* Sensory Profile Styles */
+.sensory-slider {
+  width: 100%;
+  margin: 1rem 0;
+}
+
+.slider-labels {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 0.25rem;
+  font-size: 0.75rem;
+  color: #666;
+}
+
+.sensitivity-slider {
+  width: 100%;
+  margin: 0.5rem 0;
+  -webkit-appearance: none;
+  height: 4px;
+  background: #e5e7eb;
+  border-radius: 2px;
+  outline: none;
+}
+
+.sensitivity-slider::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  background: #4f46e5;
+  cursor: pointer;
+  border: 2px solid white;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+}
+
+.sensitivity-slider::-moz-range-thumb {
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  background: #4f46e5;
+  cursor: pointer;
+  border: 2px solid white;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+}
+
+.sliders-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 0.5rem;
+  overflow-y: auto;
+  padding-right: 0.25rem;
+  flex: 1;
+  align-content: start;
+}
+
+.domain-slider {
+  background: #f8f9fa;
+  padding: 0.5rem;
+  border-radius: 6px;
+  border: 1px solid #e5e7eb;
+  display: flex;
+  flex-direction: column;
+  height: fit-content;
+}
+
+.slider-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 0.25rem;
+  padding-bottom: 0.25rem;
+  border-bottom: 1px solid #e5e7eb;
+  flex-shrink: 0;
+}
+
+.domain-name {
+  font-weight: 500;
+  color: #333;
+  font-size: 0.9rem;
+}
+
+.sensitivity-label {
+  font-size: 0.8rem;
+  color: #6c757d;
+}
+
+.observations {
+  margin-top: 0.25rem;
+  padding-top: 0.25rem;
+  border-top: 1px solid #e5e7eb;
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+.observation-item {
+  background: white;
+  padding: 0.25rem 0.5rem;
+  border-radius: 4px;
+  font-size: 0.8rem;
+  word-break: break-word;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  position: relative;
+}
+
+.observation-item .delete-observation {
+  opacity: 0;
+  background: none;
+  border: none;
+  color: #666;
+  font-size: 1.2rem;
+  padding: 0 0.25rem;
+  cursor: pointer;
+  transition: opacity 0.2s, color 0.2s;
+}
+
+.observation-item:hover .delete-observation {
+  opacity: 1;
+}
+
+.observation-item .delete-observation:hover {
+  color: #dc2626;
+}
+
+.add-observation {
+  display: flex;
+  gap: 0.25rem;
+  margin-top: 0.25rem;
+  flex-shrink: 0;
+} 

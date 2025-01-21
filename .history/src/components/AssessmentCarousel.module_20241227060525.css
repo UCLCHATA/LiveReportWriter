@@ -1,0 +1,147 @@
+.assessment-carousel {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  background: white;
+  border-radius: 8px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+}
+
+.carousel-navigation {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 1rem;
+  border-bottom: 1px solid #e5e7eb;
+  background: #f9fafb;
+}
+
+.nav-button {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 2rem;
+  height: 2rem;
+  border: 1px solid #e5e7eb;
+  border-radius: 4px;
+  background: white;
+  color: #6b7280;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.nav-button:hover:not(:disabled) {
+  background: #f3f4f6;
+  color: #374151;
+}
+
+.nav-button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.title-container {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  position: absolute;
+  left: 50%;
+  transform: translateX(-50%);
+}
+
+.tool-title {
+  font-size: 1.25rem;
+  font-weight: 600;
+  color: #1f2937;
+  margin: 0;
+}
+
+.carousel-content {
+  flex: 1;
+  overflow: hidden;
+  position: relative;
+  padding: 1rem;
+}
+
+.carousel-indicators {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  padding: 1rem;
+  background: #f9fafb;
+  border-top: 1px solid #e5e7eb;
+}
+
+.carousel-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: #e5e7eb;
+  border: none;
+  padding: 0;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.carousel-dot.active {
+  background: #4f46e5;
+  transform: scale(1.2);
+}
+
+.carousel-position {
+  margin-left: 1rem;
+  font-size: 0.875rem;
+  color: #6b7280;
+}
+
+.tooltip-wrapper {
+  position: relative;
+  display: inline-flex;
+}
+
+.help-icon {
+  color: #6b7280;
+  cursor: help;
+  transition: color 0.2s;
+}
+
+.help-icon:hover {
+  color: #4b5563;
+}
+
+.tooltip-content {
+  position: absolute;
+  visibility: hidden;
+  opacity: 0;
+  background: #1f2937;
+  color: white;
+  padding: 0.75rem 1rem;
+  border-radius: 0.5rem;
+  font-size: 0.875rem;
+  width: max-content;
+  max-width: 250px;
+  top: 100%;
+  left: 50%;
+  transform: translateX(-50%) translateY(0.5rem);
+  transition: all 0.2s;
+  z-index: 30;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.tooltip-content::before {
+  content: '';
+  position: absolute;
+  top: -0.25rem;
+  left: 50%;
+  transform: translateX(-50%) rotate(45deg);
+  width: 0.5rem;
+  height: 0.5rem;
+  background: #1f2937;
+}
+
+.tooltip-wrapper:hover .tooltip-content {
+  visibility: visible;
+  opacity: 1;
+  transform: translateX(-50%) translateY(0.25rem);
+} 

@@ -1,0 +1,106 @@
+.assessment-carousel {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  height: 100%;
+}
+
+.navigation {
+  display: flex;
+  gap: 1rem;
+  padding: 1rem;
+  justify-content: center;
+}
+
+.nav-icon {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  border: 2px solid #e5e7eb;
+  cursor: pointer;
+  position: relative;
+  transition: all 0.2s ease;
+}
+
+.nav-icon.active {
+  border-color: #6366f1;
+}
+
+.nav-icon.complete {
+  border-color: #10b981;
+  background-color: #ecfdf5;
+}
+
+.completion-indicator {
+  position: absolute;
+  top: -4px;
+  right: -4px;
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  background-color: #10b981;
+  border: 2px solid white;
+}
+
+.assessment-panel {
+  position: relative;
+  height: 100%;
+  border-radius: 0.5rem;
+  background-color: white;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+  padding: 1rem;
+}
+
+.assessment-panel.complete {
+  pointer-events: none;
+}
+
+.completion-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(16, 185, 129, 0.1);
+  backdrop-filter: blur(2px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 0.5rem;
+  pointer-events: none;
+}
+
+.completion-overlay span {
+  background-color: #10b981;
+  color: white;
+  padding: 0.5rem 1rem;
+  border-radius: 9999px;
+  font-weight: 500;
+}
+
+.completion-toggle {
+  position: absolute;
+  bottom: 1rem;
+  right: 1rem;
+  padding: 0.5rem 1rem;
+  border-radius: 0.375rem;
+  font-weight: 500;
+  transition: all 0.2s ease;
+  background-color: #f3f4f6;
+  color: #4b5563;
+  border: none;
+  cursor: pointer;
+}
+
+.completion-toggle:hover {
+  background-color: #e5e7eb;
+}
+
+.completion-toggle.complete {
+  background-color: #10b981;
+  color: white;
+}
+
+.completion-toggle.complete:hover {
+  background-color: #059669;
+} 

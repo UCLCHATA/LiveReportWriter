@@ -1,0 +1,345 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    <title>Assessment Form R3</title>
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined" rel="stylesheet">
+    <link rel="stylesheet" href="styles.css">
+    <script src="https://apis.google.com/js/api.js"></script>
+    <script type="module" src="app.js" defer></script>
+</head>
+<body>
+    <header class="site-header">
+        <div class="header-content">
+            <h1>Assessment Form R3</h1>
+            <div class="header-controls">
+                <button id="create-chata-id" class="create-button">
+                    <i class="material-icons">add_circle</i>
+                    Create CHATA ID
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <main class="main-container">
+        <!-- Form Container -->
+        <div class="form-container">
+            <div class="form-content">
+                <!-- ADOS/R2 Assessment Section -->
+                <div class="context-section" data-section="ados">
+                    <div class="context-section-header">
+                        <h4><i class="material-icons">assessment</i>ADOS/R2 Assessment</h4>
+                        <i class="material-icons toggle-icon">expand_more</i>
+                    </div>
+                    <div class="context-section-content">
+                        <div class="context-grid">
+                            <!-- Social Communication -->
+                            <div class="input-group full-width">
+                                <label>Social Communication</label>
+                                <div class="score-grid">
+                                    <div class="score-item">
+                                        <label>Social Speech</label>
+                                        <select name="social_speech" class="score-select">
+                                            <option value="">Select score</option>
+                                            <option value="0">0 - Typical range</option>
+                                            <option value="1">1 - Mild differences</option>
+                                            <option value="2">2 - Moderate differences</option>
+                                            <option value="3">3 - Marked differences</option>
+                                        </select>
+                                    </div>
+                                    <div class="score-item">
+                                        <label>Eye Contact</label>
+                                        <select name="eye_contact" class="score-select">
+                                            <option value="">Select score</option>
+                                            <option value="0">0 - Typical range</option>
+                                            <option value="1">1 - Mild differences</option>
+                                            <option value="2">2 - Moderate differences</option>
+                                            <option value="3">3 - Marked differences</option>
+                                        </select>
+                                    </div>
+                                    <div class="score-item">
+                                        <label>Gesture Use</label>
+                                        <select name="gesture_use" class="score-select">
+                                            <option value="">Select score</option>
+                                            <option value="0">0 - Typical range</option>
+                                            <option value="1">1 - Mild differences</option>
+                                            <option value="2">2 - Moderate differences</option>
+                                            <option value="3">3 - Marked differences</option>
+                                        </select>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- RRB Patterns -->
+                            <div class="input-group full-width">
+                                <label>Repetitive Behaviors & Restricted Interests</label>
+                                <div class="score-grid">
+                                    <div class="score-item">
+                                        <label>Repetitive Play</label>
+                                        <select name="repetitive_play" class="score-select">
+                                            <option value="">Select score</option>
+                                            <option value="0">0 - Typical range</option>
+                                            <option value="1">1 - Mild presence</option>
+                                            <option value="2">2 - Moderate presence</option>
+                                            <option value="3">3 - Marked presence</option>
+                                        </select>
+                                    </div>
+                                    <div class="score-item">
+                                        <label>Repetitive Movements</label>
+                                        <select name="repetitive_movements" class="score-select">
+                                            <option value="">Select score</option>
+                                            <option value="0">0 - Typical range</option>
+                                            <option value="1">1 - Mild presence</option>
+                                            <option value="2">2 - Moderate presence</option>
+                                            <option value="3">3 - Marked presence</option>
+                                        </select>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Sensory Exploration -->
+                            <div class="input-group full-width">
+                                <label>Sensory Exploration</label>
+                                <div class="score-grid">
+                                    <div class="score-item">
+                                        <label>Sensory Behaviors</label>
+                                        <select name="sensory_exploration" class="score-select">
+                                            <option value="">Select score</option>
+                                            <option value="0">0 - Typical range</option>
+                                            <option value="1">1 - Mild presence</option>
+                                            <option value="2">2 - Moderate presence</option>
+                                            <option value="3">3 - Marked presence</option>
+                                        </select>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Clinical Notes -->
+                            <div class="input-group full-width">
+                                <label>Clinical Notes</label>
+                                <textarea name="ados_clinical_notes" class="context-textarea" placeholder="Enter detailed clinical observations from the ADOS assessment"></textarea>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- R1/CHATA Assessment Section -->
+                <div class="context-section" data-section="chata">
+                    <div class="context-section-header">
+                        <h4><i class="material-icons">psychology</i>R1/CHATA Assessment</h4>
+                        <i class="material-icons toggle-icon">expand_more</i>
+                    </div>
+                    <div class="context-section-content">
+                        <div class="context-grid">
+                            <!-- Social Communication -->
+                            <div class="input-group full-width">
+                                <label>Social Communication</label>
+                                <div class="score-grid">
+                                    <div class="score-item">
+                                        <label>Joint Attention</label>
+                                        <input type="range" name="joint_attention" min="0" max="10" step="1" class="score-slider">
+                                        <span class="score-value">0/10</span>
+                                    </div>
+                                    <div class="score-item">
+                                        <label>Social Reciprocity</label>
+                                        <input type="range" name="social_reciprocity" min="0" max="10" step="1" class="score-slider">
+                                        <span class="score-value">0/10</span>
+                                    </div>
+                                    <div class="score-item">
+                                        <label>Nonverbal Communication</label>
+                                        <input type="range" name="nonverbal_communication" min="0" max="10" step="1" class="score-slider">
+                                        <span class="score-value">0/10</span>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- RRB Patterns -->
+                            <div class="input-group full-width">
+                                <label>Repetitive Behaviors & Restricted Interests</label>
+                                <div class="score-grid">
+                                    <div class="score-item">
+                                        <label>Stereotyped Behaviors</label>
+                                        <input type="range" name="stereotyped_behaviors" min="0" max="10" step="1" class="score-slider">
+                                        <span class="score-value">0/10</span>
+                                    </div>
+                                    <div class="score-item">
+                                        <label>Insistence on Sameness</label>
+                                        <input type="range" name="insistence_sameness" min="0" max="10" step="1" class="score-slider">
+                                        <span class="score-value">0/10</span>
+                                    </div>
+                                    <div class="score-item">
+                                        <label>Restricted Interests</label>
+                                        <input type="range" name="restricted_interests" min="0" max="10" step="1" class="score-slider">
+                                        <span class="score-value">0/10</span>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Sensory Sensitivities -->
+                            <div class="input-group full-width">
+                                <label>Sensory Sensitivities</label>
+                                <div class="score-grid">
+                                    <div class="score-item">
+                                        <label>Hyper-reactivity</label>
+                                        <input type="range" name="sensory_hyper" min="0" max="10" step="1" class="score-slider">
+                                        <span class="score-value">0/10</span>
+                                    </div>
+                                    <div class="score-item">
+                                        <label>Hypo-reactivity</label>
+                                        <input type="range" name="sensory_hypo" min="0" max="10" step="1" class="score-slider">
+                                        <span class="score-value">0/10</span>
+                                    </div>
+                                    <div class="score-item">
+                                        <label>Unusual Interests</label>
+                                        <input type="range" name="sensory_interests" min="0" max="10" step="1" class="score-slider">
+                                        <span class="score-value">0/10</span>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Parent Concerns -->
+                            <div class="input-group full-width">
+                                <label>Parent Concerns</label>
+                                <textarea name="parent_concerns" class="context-textarea" placeholder="Enter parent's main concerns and observations"></textarea>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Status Section -->
+                <div class="section status-section">
+                    <h4><i class="material-icons">check_circle_outline</i>Status</h4>
+                    <div class="status-group">
+                        <div class="status-item">
+                            <h4>ASC Status</h4>
+                            <select name="asc_status">
+                                <option value="">--</option>
+                                <option>ASC confirmed</option>
+                                <option>ASC not confirmed</option>
+                            </select>
+                        </div>
+                        
+                        <div class="status-item">
+                            <h4>ADHD Status</h4>
+                            <select name="adhd_status">
+                                <option value="">--</option>
+                                <option>No concerns identified</option>
+                                <option>Assessment recommended</option>
+                                <option>Previously confirmed</option>
+                                <option>Confirmed during diagnosis</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Professional Referrals -->
+                <div class="section referrals-section">
+                    <h4><i class="material-icons">share</i>Professional Referrals</h4>
+                    <div class="referrals-grid">
+                        <label><input type="checkbox" value="Speech & Language"> Speech & Language</label>
+                        <label><input type="checkbox" value="Educational Psychology"> Educational Psychology</label>
+                        <label><input type="checkbox" value="Sleep Support"> Sleep Support</label>
+                        <div class="referral-other-row">
+                            <label><input type="checkbox" value="Other"> Other </label>
+                            <input type="text" name="other_referrals" class="referral-other-input" placeholder="Specific Remarks">
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Middle Sections Grid -->
+                <div class="middle-sections-grid">
+                    <!-- Clinical Observations -->
+                    <div class="text-box-container clinical" data-default-text="• Social engagement patterns
+• Communication style
+• Response to activities
+• Behavioral patterns
+• Notable strengths/challenges">
+                        <div class="text-box-header">
+                            <i class="material-icons">visibility</i>
+                            <h4>Key Clinical Observations</h4>
+                        </div>
+                        <div class="text-box-content">
+                            <textarea class="text-area" spellcheck="true"></textarea>
+                        </div>
+                    </div>
+
+                    <!-- Strengths & Abilities -->
+                    <div class="text-box-container strengths" data-default-text="• Memory (e.g., Strong recall of sequences)
+• Visual (e.g., Pattern recognition)
+• Physical (e.g., Fine motor skills)
+• Creative (e.g., Problem-solving abilities)
+• Focus (e.g., Sustained attention)
+• Problem-solving (e.g., Logical approach)">
+                        <div class="text-box-header">
+                            <i class="material-icons">stars</i>
+                            <h4>Strengths & Abilities</h4>
+                        </div>
+                        <div class="text-box-content">
+                            <textarea class="text-area" spellcheck="true"></textarea>
+                        </div>
+                    </div>
+
+                    <!-- Priority Support Areas -->
+                    <div class="text-box-container priority" data-default-text="• Assessment data patterns
+• Family priorities
+• School observations
+• Clinical judgment">
+                        <div class="text-box-header">
+                            <i class="material-icons">priority_high</i>
+                            <h4>Priority Support Areas</h4>
+                        </div>
+                        <div class="text-box-content">
+                            <textarea class="text-area" spellcheck="true"></textarea>
+                        </div>
+                    </div>
+
+                    <!-- Support Recommendations -->
+                    <div class="text-box-container support" data-default-text="• Strength-based strategies
+• Practical implementation
+• Home/school alignment
+• Family resources">
+                        <div class="text-box-header">
+                            <i class="material-icons">lightbulb</i>
+                            <h4>Support Recommendations</h4>
+                        </div>
+                        <div class="text-box-content">
+                            <textarea class="text-area" spellcheck="true"></textarea>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Button Group -->
+            <div class="button-group">
+                <button class="submit-button">Generate Report</button>
+                <button class="clear-button">Clear Form</button>
+            </div>
+        </div>
+    </main>
+
+    <!-- Modal System -->
+    <div class="text-box-modal">
+        <div class="modal-header">
+            <div class="modal-controls">
+                <button class="modal-save">Save</button>
+                <button class="modal-close">Close</button>
+            </div>
+        </div>
+        <div class="modal-content">
+            <textarea class="modal-textarea" spellcheck="true"></textarea>
+        </div>
+    </div>
+    <div class="modal-backdrop"></div>
+
+    <footer class="site-footer">
+        <img class="footer-logo" src="https://upload.wikimedia.org/wikipedia/sco/thumb/d/d1/University_College_London_logo.svg/300px-University_College_London_logo.svg.png" alt="Left Logo">
+        <div class="footer-content">
+            <p>&copy; 2024 CHATA Report Writing Form System</p>
+            <p class="contact-text">Need help? Contact uclchata@gmail.com</p>
+        </div>
+        <img class="footer-logo" src="https://upload.wikimedia.org/wikipedia/commons/thumb/d/d3/National_Health_Service_%28England%29_logo.svg/371px-National_Health_Service_%28England%29_logo.svg.png" alt="Right Logo">
+    </footer>
+</body>
+</html>

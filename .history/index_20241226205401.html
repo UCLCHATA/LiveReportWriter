@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Assessment Form</title>
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <header class="site-header">
+        <div class="header-content">
+            <h1>Assessment Form</h1>
+            <div class="header-controls">
+                <select id="chata-id-select">
+                    <option value="">Select CHATA ID</option>
+                </select>
+                <button class="refresh-button" title="Refresh CHATA IDs">
+                    <i class="material-icons">refresh</i>
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <div class="main-container">
+        <div class="assessment-container">
+            <button class="create-report-button">
+                <i class="material-icons">add_circle</i>
+                Create New Report
+            </button>
+        </div>
+
+        <div class="form-container">
+            <div class="form-content">
+                <div class="status-section">
+                    <div class="status-group">
+                        <div class="status-item">
+                            <h4>ASC Status</h4>
+                            <select id="asc-status">
+                                <option value="">Select status</option>
+                                <option value="ASC confirmed">ASC confirmed</option>
+                                <option value="ASC not confirmed">ASC not confirmed</option>
+                                <option value="Unclear">Unclear</option>
+                            </select>
+                        </div>
+                        <div class="status-item">
+                            <h4>ADOS Module</h4>
+                            <select id="ados-module">
+                                <option value="">Select module</option>
+                                <option value="Module 1">Module 1</option>
+                                <option value="Module 2">Module 2</option>
+                                <option value="Module 3">Module 3</option>
+                                <option value="Module 4">Module 4</option>
+                                <option value="Toddler Module">Toddler Module</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="referrals-section">
+                    <h4>Professional Referrals</h4>
+                    <div class="referrals-grid">
+                        <label><input type="checkbox" name="referral" value="speech"> Speech Pathology</label>
+                        <label><input type="checkbox" name="referral" value="ot"> Occupational Therapy</label>
+                        <label><input type="checkbox" name="referral" value="psychology"> Psychology</label>
+                        <label><input type="checkbox" name="referral" value="psychiatry"> Psychiatry</label>
+                        <label><input type="checkbox" name="referral" value="pediatrician"> Pediatrician</label>
+                        <label><input type="checkbox" name="referral" value="genetics"> Genetics</label>
+                        <div class="referral-other-row">
+                            <label><input type="checkbox" name="referral" value="other"> Other:</label>
+                            <input type="text" class="referral-other-input" placeholder="Specify other referrals">
+                        </div>
+                    </div>
+                </div>
+
+                <div class="text-box-container clinical">
+                    <h4>
+                        <i class="material-icons">description</i>
+                        Clinical Observations
+                    </h4>
+                    <textarea class="field-preview" placeholder="Enter clinical observations"></textarea>
+                </div>
+
+                <div class="text-box-container strengths">
+                    <h4>
+                        <i class="material-icons">star</i>
+                        Strengths and Abilities
+                    </h4>
+                    <textarea class="field-preview" placeholder="Enter strengths and abilities"></textarea>
+                </div>
+
+                <div class="text-box-container priority">
+                    <h4>
+                        <i class="material-icons">priority_high</i>
+                        Priority Areas for Support
+                    </h4>
+                    <textarea class="field-preview" placeholder="Enter priority areas for support"></textarea>
+                </div>
+
+                <div class="text-box-container support">
+                    <h4>
+                        <i class="material-icons">support</i>
+                        Support Recommendations
+                    </h4>
+                    <textarea class="field-preview" placeholder="Enter support recommendations"></textarea>
+                </div>
+            </div>
+
+            <div class="button-group">
+                <button class="submit-button">Submit Assessment</button>
+                <button class="clear-button">Clear Form</button>
+            </div>
+        </div>
+    </div>
+
+    <footer class="site-footer">
+        <div class="footer-content">
+            <p>Assessment Form System</p>
+            <p class="contact-text">For technical support, please contact the IT team</p>
+        </div>
+    </footer>
+
+    <script src="app.js"></script>
+</body>
+</html>

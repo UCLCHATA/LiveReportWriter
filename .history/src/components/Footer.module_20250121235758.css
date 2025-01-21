@@ -1,0 +1,73 @@
+.footer {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  background-color: #333;
+  color: white;
+  padding: 1rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  z-index: 1000;
+}
+
+.logos {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.logo {
+  height: 40px;
+  width: auto;
+}
+
+.info {
+  text-align: right;
+  font-size: 0.9rem;
+}
+
+.info p {
+  margin: 0.2rem 0;
+}
+
+.info a {
+  color: white;
+  text-decoration: none;
+}
+
+.info a:hover {
+  text-decoration: underline;
+}
+
+.footerContent {
+  max-width: 1200px;
+  margin: 0 auto;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+  padding: 0 2rem;
+}
+
+.footerLogo {
+  height: 35px;
+  width: auto;
+  object-fit: contain;
+}
+
+.uclLogo {
+  filter: brightness(0) invert(1);
+}
+
+.nhsLogo {
+  /* No filter needed for NHS logo since it's already white */
+  filter: none;
+}
+
+.contactText {
+  font-size: 0.8rem;
+  color: #ccc;
+  margin-top: 0.25rem;
+} 

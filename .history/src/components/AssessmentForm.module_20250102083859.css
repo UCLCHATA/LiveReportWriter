@@ -1,0 +1,57 @@
+.textAreaWrapper {
+  position: relative;
+  width: 100%;
+  margin-bottom: 0.5rem;
+}
+
+.textAreaOverlay {
+  position: absolute;
+  inset: -0.25rem;
+  background: rgba(167, 243, 208, 0.1);
+  backdrop-filter: blur(4px);
+  pointer-events: none;
+  border-radius: 0.75rem;
+  z-index: 2;
+  opacity: 0;
+  transition: all 0.3s ease;
+}
+
+.formSections.allExcellent .textAreaOverlay {
+  opacity: 1;
+}
+
+.textAreaWrapper:focus-within .textAreaOverlay {
+  backdrop-filter: none;
+}
+
+.textArea {
+  position: relative;
+  z-index: 1;
+  width: 100%;
+  min-height: 120px;
+  padding: 0.75rem;
+  border: 1px solid #e5e7eb;
+  border-radius: 0.5rem;
+  resize: vertical;
+  font-size: 0.875rem;
+  line-height: 1.5;
+  color: #6b7280;
+  background: white;
+  transition: all 0.2s ease;
+}
+
+.textArea:focus {
+  outline: none;
+  border-color: #93c5fd;
+  box-shadow: 0 0 0 2px rgba(147, 197, 253, 0.2);
+  color: #111827;
+  z-index: 3;
+}
+
+.formSections {
+  position: relative;
+  padding: 0.5rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+} 

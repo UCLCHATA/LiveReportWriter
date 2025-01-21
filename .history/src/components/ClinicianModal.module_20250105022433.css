@@ -1,0 +1,321 @@
+.modalOverlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.5);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+}
+
+.modalContent {
+  background: white;
+  padding: 2rem;
+  border-radius: 8px;
+  width: 90%;
+  max-width: 600px;
+  max-height: 90vh;
+  overflow-y: auto;
+  position: relative;
+}
+
+.alertContent {
+  background: white;
+  padding: 1.5rem;
+  border-radius: 8px;
+  width: 90%;
+  max-width: 360px;
+  text-align: center;
+}
+
+.formSection {
+  margin-bottom: 1.5rem;
+}
+
+.formSection h2 {
+  color: #111;
+  font-size: 1.25rem;
+  margin-bottom: 1rem;
+}
+
+.formSection h3 {
+  color: #333;
+  margin-bottom: 0.75rem;
+  font-size: 1rem;
+  border-bottom: 1px solid #eee;
+  padding-bottom: 0.5rem;
+}
+
+.formRow {
+  display: flex;
+  gap: 0.75rem;
+  margin-bottom: 0.75rem;
+}
+
+.formGroup {
+  flex: 1;
+  min-width: 0;
+}
+
+.compactField {
+  max-width: 200px;
+  min-width: 120px;
+}
+
+.compactField.clinicField {
+  max-width: 160px;
+}
+
+.compactField.emailField {
+  max-width: 240px;
+  min-width: 240px;
+}
+
+.compactField.genderField {
+  max-width: 120px;
+}
+
+.compactField.ageField {
+  min-width: 220px;
+  max-width: 280px;
+}
+
+.formGroup label {
+  display: block;
+  margin-bottom: 0.25rem;
+  color: #555;
+  font-weight: 500;
+  font-size: 0.85rem;
+}
+
+.formGroup input,
+.formGroup select {
+  width: 100%;
+  padding: 0.5rem;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  font-size: 0.9rem;
+  background-color: white;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.formGroup select {
+  padding-right: 24px;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%23666' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 4px center;
+  background-size: 16px;
+  appearance: none;
+}
+
+.formGroup input:focus,
+.formGroup select:focus {
+  outline: none;
+  border-color: #007bff;
+  box-shadow: 0 0 0 2px rgba(0, 123, 255, 0.25);
+}
+
+/* React-Select custom styles */
+.ageSelect {
+  font-size: 0.9rem;
+}
+
+:global(.age-select__control) {
+  min-height: 34px !important;
+  border-color: #ddd !important;
+}
+
+:global(.age-select__control--is-focused) {
+  border-color: #007bff !important;
+  box-shadow: 0 0 0 2px rgba(0, 123, 255, 0.25) !important;
+}
+
+:global(.age-select__menu) {
+  font-size: 0.9rem !important;
+  position: absolute !important;
+  width: 100% !important;
+  z-index: 1002 !important;
+  background: white !important;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15) !important;
+}
+
+:global(.age-select__menu-list) {
+  max-height: 245px !important; /* Approximately 7 items */
+}
+
+:global(.age-select__option) {
+  padding: 6px 12px !important;
+  white-space: nowrap !important;
+}
+
+/* CHATA ID styles */
+.chataIdInput {
+  margin: 0.75rem 0;
+}
+
+.chataIdInput input {
+  width: 100%;
+  padding: 0.75rem;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  font-size: 1rem;
+  text-align: center;
+  letter-spacing: 1px;
+  font-family: monospace;
+}
+
+.chataIdDisplay {
+  margin: 1rem 0;
+  padding: 0.75rem;
+  background-color: #f8f9fa;
+  border-radius: 4px;
+  font-size: 1.25rem;
+  font-family: monospace;
+  letter-spacing: 1px;
+  color: #007bff;
+  font-weight: 600;
+  text-align: center;
+}
+
+.chataIdNote {
+  margin: 0.75rem 0;
+  color: #666;
+  font-size: 0.9rem;
+  line-height: 1.4;
+}
+
+.error {
+  color: #dc3545;
+  font-size: 0.85rem;
+  margin-top: 0.5rem;
+}
+
+.buttonGroup {
+  display: flex;
+  justify-content: flex-end;
+  gap: 0.75rem;
+  margin-top: 1.5rem;
+}
+
+.cancelButton,
+.submitButton {
+  padding: 0.5rem 1rem;
+  border: none;
+  border-radius: 4px;
+  font-size: 0.9rem;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+.cancelButton {
+  background-color: #f8f9fa;
+  color: #212529;
+}
+
+.submitButton {
+  background-color: #007bff;
+  color: white;
+}
+
+.cancelButton:hover {
+  background-color: #e2e6ea;
+}
+
+.submitButton:hover {
+  background-color: #0056b3;
+}
+
+/* Responsive adjustments */
+@media (max-width: 640px) {
+  .formRow {
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+  
+  .compactField {
+    max-width: none;
+  }
+  
+  .modalContent {
+    padding: 1.25rem;
+  }
+} 
+
+/* Dialog styles */
+.dialogOverlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.5);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1100;
+}
+
+.dialogContent {
+  background: white;
+  padding: 1.5rem;
+  border-radius: 8px;
+  width: 90%;
+  max-width: 360px;
+  text-align: center;
+  position: relative;
+}
+
+.closeButton {
+  position: absolute;
+  top: 0.75rem;
+  right: 0.75rem;
+  width: 24px;
+  height: 24px;
+  border: none;
+  background: none;
+  cursor: pointer;
+  padding: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #666;
+  font-size: 1.25rem;
+  transition: color 0.2s;
+}
+
+.closeButton:hover {
+  color: #333;
+}
+
+.preserveHeader {
+  background: linear-gradient(
+    to bottom,
+    transparent 0%,
+    transparent 64px,
+    rgba(0, 0, 0, 0.5) 64px
+  );
+}
+
+.preserveFooter {
+  background: linear-gradient(
+    to top,
+    transparent 0%,
+    transparent 64px,
+    rgba(0, 0, 0, 0.5) 64px
+  );
+}
+
+@keyframes blink {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.5; }
+}
+
+.blinkingId {
+  animation: blink 2s ease-in-out infinite;
+  font-weight: bold;
+  color: #007bff;
+} 

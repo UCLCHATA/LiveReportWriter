@@ -1,0 +1,76 @@
+/* Form Container */
+.formContainer {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  position: relative;
+  padding: 1rem;
+}
+
+.formSections {
+  position: relative;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1rem;
+  padding: 0.5rem;
+}
+
+.formSection {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.textAreaWrapper {
+  position: relative;
+  width: 100%;
+}
+
+.textArea {
+  width: 100%;
+  min-height: 100px;  /* Reduced height */
+  padding: 0.75rem;
+  border: 1px solid #e5e7eb;
+  border-radius: 0.5rem;
+  resize: vertical;
+  font-size: 0.875rem;
+  line-height: 1.5;
+  color: #1f2937;
+  background: white;
+  transition: all 0.2s ease;
+  position: relative;
+  z-index: 1;
+}
+
+.textArea:focus {
+  outline: none;
+  border-color: #93c5fd;
+  box-shadow: 0 0 0 2px rgba(147, 197, 253, 0.2);
+  z-index: 3;
+}
+
+/* Single overlay for all sections */
+.collectiveOverlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(167, 243, 208, 0.1);
+  backdrop-filter: blur(4px);
+  pointer-events: none;
+  border-radius: 0.75rem;
+  z-index: 2;
+  opacity: 0;
+  transition: all 0.3s ease;
+}
+
+.formSections.focused .collectiveOverlay {
+  backdrop-filter: none;
+  background: rgba(167, 243, 208, 0.05);
+}
+
+.formSections.allExcellent .collectiveOverlay {
+  opacity: 1;
+} 

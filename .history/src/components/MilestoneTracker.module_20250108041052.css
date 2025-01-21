@@ -1,0 +1,252 @@
+.container {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  padding: 1rem;
+  background: var(--background-color);
+  border-radius: 8px;
+  height: auto;
+  width: 100%;
+  max-width: 100%;
+  overflow-y: auto;
+  overflow-x: hidden;
+}
+
+.categoriesContainer {
+  display: flex;
+  gap: 0.5rem;
+  justify-content: space-between;
+  margin-bottom: 1rem;
+  padding: 0.75rem;
+  background: white;
+  border-radius: 8px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+  width: 100%;
+  overflow: visible;
+  flex-shrink: 0;
+}
+
+.category {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  min-width: 120px;
+  max-width: calc(25% - 0.5rem);
+}
+
+.category h3 {
+  color: var(--text-color);
+  font-size: 0.9rem;
+  margin: 0;
+  padding-bottom: 0.25rem;
+  border-bottom: 2px solid;
+  white-space: nowrap;
+}
+
+.milestoneList {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  padding: 0.25rem;
+  overflow: visible;
+}
+
+/* Base milestone styles */
+.milestone {
+  padding: 6px 8px;
+  border: none;
+  border-radius: 8px;
+  cursor: grab;
+  user-select: none;
+  font-size: 11px;
+  position: relative;
+  width: fit-content;
+  min-width: 80px;
+  max-width: 150px;
+  margin: 2px;
+  color: white;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+  transition: all 0.2s ease;
+  word-wrap: break-word;
+  line-height: 1.2;
+}
+
+/* Category colors */
+.milestone[data-category="communication"] {
+  background: linear-gradient(135deg, #4299E1, #3182ce);
+  border: 1px solid #3182ce;
+}
+
+.milestone[data-category="motor"] {
+  background: linear-gradient(135deg, #48BB78, #38A169);
+  border: 1px solid #38A169;
+}
+
+.milestone[data-category="social"] {
+  background: linear-gradient(135deg, #ED8936, #DD6B20);
+  border: 1px solid #DD6B20;
+}
+
+.milestone[data-category="concerns"] {
+  background: linear-gradient(135deg, #9F7AEA, #805AD5);
+  border: 1px solid #805AD5;
+}
+
+/* Timeline styles */
+.timelineWrapper {
+  width: 95%;
+  margin: 0 auto;
+  overflow: hidden;
+  flex-shrink: 0;
+  margin-bottom: 1.5rem;
+  padding-bottom: 1.5rem;
+}
+
+.timeline {
+  position: relative;
+  width: 100%;
+  height: 250px;
+  background: var(--timeline-background);
+  border-radius: 8px;
+  margin-top: 0.5rem;
+  border: 1px solid var(--border-color);
+  padding: 0.75rem 0;
+  overflow: visible;
+}
+
+/* Placed milestone styles */
+.placedMilestone {
+  background: white !important;
+  color: #1a202c !important;
+  padding: 4px 24px 4px 8px;
+  min-height: unset;
+  height: auto;
+  display: flex;
+  align-items: center;
+  border: 1px solid;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  z-index: 1;
+}
+
+.placedMilestone[data-category="communication"] { border-color: #4299E1 !important; }
+.placedMilestone[data-category="motor"] { border-color: #48BB78 !important; }
+.placedMilestone[data-category="social"] { border-color: #ED8936 !important; }
+.placedMilestone[data-category="concerns"] { border-color: #9F7AEA !important; }
+
+/* Month indicator styles */
+.monthCircle {
+  position: absolute;
+  top: -4px;
+  right: -8px;
+  min-width: 16px;
+  height: 16px;
+  border-radius: 3px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.6rem;
+  font-weight: 600;
+  background: white;
+  padding: 0 3px;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+  z-index: 4;
+  transition: all 0.2s ease;
+}
+
+.monthText {
+  color: #1a202c !important;
+  white-space: nowrap;
+  font-size: 0.6rem;
+  transition: color 0.2s ease;
+  visibility: visible !important;
+  opacity: 1 !important;
+}
+
+/* Month difference colors */
+.monthText.showDifference[data-delayed="true"] {
+  color: #DC2626 !important;
+}
+
+.monthText.showDifference[data-early="true"] {
+  color: #059669 !important;
+}
+
+/* Timeline milestone positioning */
+.timelineMilestone {
+  position: absolute;
+  transform: translate(-50%, 0);
+  pointer-events: auto;
+  transition: all 0.3s ease;
+  margin-top: 24px;
+  z-index: 1;
+}
+
+.timelineMilestone:hover {
+  z-index: 2;
+}
+
+/* Custom concern button */
+.milestone[data-milestone-id="custom-concern"] {
+  width: 36px;
+  height: 36px;
+  min-width: 36px;
+  max-width: 36px;
+  padding: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.5rem;
+  border-radius: 50%;
+  margin: 4px auto;
+  cursor: pointer;
+}
+
+.milestone[data-milestone-id="custom-concern"].editing {
+  width: 150px !important;
+  min-width: 150px !important;
+  max-width: 150px !important;
+  height: 36px !important;
+  border-radius: 8px;
+  padding: 4px;
+  font-size: 11px;
+}
+
+.customInput {
+  width: 100%;
+  height: 28px;
+  padding: 6px 8px;
+  border: none;
+  border-radius: 4px;
+  background: rgba(255, 255, 255, 0.95);
+  color: #1a202c;
+  font-size: 11px;
+  outline: none;
+}
+
+/* History box styles */
+.historyBox {
+  width: 100%;
+  padding: 0.75rem;
+  background: white;
+  border-radius: 8px;
+  position: relative;
+  z-index: 2;
+  margin-top: 0.5rem;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+  flex-shrink: 0;
+}
+
+.historyTextarea {
+  width: 100%;
+  height: 120px;
+  padding: 0.5rem;
+  border: 1px solid #2D3748;
+  border-radius: 4px;
+  font-size: 0.8rem;
+  line-height: 1.4;
+  color: var(--text-color);
+  background: var(--background-color);
+  resize: none;
+  outline: none;
+} 

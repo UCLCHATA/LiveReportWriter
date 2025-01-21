@@ -1,0 +1,312 @@
+.container {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  padding: 1rem;
+  background: var(--background-color);
+}
+
+.header {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  padding-bottom: 1rem;
+  border-bottom: 1px solid var(--border-color);
+}
+
+.header h3 {
+  font-size: 1.25rem;
+  font-weight: 600;
+  margin: 0;
+  color: var(--text-color);
+}
+
+.header p {
+  color: var(--text-muted);
+  font-size: 0.875rem;
+  margin: 0.25rem 0 0;
+}
+
+.categorySelector {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.filterIcon {
+  color: var(--text-muted);
+  width: 1rem;
+  height: 1rem;
+}
+
+.content {
+  flex: 1;
+  overflow-y: auto;
+  padding-right: 0.5rem;
+}
+
+.quickAddSection {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.quickAddItem {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0.75rem;
+  border: 1px solid var(--border-color);
+  border-radius: 8px;
+  transition: background-color 0.2s;
+}
+
+.quickAddItem:hover {
+  background: var(--hover-background);
+}
+
+.toolInfo {
+  flex: 1;
+}
+
+.toolInfo h4 {
+  font-size: 1rem;
+  font-weight: 500;
+  margin: 0;
+  display: inline-block;
+}
+
+.timeNeeded {
+  color: var(--text-muted);
+  font-size: 0.75rem;
+  margin-left: 0.5rem;
+}
+
+.toolInfo p {
+  color: var(--text-muted);
+  font-size: 0.875rem;
+  margin: 0.25rem 0 0;
+}
+
+.toolControls {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.toolControls input,
+.toolControls select {
+  padding: 0.375rem;
+  border: 1px solid var(--border-color);
+  border-radius: 4px;
+  font-size: 0.875rem;
+}
+
+.addButton {
+  padding: 0.375rem;
+  border: none;
+  background: none;
+  color: var(--primary-color);
+  cursor: pointer;
+  border-radius: 4px;
+  transition: background-color 0.2s;
+}
+
+.addButton:hover {
+  background: var(--primary-color-light);
+}
+
+.completedSection {
+  margin-top: 2rem;
+}
+
+.completedSection h4 {
+  font-size: 1rem;
+  font-weight: 500;
+  margin: 0 0 1rem;
+}
+
+.completedItem {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  padding: 0.75rem;
+  background: var(--success-background);
+  border: 1px solid var(--success-border);
+  border-radius: 8px;
+  margin-bottom: 0.5rem;
+}
+
+.checkIcon {
+  color: var(--success-color);
+  width: 1.25rem;
+  height: 1.25rem;
+}
+
+.assessmentInfo {
+  flex: 1;
+}
+
+.assessmentHeader {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-bottom: 0.25rem;
+}
+
+.moduleTag,
+.versionTag {
+  padding: 0.25rem 0.5rem;
+  background: var(--tag-background);
+  border-radius: 4px;
+  font-size: 0.75rem;
+  color: var(--text-muted);
+}
+
+.icfDomains {
+  font-size: 0.75rem;
+  color: var(--text-muted);
+}
+
+.detailsButton {
+  padding: 0.375rem;
+  border: none;
+  background: none;
+  color: var(--text-muted);
+  cursor: pointer;
+  border-radius: 4px;
+  transition: all 0.2s;
+}
+
+.detailsButton:hover {
+  background: var(--hover-background);
+  color: var(--text-color);
+}
+
+.assessmentDetails {
+  margin-top: 0.5rem;
+  padding-top: 0.5rem;
+  border-top: 1px solid var(--border-color);
+}
+
+.assessmentDetails textarea {
+  width: 100%;
+  min-height: 80px;
+  padding: 0.5rem;
+  border: 1px solid var(--border-color);
+  border-radius: 4px;
+  margin-top: 0.25rem;
+  font-size: 0.875rem;
+  resize: vertical;
+}
+
+.testBubbles {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin-bottom: 2rem;
+}
+
+.testBubble {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.5rem 1rem;
+  border: 1px solid var(--border-color);
+  border-radius: 20px;
+  background: var(--card-background);
+  font-size: 0.875rem;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.testBubble:hover {
+  background: var(--hover-background);
+}
+
+.testBubble.selected {
+  background: var(--primary-color);
+  color: white;
+  border-color: var(--primary-color);
+}
+
+.bubbleIcon {
+  width: 1rem;
+  height: 1rem;
+}
+
+.selectedTests {
+  margin-top: 2rem;
+}
+
+.selectedTest {
+  border: 1px solid var(--border-color);
+  border-radius: 8px;
+  margin-bottom: 0.5rem;
+  overflow: hidden;
+}
+
+.testHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0.75rem;
+  background: var(--card-background);
+}
+
+.testInfo {
+  flex: 1;
+}
+
+.testInfo h4 {
+  font-size: 1rem;
+  font-weight: 500;
+  margin: 0;
+}
+
+.fullName {
+  font-size: 0.75rem;
+  color: var(--text-muted);
+}
+
+.testControls {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.dateInput {
+  padding: 0.375rem;
+  border: 1px solid var(--border-color);
+  border-radius: 4px;
+  font-size: 0.875rem;
+}
+
+.testDetails {
+  padding: 0.75rem;
+  border-top: 1px solid var(--border-color);
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.testDetails input,
+.testDetails select {
+  padding: 0.5rem;
+  border: 1px solid var(--border-color);
+  border-radius: 4px;
+  font-size: 0.875rem;
+}
+
+.testDetails textarea {
+  width: 100%;
+  min-height: 80px;
+  padding: 0.5rem;
+  border: 1px solid var(--border-color);
+  border-radius: 4px;
+  font-size: 0.875rem;
+  resize: vertical;
+}
+
+/* Continue with other styles... */ 

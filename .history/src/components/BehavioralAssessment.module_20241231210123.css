@@ -1,0 +1,62 @@
+.behavioralAssessment {
+  padding: 1rem;
+}
+
+.behavioralAssessment h2 {
+  margin-bottom: 1rem;
+  color: #333;
+  font-size: 1.25rem;
+}
+
+.timelineContainer {
+  margin-bottom: 2rem;
+}
+
+.timelineContainer h3 {
+  color: #4a5568;
+  font-size: 1rem;
+  margin-bottom: 0.75rem;
+  padding-bottom: 0.25rem;
+  border-bottom: 1px solid #e2e8f0;
+}
+
+.timelineRow {
+  display: flex;
+  align-items: center;
+  margin-bottom: 0.75rem;
+  gap: 1rem;
+}
+
+.timelineLabel {
+  width: 120px;
+  font-weight: 500;
+  font-size: 0.875rem;
+  color: #4a5568;
+}
+
+.timelineTrack {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.timelineTrack input[type="checkbox"] {
+  width: 1rem;
+  height: 1rem;
+  cursor: pointer;
+}
+
+.timelineTrack input[type="number"] {
+  width: 80px;
+  padding: 0.25rem 0.5rem;
+  border: 1px solid #e2e8f0;
+  border-radius: 0.25rem;
+  font-size: 0.875rem;
+}
+
+.timelineTrack input[type="number"]:focus {
+  outline: none;
+  border-color: #4f46e5;
+  box-shadow: 0 0 0 1px rgba(79, 70, 229, 0.2);
+} 

@@ -1,0 +1,258 @@
+import React, { useState, useEffect } from 'react';
+import { HelpCircle } from 'lucide-react';
+import { RadarChart, PolarGrid, PolarAngleAxis, PolarRadiusAxis, Radar, ResponsiveContainer } from 'recharts';
+import styles from './SocialCommunicationProfile.module.css';
+
+interface Domain {
+  name: string;
+  value: number | undefined;
+  observations: string[];
+  label: 'Age Appropriate' | 'Subtle Differences' | 'Emerging' | 'Limited' | 'Significantly Limited';
+}
+
+interface SocialCommunicationData {
+  domains: Record<string, Domain>;
+}
+
+interface SocialCommunicationProfileProps {
+  data: SocialCommunicationData;
+  onChange: (data: SocialCommunicationData) => void;
+}
+
+interface SocialCommunicationGraphProps {
+  data: SocialCommunicationData;
+}
+
+const getSensitivityLabel = (value: number): 'Age Appropriate' | 'Subtle Differences' | 'Emerging' | 'Limited' | 'Significantly Limited' => {
+  switch (value) {
+    case 1: return 'Age Appropriate';
+    case 2: return 'Subtle Differences';
+    case 3: return 'Emerging';
+    case 4: return 'Limited';
+    case 5: return 'Significantly Limited';
+    default: return 'Emerging';
+  }
+};
+
+const getDomainTooltip = (domain: string): string => {
+  switch (domain) {
+    case 'Joint Attention':
+      return 'DSM-5 A.1 & ICF b122:\n• Social-emotional reciprocity\n• Initiation of social interaction\n• Sharing of interests/emotions\n• Response to social approaches\n• Psychosocial functions';
+    case 'Social Reciprocity':
+      return 'DSM-5 A.1 & ICF d710:\n• Back-and-forth communication\n• Emotional engagement\n• Social imitation skills\n• Basic interpersonal interactions\n• Relationship maintenance';
+    case 'Verbal Communication':
+      return 'DSM-5 A.2 & ICF b167:\n• Expressive language skills\n• Conversation abilities\n• Language pragmatics\n• Mental functions of language\n• Speech patterns/prosody';
+    case 'Non-verbal Communication':
+      return 'DSM-5 A.2 & ICF b1671:\n• Gesture use and understanding\n• Facial expression range\n• Eye contact quality\n• Expression of language\n• Body language interpretation';
+    case 'Social Understanding':
+      return 'DSM-5 A.3 & ICF d720:\n• Relationship comprehension\n• Social context adaptation\n• Complex social interactions\n• Social inference abilities\n• Boundary awareness';
+    case 'Play Skills':
+      return 'DSM-5 A.3 & ICF d880:\n• Imaginative play development\n• Symbolic play abilities\n• Social play engagement\n• Engagement in play\n• Play flexibility';
+    default:
+      return 'Rate social communication abilities in this domain';
+  }
+};
+
+const getSliderBackground = (value: number) => {
+  const percentage = ((value - 1) / 4) * 100;
+  return `linear-gradient(to right, #4f46e5 ${percentage}%, #e5e7eb ${percentage}%)`;
+};
+
+export const SocialCommunicationGraph: React.FC<SocialCommunicationGraphProps> = ({ data }) => {
+  if (!data?.domains) return null;
+
+  const chartData = Object.values(data.domains).map(domain => ({
+    subject: domain.name,
+    A: domain.value,
+    fullMark: 5,
+  }));
+
+  return (
+    <div className={styles.graphContainer}>
+      <ResponsiveContainer width="100%" height="100%">
+        <RadarChart 
+          cx="50%" 
+          cy="50%" 
+          outerRadius="80%" 
+          data={chartData}
+        >
+          <PolarGrid gridType="polygon" />
+          <PolarAngleAxis 
+            dataKey="subject" 
+            tick={{ fontSize: 12 }}
+          />
+          <PolarRadiusAxis 
+            angle={30} 
+            domain={[1, 5]} 
+            tickCount={5}
+            tick={{ fontSize: 11 }}
+            scale="linear"
+            allowDataOverflow={false}
+          />
+          <Radar
+            name="Social Communication"
+            dataKey="A"
+            stroke="#4f46e5"
+            fill="#4f46e5"
+            fillOpacity={0.5}
+          />
+        </RadarChart>
+      </ResponsiveContainer>
+    </div>
+  );
+};
+
+export const SocialCommunicationProfile: React.FC<SocialCommunicationProfileProps> = ({ data, onChange }) => {
+  const [newObservation, setNewObservation] = useState('');
+  const [selectedDomain, setSelectedDomain] = useState<string | null>(null);
+
+  // Initialize domains if not present in data
+  useEffect(() => {
+    if (!data?.domains) {
+      onChange({
+        domains: {
+          jointAttention: { name: 'Joint Attention', value: undefined, observations: [], label: 'Emerging' },
+          socialReciprocity: { name: 'Social Reciprocity', value: undefined, observations: [], label: 'Emerging' },
+          verbalCommunication: { name: 'Verbal Communication', value: undefined, observations: [], label: 'Emerging' },
+          nonverbalCommunication: { name: 'Non-verbal Communication', value: undefined, observations: [], label: 'Emerging' },
+          socialUnderstanding: { name: 'Social Understanding', value: undefined, observations: [], label: 'Emerging' },
+          playSkills: { name: 'Play Skills', value: undefined, observations: [], label: 'Emerging' },
+        }
+      });
+    }
+  }, [data, onChange]);
+
+  const handleSensitivityChange = (domain: string, value: number) => {
+    if (!data?.domains) return;
+    
+    const updatedData = {
+      type: 'socialCommunication',
+      domains: {
+        ...data.domains,
+        [domain]: {
+          ...data.domains[domain],
+          value,
+          label: getSensitivityLabel(value)
+        }
+      }
+    };
+    onChange(updatedData);
+  };
+
+  const addObservation = (domain: string) => {
+    if (!data?.domains || !newObservation.trim()) return;
+    
+    const updatedData = {
+      type: 'socialCommunication',
+      domains: {
+        ...data.domains,
+        [domain]: {
+          ...data.domains[domain],
+          observations: [...(data.domains[domain].observations || []), newObservation.trim()]
+        }
+      }
+    };
+    onChange(updatedData);
+    setNewObservation('');
+  };
+
+  const deleteObservation = (domain: string, index: number) => {
+    if (!data?.domains) return;
+    
+    onChange({
+      domains: {
+        ...data.domains,
+        [domain]: {
+          ...data.domains[domain],
+          observations: data.domains[domain].observations.filter((_, i) => i !== index)
+        }
+      }
+    });
+  };
+
+  const handleTooltipPosition = (e: React.MouseEvent<HTMLDivElement>) => {
+    const tooltip = e.currentTarget.querySelector(`.${styles.tooltipContent}`) as HTMLElement;
+    if (!tooltip) return;
+
+    // Get cursor position
+    const cursorX = e.clientX;
+    const cursorY = e.clientY;
+
+    // Get viewport dimensions
+    const viewportHeight = window.innerHeight;
+
+    // Get tooltip dimensions
+    const tooltipHeight = tooltip.offsetHeight;
+
+    // Calculate vertical position - always try to position below cursor first
+    let top = cursorY + 8;
+
+    // If tooltip would overflow bottom of viewport, position above cursor
+    if (top + tooltipHeight > viewportHeight - 10) {
+      top = cursorY - tooltipHeight - 8;
+    }
+
+    // Apply vertical position only (horizontal is handled by CSS)
+    tooltip.style.top = `${top}px`;
+    tooltip.style.left = `${cursorX}px`; // Base position for CSS transforms
+  };
+
+  if (!data?.domains) return null;
+
+  return (
+    <div className={styles.slidersGrid}>
+      {Object.entries(data.domains).map(([key, domain]) => (
+        <div key={key} className={styles.domainSlider}>
+          <div className={styles.sliderHeader}>
+            <span className={styles.domainName}>{domain.name}</span>
+            <span className={styles.sensitivityLabel}>{domain.label}</span>
+            <div 
+              className={styles.tooltipWrapper}
+              onMouseMove={handleTooltipPosition}
+            >
+              <HelpCircle className={styles.helpIcon} size={14} />
+              <div className={styles.tooltipContent}>
+                {getDomainTooltip(domain.name)}
+              </div>
+            </div>
+          </div>
+
+          <input
+            type="range"
+            min={1}
+            max={5}
+            value={domain.value || 3}
+            onChange={(e) => handleSensitivityChange(key, parseInt(e.target.value))}
+            className={styles.sensitivitySlider}
+            style={{ background: getSliderBackground(domain.value || 3) }}
+          />
+
+          <div className={styles.observations}>
+            {domain.observations.map((obs, obsIndex) => (
+              <div key={obsIndex} className={styles.observationItem}>
+                {obs}
+                <button
+                  onClick={() => deleteObservation(key, obsIndex)}
+                  className={styles.deleteObservation}
+                >
+                  ×
+                </button>
+              </div>
+            ))}
+            <div className={styles.addObservation}>
+              <input
+                type="text"
+                value={selectedDomain === key ? newObservation : ''}
+                onChange={(e) => setNewObservation(e.target.value)}
+                onFocus={() => setSelectedDomain(key)}
+                onKeyPress={(e) => e.key === 'Enter' && addObservation(key)}
+                placeholder="Add observation..."
+              />
+              <button onClick={() => addObservation(key)}>Add</button>
+            </div>
+          </div>
+        </div>
+      ))}
+    </div>
+  );
+}; 
