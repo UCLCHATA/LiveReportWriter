@@ -34,6 +34,7 @@ interface AssessmentCarouselProps {
 interface ComponentProps {
   data: any;
   onChange: (data: any) => void;
+  chatId?: string;
 }
 
 interface CompletionState {
@@ -353,20 +354,22 @@ export const AssessmentCarousel: React.FC<AssessmentCarouselProps> = React.memo(
     const progress = calculateProgress(component);
     const isComplete = component?.isComplete || false;
     
-    // Only update if progress or completion state has changed
-    if (progress !== completionStates[currentTool.id]?.progress || 
-        isComplete !== completionStates[currentTool.id]?.isComplete) {
+    // Only update if there's a meaningful change
+    const currentState = completionStates[currentTool.id];
+    if (!currentState || 
+        Math.abs(progress - currentState.progress) > 1 || 
+        isComplete !== currentState.isComplete) {
       setCompletionStates(prev => ({
         ...prev,
         [currentTool.id]: {
           ...prev[currentTool.id],
-          progress: isComplete ? 100 : progress, // If complete, force 100%
+          progress: isComplete ? 100 : progress,
           isComplete,
-          autoDetected: false // Never auto-detect completion
+          autoDetected: false
         }
       }));
     }
-  }, [currentIndex, globalState, calculateProgress, completionStates]);
+  }, [currentIndex, globalState?.assessments, calculateProgress]);
 
   // Separate effect for total progress calculation with reduced frequency
   useEffect(() => {
@@ -403,33 +406,18 @@ export const AssessmentCarousel: React.FC<AssessmentCarouselProps> = React.memo(
   const handleToggleInclude = useCallback(async () => {
     setIncludeInReport(prev => !prev);
     
-    // If including in report, capture and download the chart
+    // If including in report, capture and preview the chart
     if (!includeInReport) {
       try {
         const chartElement = document.querySelector('.combined-radar-chart') as HTMLElement;
         if (chartElement) {
-          const canvas = await html2canvas(chartElement, {
-            backgroundColor: null,
-            scale: 2,
-            logging: false,
-            allowTaint: true,
-            useCORS: true
-          });
+          const canvas = await html2canvas(chartElement);
           const chartImage = canvas.toDataURL('image/png');
           
-          // Create a temporary link element
-          const link = document.createElement('a');
-          link.href = chartImage;
-          link.download = 'ASD Profile chart.png';
-          
-          // Show dialog to user
-          const userConfirmed = window.confirm('The image will be downloaded. Please save it and manually add it to your generated report.');
-          
-          if (userConfirmed) {
-            // Trigger download
-            document.body.appendChild(link);
-            link.click();
-            document.body.removeChild(link);
+          // Open image in new tab
+          const newTab = window.open();
+          if (newTab) {
+            newTab.document.write(`<img src="${chartImage}" alt="Combined Radar Chart" />`);
           }
         }
       } catch (error) {
@@ -673,6 +661,7 @@ export const AssessmentCarousel: React.FC<AssessmentCarouselProps> = React.memo(
                 ...data,
                 type: currentTool?.id
               })}
+              chatId={globalState.chatId}
             />
             {completionStates[currentTool?.id]?.isComplete && (
               <div className={styles.completionOverlay} />

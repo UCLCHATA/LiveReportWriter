@@ -637,19 +637,22 @@ export const MilestoneTracker: React.FC<{ data: any; onChange: (data: any) => vo
   const handleIncludeInReportToggle = async () => {
     setIncludeInReport(prev => !prev);
     
+    // If we're including in report, capture and download the image
     if (!includeInReport) {
       try {
         const timelineImage = await captureTimelineImage();
         if (timelineImage) {
-          // Create a temporary link element
+          // Create a download link
           const link = document.createElement('a');
           link.href = timelineImage;
-          link.download = 'Developmental timeline.png';
+          link.download = `Developmental timeline_${chatId}`;
           
-          // Show dialog to user
-          const userConfirmed = window.confirm('The image will be downloaded. Please save it and manually add it to your generated report.');
+          // Create and show dialog
+          const dialogResult = window.confirm(
+            'The timeline image will be downloaded. Please save it and manually add it to your generated report.'
+          );
           
-          if (userConfirmed) {
+          if (dialogResult) {
             // Trigger download
             document.body.appendChild(link);
             link.click();

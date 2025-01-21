@@ -582,49 +582,7 @@ export const MilestoneTracker: React.FC<{ data: any; onChange: (data: any) => vo
   const captureTimelineImage = async () => {
     if (wrapperRef.current) {
       try {
-        // Store original styles
-        const originalMargin = wrapperRef.current.style.marginBottom;
-        const originalHeight = wrapperRef.current.style.height;
-        
-        // Set temporary styles for capture
-        wrapperRef.current.style.marginBottom = '0px';
-        wrapperRef.current.style.height = '240px'; // Increased height to accommodate labels
-        
-        const canvas = await html2canvas(wrapperRef.current, {
-          backgroundColor: null,
-          scale: 2,
-          logging: false,
-          allowTaint: true,
-          useCORS: true,
-          onclone: (clonedDoc) => {
-            const clonedWrapper = clonedDoc.querySelector(`.${styles.timelineWrapper}`);
-            if (clonedWrapper) {
-              (clonedWrapper as HTMLElement).style.marginBottom = '0px';
-              (clonedWrapper as HTMLElement).style.height = '240px';
-              
-              // Make all month markers and labels visible
-              const markers = clonedWrapper.querySelectorAll(`.${styles.monthMarker}`);
-              markers.forEach((marker) => {
-                (marker as HTMLElement).style.opacity = '1';
-                const markerLine = marker.querySelector(`.${styles.markerLine}`);
-                if (markerLine) {
-                  (markerLine as HTMLElement).style.opacity = '1';
-                }
-                const label = marker.querySelector(`.${styles.markerLabel}`);
-                if (label) {
-                  (label as HTMLElement).style.opacity = '1';
-                  (label as HTMLElement).style.visibility = 'visible';
-                  (label as HTMLElement).style.bottom = '-25px';
-                }
-              });
-            }
-          }
-        });
-
-        // Restore original styles
-        wrapperRef.current.style.marginBottom = originalMargin;
-        wrapperRef.current.style.height = originalHeight;
-        
+        const canvas = await html2canvas(wrapperRef.current);
         return canvas.toDataURL('image/png');
       } catch (error) {
         console.error('Error capturing timeline image:', error);
@@ -635,8 +593,6 @@ export const MilestoneTracker: React.FC<{ data: any; onChange: (data: any) => vo
   };
 
   const handleIncludeInReportToggle = async () => {
-    setIncludeInReport(prev => !prev);
-    
     if (!includeInReport) {
       try {
         const timelineImage = await captureTimelineImage();
