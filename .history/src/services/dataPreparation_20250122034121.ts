@@ -15,7 +15,13 @@ interface ProfileData {
 
 // Helper to format domain data
 function formatDomainData(domain: any): string {
-    if (!domain || typeof domain.value === 'undefined' || domain.value === null) {
+    const defaultData = {
+        value: 0,
+        label: 'Skipped',
+        observations: []
+    };
+
+    if (!domain || typeof domain.value === 'undefined') {
         return '';
     }
 
