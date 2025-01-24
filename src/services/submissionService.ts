@@ -62,7 +62,7 @@ export class SubmissionService {
     // Check CHATA ID
     if (!globalState.chataId) {
       console.error('❌ Missing CHATA ID');
-      alert(ALERT_MESSAGES.INVALID_DATA);
+      alert('Please ensure you have a valid CHATA ID before submitting.');
       return false;
     }
 
@@ -72,6 +72,16 @@ export class SubmissionService {
         !globalState.clinician?.clinicName?.trim()) {
       console.error('❌ Missing required clinician information');
       alert('Please fill in all required clinician fields (Name, Email, and Clinic Name) before submitting.');
+      return false;
+    }
+
+    // Check child information
+    if (!globalState.formData?.childFirstname?.trim() || 
+        !globalState.formData?.childSecondname?.trim() || 
+        !globalState.formData?.childAge?.trim() || 
+        !globalState.formData?.childGender?.trim()) {
+      console.error('❌ Missing required child information');
+      alert('Please fill in all required child information (First Name, Last Name, Age, and Gender) before submitting.');
       return false;
     }
 
@@ -99,15 +109,36 @@ export class SubmissionService {
       }
     }
 
-    // Log clinician data for debugging
-    const { name, email, clinicName } = globalState.clinician;
-    console.log('👤 Clinician data present:', {
-      name: name || '(empty)',
-      email: email || '(empty)',
-      clinicName: clinicName || '(empty)',
-      rawData: globalState.clinician
-    });
+    // Check if all required domains have scores
+    const domains = {
+      sensory: ['visual', 'auditory', 'tactile', 'vestibular', 'proprioceptive', 'oral'],
+      social: ['jointAttention', 'nonverbalCommunication', 'verbalCommunication', 'socialUnderstanding', 'playSkills', 'peerInteractions'],
+      behavior: ['repetitiveBehaviors', 'routinesRituals', 'specialInterests', 'sensoryInterests', 'emotionalRegulation', 'flexibility']
+    };
 
+    // Check sensory domains
+    if (!globalState.formData?.sensoryProfile?.domains) {
+      console.error('❌ Missing sensory profile scores');
+      alert('Please complete all sensory profile assessments before submitting.');
+      return false;
+    }
+
+    // Check social domains
+    if (!globalState.formData?.socialCommunication?.domains) {
+      console.error('❌ Missing social communication scores');
+      alert('Please complete all social communication assessments before submitting.');
+      return false;
+    }
+
+    // Check behavior domains
+    if (!globalState.formData?.behaviorInterests?.domains) {
+      console.error('❌ Missing behavior and interests scores');
+      alert('Please complete all behavior and interests assessments before submitting.');
+      return false;
+    }
+
+    // Log successful validation
+    console.log('✓ All validation checks passed');
     return true;
   }
 
