@@ -1,20 +1,11 @@
-<<<<<<< HEAD
-import { APPS_SCRIPT_URLS } from '../config/api';
-
-export const SHEETY_API_ID = 'd9da852d0370030da19c227582af6f3a';
-=======
 import html2canvas from 'html2canvas';
 
 // Sheety API configuration
 export const SHEETY_API_ID = import.meta.env.VITE_SHEETY_API_ID;
->>>>>>> fix-deployment
 export const SHEETY_PROJECT = 'chataLiveData';
 export const SHEETY_BASE_URL = `https://api.sheety.co/${SHEETY_API_ID}/${SHEETY_PROJECT}`;
 export const R3_FORM_API = `${SHEETY_BASE_URL}/r3Form`;
 
-<<<<<<< HEAD
-export interface ChataData {
-=======
 // API Configuration
 export const API_CONFIG = {
   MAX_RETRIES: 3,
@@ -29,120 +20,150 @@ export interface ApiError extends Error {
   status?: number;
 }
 
-interface SheetyResponse {
-  success: boolean;
-  error?: string;
-  r3Form?: {
->>>>>>> fix-deployment
-    id: string;
-    chataId: string;
-    timestamp: string;
-    [key: string]: any;
-  };
-}
+// Define alert message types for consistency
+const ALERT_MESSAGES = {
+  SUBMISSION_SUCCESS: '✓ Form submitted successfully! Your report will be generated and emailed to you shortly.',
+  SUBMISSION_ERROR: (message: string) => `❌ Form submission failed: ${message}\nPlease try again or contact support if the problem persists.`,
+  INVALID_CHATA_ID: 'Submission Error: Invalid CHATA ID. Please check and try again.'
+} as const;
 
-<<<<<<< HEAD
-export async function fetchChataData(): Promise<ChataData[]> {
-    const response = await fetch(ALL_URL_API, {
-        headers: {
-            'Authorization': 'Bearer CHATAI'
+// Strict column ordering for Sheety submissions
+const SHEETY_COLUMNS = [
+  'timestamp',
+  'chataId',
+  'clinicianName',
+  'clinicianEmail',
+  'clinicName',
+  'childFirstname',
+  'childSecondname',
+  'childAge',
+  'childGender',
+  'clinicalObservations',
+  'sensoryProfile',
+  'socialCommunication',
+  'behaviorInterests',
+  'milestoneTimelineData',
+  'assessmentLogData',
+  'status',
+  'submissionDate'
+] as const;
+
+export async function submitFormData(formData: any): Promise<SheetyResponse> {
+    try {
+        console.log('Starting form submission process...', {
+            submittedChataId: formData.chataId,
+            urlChataId: new URLSearchParams(window.location.search).get('chataId')
+        });
+        
+        // Validate CHATA ID
+        const urlParams = new URLSearchParams(window.location.search);
+        const urlChataId = urlParams.get('chataId');
+        
+        if (!formData.chataId || formData.chataId !== urlChataId) {
+            console.error('CHATA ID mismatch:', {
+                formChataId: formData.chataId,
+                urlChataId: urlChataId
+            });
+            alert(ALERT_MESSAGES.INVALID_CHATA_ID);
+            throw new Error('Invalid CHATA ID');
         }
-    });
-    if (!response.ok) {
-        throw new Error('Failed to fetch CHATA data');
-=======
-// Helper to format sensory score
-function formatSensoryScore(domain: any): string {
-    if (!domain || typeof domain.value === 'undefined') return 'Skipped';
-    return `${domain.value}/5`;
-}
-
-// Helper to format social communication score
-function formatSocialScore(domain: any): string {
-    if (!domain || typeof domain.value === 'undefined') return 'Skipped';
-    return `${domain.value}/5`;
-}
-
-// Helper to format behavior score
-function formatBehaviorScore(domain: any): string {
-    if (!domain || typeof domain.value === 'undefined') return 'Skipped';
-    return `${domain.value}/5`;
-}
-
-// Helper to format observations
-function formatObservations(observations: string[] | undefined): string {
-    if (!observations || !Array.isArray(observations)) return '';
-    return observations.filter(obs => obs && typeof obs === 'string').join(', ');
-}
-
-// Helper to format sensory scores
-function formatSensoryScores(profile: any) {
-    if (!profile?.domains) return {};
-    const scores: Record<string, string> = {};
-    for (const [key, domain] of Object.entries(profile.domains)) {
-        scores[key] = formatSensoryScore(domain);
->>>>>>> fix-deployment
-    }
-    return scores;
-}
-
-<<<<<<< HEAD
-export async function submitFormData(formData: any) {
-    // Format the data according to Sheety's column naming convention
-    const formDataToSubmit = {
+        
+        // Format main form data
+        const formattedData = formatFormData(formData);
+        console.log('Main form data formatted successfully. Payload:', {
+            chataId: formattedData.r3Form.chataId,
+            clinicianInfo: {
+                name: formattedData.r3Form.clinicianName,
+                email: formattedData.r3Form.clinicianEmail,
+                clinic: formattedData.r3Form.clinicName
+            },
+            childInfo: {
+                firstName: formattedData.r3Form.childFirstname,
+                lastName: formattedData.r3Form.childSecondname,
+                age: formattedData.r3Form.childAge,
+                gender: formattedData.r3Form.childGender
+            }
+        });
+        
+        // Submit main form data
+        console.log('Submitting main form data to Sheety...');
+        const mainResponse = await submitToSheetyAPI(R3_FORM_API, formattedData);
+        console.log('✓ Main form data submitted successfully:', {
+            responseId: mainResponse.r3Form?.id,
+            chataId: mainResponse.r3Form?.chataId,
+            timestamp: mainResponse.r3Form?.timestamp
+        });
+        
+        // If images are included, submit them separately
+        if (formData.includeImages) {
+            console.log('Processing image submissions...', {
+                milestoneIncluded: formData.milestoneImage?.include,
+                radarChartIncluded: formData.radarChartImage?.include
+            });
+            
+            // Submit milestone image if included
+            if (formData.milestoneImage?.include) {
+                console.log('Submitting milestone timeline image...', {
+                    chataId: formData.chataId,
+                    chunk1Length: formData.milestoneImage.chunk1?.length || 0,
+                    chunk2Length: formData.milestoneImage.chunk2?.length || 0,
+                    chunk3Length: formData.milestoneImage.chunk3?.length || 0
+                });
+                const milestoneImageData = {
+                    r3Form: {
+                        chataId: formData.chataId,
+                        milestoneImageChunk1: formData.milestoneImage.chunk1,
+                        milestoneImageChunk2: formData.milestoneImage.chunk2,
+                        milestoneImageChunk3: formData.milestoneImage.chunk3
+                    }
+                };
+                await submitToSheetyAPI(R3_FORM_API, milestoneImageData);
+                console.log('✓ Milestone timeline image submitted successfully');
+            } else {
+                console.log('Milestone timeline image submission skipped (not included)');
+            }
+            
+            // Submit radar chart image if included
+            if (formData.radarChartImage?.include) {
+                console.log('Submitting combined radar chart image...', {
+                    chataId: formData.chataId,
+                    chunk1Length: formData.radarChartImage.chunk1?.length || 0,
+                    chunk2Length: formData.radarChartImage.chunk2?.length || 0,
+                    chunk3Length: formData.radarChartImage.chunk3?.length || 0
+                });
+                const radarChartImageData = {
         r3Form: {
             chataId: formData.chataId,
-            name: formData.name,
-            timestamp: formData.timestamp,
-            asc: formData.ascStatus,
-            adhd: formData.adhdStatus,
-            observations: formData.clinicalObservations,
-            strengths: formData.strengths,
-            supportAreas: formData.priorityAreas,
-            recommendations: formData.recommendations,
-            referrals: Object.entries(formData.referrals)
-                .filter(([_, value]) => value)
-                .map(([key]) => key)
-                .join(', '),
-            remarks: formData.remarks || '',
-            differential: formData.differentialDiagnosis || '',
-            milestones: JSON.stringify(formData.milestones?.map((milestone: { 
-                id: string; 
-                title: string; 
-                category: string; 
-                expectedAge: number; 
-                actualAge?: number; 
-                status: string; 
-            }) => ({
-                id: milestone.id,
-                title: milestone.title,
-                category: milestone.category,
-                expectedAge: milestone.expectedAge,
-                actualAge: milestone.actualAge,
-                status: milestone.status,
-                difference: milestone.actualAge !== undefined ? milestone.actualAge - milestone.expectedAge : null
-            })) || []),
-            milestoneHistory: formData.milestoneHistory || '',
-            radarChartImage: formData.radarChartImage || '',
-            timelineImage: formData.timelineImage || ''
+                        combinedGraphImageChunk1: formData.radarChartImage.chunk1,
+                        combinedGraphImageChunk2: formData.radarChartImage.chunk2,
+                        combinedGraphImageChunk3: formData.radarChartImage.chunk3
+                    }
+                };
+                await submitToSheetyAPI(R3_FORM_API, radarChartImageData);
+                console.log('✓ Combined radar chart image submitted successfully');
+            } else {
+                console.log('Combined radar chart image submission skipped (not included)');
+            }
+            
+            console.log('✓ All image submissions completed');
+        } else {
+            console.log('Image submissions skipped (includeImages flag is false)');
         }
-    };
-
-    const response = await fetch(R3_FORM_API, {
-        method: 'POST',
-        headers: {
-            'Authorization': 'Bearer CHATAI',
-            'Content-Type': 'application/json'
-        },
-        body: JSON.stringify(formDataToSubmit)
-    });
-    
-    if (!response.ok) {
-        const errorText = await response.text();
-        throw new Error(`Form submission failed: ${errorText}`);
+        
+        console.log('✓ Form submission process completed successfully');
+        alert(ALERT_MESSAGES.SUBMISSION_SUCCESS);
+        return mainResponse;
+    } catch (error) {
+        console.error('Form submission failed:', {
+            error: error instanceof Error ? error.message : String(error),
+            code: error instanceof Error ? (error as ApiError).code : undefined,
+            status: error instanceof Error ? (error as ApiError).status : undefined
+        });
+        const apiError: ApiError = error instanceof Error ? error : new Error(String(error));
+        apiError.code = 'FORM_SUBMISSION_FAILED';
+        alert(ALERT_MESSAGES.SUBMISSION_ERROR(apiError.message));
+        throw apiError;
     }
-    
-    return response.json();
 }
 
 interface SheetyResponse {
@@ -239,7 +260,108 @@ export const submitToSheetyAPI = async (url: string, data: any): Promise<SheetyR
 
       try {
         const response = await fetch(url, {
-=======
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': 'Bearer CHATAI'
+          },
+          body: JSON.stringify(formattedData),
+          signal: controller.signal
+        });
+
+        clearTimeout(timeout);
+
+        const responseText = await response.text();
+        console.log('Raw Sheety API Response:', responseText);
+
+        let jsonResponse;
+        try {
+          jsonResponse = JSON.parse(responseText);
+          console.log('Parsed Sheety API Response:', jsonResponse);
+        } catch (e) {
+          console.error('Failed to parse Sheety API response:', {
+            responseText,
+            error: e instanceof Error ? e.message : 'Unknown error'
+          });
+          throw new Error(`Invalid JSON response from Sheety API: ${responseText}`);
+        }
+
+        if (!response.ok) {
+          // Special handling for payload too large errors
+          if (response.status === 413) {
+            throw new Error('Payload too large. Please reduce the size of the data being sent.');
+          }
+          
+          console.error('Sheety API Error:', {
+            status: response.status,
+            statusText: response.statusText,
+            response: jsonResponse,
+            requestData: logSafeData
+          });
+          throw new Error(`Sheety API submission failed: ${response.status} ${response.statusText}`);
+        }
+
+        // Log successful submission details
+        console.log('Sheety API Success:', {
+          status: response.status,
+          rowId: jsonResponse?.r3Form?.id,
+          isChunk,
+          response: jsonResponse
+        });
+
+        return jsonResponse;
+      } finally {
+        clearTimeout(timeout);
+      }
+    } catch (error: unknown) {
+      if (error instanceof Error && error.name === 'AbortError') {
+        throw new Error('Request timed out after 30 seconds');
+      }
+      console.error('Sheety API submission error:', {
+        error: error instanceof Error ? error.message : 'Unknown error',
+        stack: error instanceof Error ? error.stack : undefined
+      });
+      throw error;
+    }
+  };
+
+  return retryWithBackoff(submitFn);
+};
+
+// Helper to format sensory score
+function formatSensoryScore(domain: any): string {
+    if (!domain || typeof domain.value === 'undefined') return 'Skipped';
+    return `${domain.value}/5`;
+}
+
+// Helper to format social communication score
+function formatSocialScore(domain: any): string {
+    if (!domain || typeof domain.value === 'undefined') return 'Skipped';
+    return `${domain.value}/5`;
+}
+
+// Helper to format behavior score
+function formatBehaviorScore(domain: any): string {
+    if (!domain || typeof domain.value === 'undefined') return 'Skipped';
+    return `${domain.value}/5`;
+}
+
+// Helper to format observations
+function formatObservations(observations: string[] | undefined): string {
+    if (!observations || !Array.isArray(observations)) return '';
+    return observations.filter(obs => obs && typeof obs === 'string').join(', ');
+}
+
+// Helper to format sensory scores
+function formatSensoryScores(profile: any) {
+    if (!profile?.domains) return {};
+    const scores: Record<string, string> = {};
+    for (const [key, domain] of Object.entries(profile.domains)) {
+        scores[key] = formatSensoryScore(domain);
+    }
+    return scores;
+}
+
 // Helper to format social scores
 function formatSocialScores(profile: any) {
     if (!profile?.domains) return {};
@@ -389,7 +511,7 @@ function chunkImageData(base64Data: string): { chunk1: string, chunk2: string, c
     };
 }
 
-// Helper to format form data
+// Helper to format form data with strict column ordering
 function formatFormData(formData: any) {
     console.group('📦 Preparing submission data by component:');
     
@@ -413,7 +535,6 @@ function formatFormData(formData: any) {
     });
 
     // Process milestone data to ensure it's wrapped correctly for Sheety
-    // but will display as plain text in Google Sheets
     const processedMilestoneData = formData.milestoneTimelineData 
         ? { value: formData.milestoneTimelineData }
         : { value: '' };
@@ -423,266 +544,36 @@ function formatFormData(formData: any) {
         ? { value: formData.historyOfConcerns }
         : { value: '' };
 
-    // Return the data as is, wrapped in r3Form object
-    return {
-        r3Form: {
-            ...formData,
+    // Create a base object with all columns initialized to empty strings
+    const orderedData = SHEETY_COLUMNS.reduce((acc, column) => ({
+        ...acc,
+        [column]: ''
+    }), {} as Record<string, any>);
+
+    // Fill in the data in the correct order
+    const filledData = {
+        ...orderedData,
+        timestamp: new Date().toISOString(),
+        chataId: formData.chataId,
+        clinicianName: formData.clinicianName || '',
+        clinicianEmail: formData.clinicianEmail || '',
+        clinicName: formData.clinicName || '',
+        childFirstname: formData.childFirstname || '',
+        childSecondname: formData.childSecondname || '',
+        childAge: formData.childAge || '',
+        childGender: formData.childGender || '',
+        clinicalObservations: formData.clinicalObservations || '',
+        sensoryProfile: JSON.stringify(formData.sensoryProfile || {}),
+        socialCommunication: JSON.stringify(formData.socialCommunication || {}),
+        behaviorInterests: JSON.stringify(formData.behaviorInterests || {}),
             milestoneTimelineData: JSON.stringify(processedMilestoneData),
-            historyOfConcerns: JSON.stringify(processedHistoryData),
+        assessmentLogData: JSON.stringify(processedHistoryData),
             status: 'submitted',
             submissionDate: new Date().toISOString()
-        }
+    };
+
+    // Return the data wrapped in r3Form object with ordered columns
+    return {
+        r3Form: filledData
     };
 }
-
-// Submit form data to Sheety with separate image submissions
-export async function submitFormData(formData: any): Promise<SheetyResponse> {
-    try {
-        console.log('Starting form submission process...', {
-            submittedChataId: formData.chataId,
-            urlChataId: new URLSearchParams(window.location.search).get('chataId')
-        });
-        
-        // Validate CHATA ID
-        const urlParams = new URLSearchParams(window.location.search);
-        const urlChataId = urlParams.get('chataId');
-        
-        if (!formData.chataId || formData.chataId !== urlChataId) {
-            console.error('CHATA ID mismatch:', {
-                formChataId: formData.chataId,
-                urlChataId: urlChataId
-            });
-            throw new Error('Invalid CHATA ID');
-        }
-        
-        // Format main form data
-        const formattedData = formatFormData(formData);
-        console.log('Main form data formatted successfully. Payload:', {
-            chataId: formattedData.r3Form.chataId,
-            clinicianInfo: {
-                name: formattedData.r3Form.clinicianName,
-                email: formattedData.r3Form.clinicianEmail,
-                clinic: formattedData.r3Form.clinicName
-            },
-            childInfo: {
-                firstName: formattedData.r3Form.childFirstname,
-                lastName: formattedData.r3Form.childSecondname,
-                age: formattedData.r3Form.childAge,
-                gender: formattedData.r3Form.childGender
-            }
-        });
-        
-        // Submit main form data
-        console.log('Submitting main form data to Sheety...');
-        const mainResponse = await submitToSheety(formattedData);
-        console.log('✓ Main form data submitted successfully:', {
-            responseId: mainResponse.r3Form?.id,
-            chataId: mainResponse.r3Form?.chataId,
-            timestamp: mainResponse.r3Form?.timestamp
-        });
-        
-        // If images are included, submit them separately
-        if (formData.includeImages) {
-            console.log('Processing image submissions...', {
-                milestoneIncluded: formData.milestoneImage?.include,
-                radarChartIncluded: formData.radarChartImage?.include
-            });
-            
-            // Submit milestone image if included
-            if (formData.milestoneImage?.include) {
-                console.log('Submitting milestone timeline image...', {
-                    chataId: formData.chataId,
-                    chunk1Length: formData.milestoneImage.chunk1?.length || 0,
-                    chunk2Length: formData.milestoneImage.chunk2?.length || 0,
-                    chunk3Length: formData.milestoneImage.chunk3?.length || 0
-                });
-                const milestoneImageData = {
-                    r3Form: {
-                        chataId: formData.chataId,
-                        milestoneImageChunk1: formData.milestoneImage.chunk1,
-                        milestoneImageChunk2: formData.milestoneImage.chunk2,
-                        milestoneImageChunk3: formData.milestoneImage.chunk3
-                    }
-                };
-                await submitToSheety(milestoneImageData);
-                console.log('✓ Milestone timeline image submitted successfully');
-            } else {
-                console.log('Milestone timeline image submission skipped (not included)');
-            }
-            
-            // Submit radar chart image if included
-            if (formData.radarChartImage?.include) {
-                console.log('Submitting combined radar chart image...', {
-                    chataId: formData.chataId,
-                    chunk1Length: formData.radarChartImage.chunk1?.length || 0,
-                    chunk2Length: formData.radarChartImage.chunk2?.length || 0,
-                    chunk3Length: formData.radarChartImage.chunk3?.length || 0
-                });
-                const radarChartImageData = {
-                    r3Form: {
-                        chataId: formData.chataId,
-                        combinedGraphImageChunk1: formData.radarChartImage.chunk1,
-                        combinedGraphImageChunk2: formData.radarChartImage.chunk2,
-                        combinedGraphImageChunk3: formData.radarChartImage.chunk3
-                    }
-                };
-                await submitToSheety(radarChartImageData);
-                console.log('✓ Combined radar chart image submitted successfully');
-            } else {
-                console.log('Combined radar chart image submission skipped (not included)');
-            }
-            
-            console.log('✓ All image submissions completed');
-        } else {
-            console.log('Image submissions skipped (includeImages flag is false)');
-        }
-        
-        console.log('✓ Form submission process completed successfully');
-        return mainResponse;
-    } catch (error) {
-        console.error('Form submission failed:', {
-            error: error instanceof Error ? error.message : String(error),
-            code: error instanceof Error ? (error as ApiError).code : undefined,
-            status: error instanceof Error ? (error as ApiError).status : undefined
-        });
-        const apiError: ApiError = error instanceof Error ? error : new Error(String(error));
-        apiError.code = 'FORM_SUBMISSION_FAILED';
-        throw apiError;
-    }
-}
-
-// Helper to submit data to Sheety
-async function submitToSheety(data: any): Promise<SheetyResponse> {
-      const controller = new AbortController();
-    const timeout = setTimeout(() => controller.abort(), API_CONFIG.TIMEOUT);
-
-    try {
-        const payload = JSON.stringify(data);
-        console.log('Making Sheety API request...', {
-            url: R3_FORM_API,
-            dataSize: payload.length,
-            timeout: API_CONFIG.TIMEOUT,
-            payloadPreview: payload.substring(0, 200) + '...'
-        });
-
-        const response = await fetch(R3_FORM_API, {
->>>>>>> fix-deployment
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-            'Authorization': 'Bearer CHATAI'
-          },
-<<<<<<< HEAD
-          body: JSON.stringify(formattedData),
-=======
-            body: payload,
->>>>>>> fix-deployment
-          signal: controller.signal
-        });
-
-        clearTimeout(timeout);
-<<<<<<< HEAD
-
-        const responseText = await response.text();
-        console.log('Raw Sheety API Response:', responseText);
-=======
-        const responseText = await response.text();
-        
-        console.log('Sheety API response received:', {
-            status: response.status,
-            statusText: response.statusText,
-            responseSize: responseText.length,
-            responsePreview: responseText.substring(0, 200) + '...'
-        });
->>>>>>> fix-deployment
-
-        let jsonResponse;
-        try {
-          jsonResponse = JSON.parse(responseText);
-<<<<<<< HEAD
-          console.log('Parsed Sheety API Response:', jsonResponse);
-        } catch (e) {
-          console.error('Failed to parse Sheety API response:', {
-            responseText,
-            error: e instanceof Error ? e.message : 'Unknown error'
-          });
-=======
-            if (response.ok) {
-                console.log('Sheety API request successful:', {
-                    success: true,
-                    id: jsonResponse.r3Form?.id,
-                    chataId: jsonResponse.r3Form?.chataId,
-                    fields: Object.keys(jsonResponse.r3Form || {}).join(', ')
-                });
-            } else {
-                console.error('Sheety API request failed:', {
-                    success: false,
-                    error: jsonResponse.error,
-                    status: response.status,
-                    response: responseText
-                });
-            }
-        } catch (e) {
-            console.error('Failed to parse Sheety API response:', responseText);
->>>>>>> fix-deployment
-          throw new Error(`Invalid JSON response from Sheety API: ${responseText}`);
-        }
-
-        if (!response.ok) {
-<<<<<<< HEAD
-          // Special handling for payload too large errors
-          if (response.status === 413) {
-            throw new Error('Payload too large. Please reduce the size of the data being sent.');
-          }
-          
-          console.error('Sheety API Error:', {
-            status: response.status,
-            statusText: response.statusText,
-            response: jsonResponse,
-            requestData: logSafeData
-          });
-          throw new Error(`Sheety API submission failed: ${response.status} ${response.statusText}`);
-        }
-
-        // Log successful submission details
-        console.log('Sheety API Success:', {
-          status: response.status,
-          rowId: jsonResponse?.r3Form?.id,
-          isChunk,
-          response: jsonResponse
-        });
-
-        return jsonResponse;
-      } finally {
-        clearTimeout(timeout);
-      }
-    } catch (error: unknown) {
-      if (error instanceof Error && error.name === 'AbortError') {
-        throw new Error('Request timed out after 30 seconds');
-      }
-      console.error('Sheety API submission error:', {
-        error: error instanceof Error ? error.message : 'Unknown error',
-        stack: error instanceof Error ? error.stack : undefined
-      });
-      throw error;
-    }
-  };
-
-  return retryWithBackoff(submitFn);
-}; 
-=======
-          throw new Error(`Sheety API submission failed: ${response.status} ${response.statusText}`);
-        }
-
-        return jsonResponse;
-    } catch (error: any) {
-        console.error('Sheety API request failed:', {
-            error: error instanceof Error ? error.message : String(error),
-            timeout: error.name === 'AbortError' ? 'Request timed out' : undefined
-        });
-        throw error;
-      } finally {
-        clearTimeout(timeout);
-      }
-} 
->>>>>>> fix-deployment
