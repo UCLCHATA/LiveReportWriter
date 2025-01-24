@@ -75,6 +75,30 @@ export class SubmissionService {
       return false;
     }
 
+    // Check ASC and ADHD status selection
+    if (!globalState.formData?.ascStatus || !globalState.formData?.adhdStatus) {
+      console.error('❌ Missing ASC or ADHD status selection');
+      alert('Please select both ASC and ADHD status before submitting.');
+      return false;
+    }
+
+    // Check minimum word count in assessment textboxes
+    const MIN_WORDS = 20; // Minimum words required per textbox
+    const textboxes = [
+      { name: 'Sensory Profile', text: globalState.formData?.sensoryProfileText },
+      { name: 'Social Communication', text: globalState.formData?.socialCommunicationText },
+      { name: 'Behavior and Interests', text: globalState.formData?.behaviorInterestsText },
+      { name: 'Clinical Observations', text: globalState.formData?.clinicalObservationsText }
+    ];
+
+    for (const { name, text } of textboxes) {
+      if (!text || text.trim().split(/\s+/).length < MIN_WORDS) {
+        console.error(`❌ Insufficient detail in ${name}`);
+        alert(`Please provide at least ${MIN_WORDS} words of detail in the ${name} section.`);
+        return false;
+      }
+    }
+
     // Log clinician data for debugging
     const { name, email, clinicName } = globalState.clinician;
     console.log('👤 Clinician data present:', {
