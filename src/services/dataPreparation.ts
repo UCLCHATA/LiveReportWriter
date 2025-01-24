@@ -28,7 +28,8 @@ function formatDomainScore(domain: any): string {
         return 'Skipped';
     }
 
-    return `${domain.label}, ${domain.value} out of 5 on the 5 point scale`;
+    // Return just 'Skipped' for zero values, preserving the existing format for other values
+    return domain.value === 0 ? 'Skipped' : `${domain.label}, ${domain.value} out of 5 on the 5 point scale`;
 }
 
 // Format sensory profile data
