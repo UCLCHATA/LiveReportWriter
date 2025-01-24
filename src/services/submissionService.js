@@ -1,6 +1,13 @@
 import { submitFormData } from './api';
 import html2canvas from 'html2canvas';
 import { prepareFormDataForSubmission } from './dataPreparation';
+
+const ALERT_MESSAGES = {
+  SUCCESS: '✓ Form submitted successfully!\n\nThe CHATA Report Writing Engine is now processing your data. You will receive an email with a draft copy of your report shortly.\n\nPlease review all highlighted sections carefully before sharing the report. This helps ensure the content accurately reflects your clinical observations.',
+  ERROR: (message) => `❌ Form submission failed: ${message}\n\nPlease email the error details to uclchata@gmail.com so our development team can assist you.\n\nInclude your CHATA ID and the time of submission in your email.`,
+  INVALID_DATA: 'Invalid submission data. Please check all required fields and try again.\n\nIf this issue persists, contact uclchata@gmail.com for support.'
+};
+
 export class SubmissionService {
     static validateSubmissionData(globalState) {
         console.log('🔍 Starting validation with state:', {
@@ -12,6 +19,7 @@ export class SubmissionService {
         // Only CHATA ID is required
         if (!globalState.chataId) {
             console.error('❌ Missing CHATA ID');
+            alert(ALERT_MESSAGES.INVALID_DATA);
             return false;
         }
         // Log clinician data for debugging
@@ -109,6 +117,10 @@ export class SubmissionService {
                 chataId: submissionData.chataId,
                 timestamp: submissionData.timestamp
             });
+            
+            // Show success alert
+            alert(ALERT_MESSAGES.SUCCESS);
+            
             return {
                 success: true,
                 submittedData: submissionData
@@ -116,6 +128,10 @@ export class SubmissionService {
         }
         catch (error) {
             console.error('Submission failed:', error);
+            
+            // Show error alert
+            alert(ALERT_MESSAGES.ERROR(error instanceof Error ? error.message : 'Unknown error occurred'));
+            
             return {
                 success: false,
                 error: error instanceof Error ? error.message : 'Unknown error occurred'
