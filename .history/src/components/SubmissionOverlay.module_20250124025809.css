@@ -1,0 +1,572 @@
+.overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.7);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+}
+
+.content {
+  background-color: white;
+  padding: 2rem;
+  border-radius: 12px;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.15);
+  position: relative;
+  max-width: 500px;
+  width: 90%;
+  text-align: center;
+}
+
+.closeButton {
+  position: absolute;
+  top: 1rem;
+  right: 1rem;
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: #666;
+  padding: 0.5rem;
+  border-radius: 50%;
+  transition: background-color 0.2s;
+}
+
+.closeButton:hover {
+  background-color: #f0f0f0;
+}
+
+.progressBar {
+  width: 100%;
+  height: 4px;
+  background-color: #f0f0f0;
+  border-radius: 2px;
+  margin: 1rem 0;
+  overflow: hidden;
+}
+
+.progressFill {
+  height: 100%;
+  background-color: #4CAF50;
+  transition: width 0.3s ease-in-out;
+}
+
+.stage {
+  margin-top: 1.5rem;
+}
+
+.notification {
+  padding: 2rem;
+  border-radius: 8px;
+  text-align: center;
+}
+
+.successMessage {
+  background-color: #f0fff4;
+  border: 1px solid #c6f6d5;
+}
+
+.errorMessage {
+  background-color: #fff5f5;
+  border: 1px solid #fed7d7;
+}
+
+.icon {
+  margin-bottom: 1rem;
+}
+
+.successMessage .icon {
+  color: #48bb78;
+}
+
+.errorMessage .icon {
+  color: #f56565;
+}
+
+.stageMessage {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1rem;
+}
+
+.spinner {
+  width: 40px;
+  height: 40px;
+  border: 3px solid #f0f0f0;
+  border-top: 3px solid #4CAF50;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+.clearButton, .retryButton {
+  margin-top: 1.5rem;
+  padding: 0.75rem 1.5rem;
+  border-radius: 4px;
+  border: none;
+  cursor: pointer;
+  font-weight: 500;
+  transition: background-color 0.2s;
+}
+
+.clearButton {
+  background-color: #4CAF50;
+  color: white;
+}
+
+.clearButton:hover {
+  background-color: #43a047;
+}
+
+.retryButton {
+  background-color: #f56565;
+  color: white;
+}
+
+.retryButton:hover {
+  background-color: #e53e3e;
+}
+
+.note {
+  margin-top: 1rem;
+  font-size: 0.9rem;
+  color: #666;
+}
+
+.note a {
+  color: #4CAF50;
+  text-decoration: none;
+}
+
+.note a:hover {
+  text-decoration: underline;
+}
+
+.modal {
+  background: white;
+  border-radius: 12px;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+  width: 90%;
+  max-width: 600px;
+  overflow: hidden;
+  animation: slideUp 0.4s ease;
+}
+
+.header {
+  padding: 1.25rem;
+  border-bottom: 1px solid #f3f4f6;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.header h2 {
+  margin: 0;
+  font-size: 1.25rem;
+  color: #111827;
+  font-weight: 600;
+}
+
+.stageIndicator {
+  text-align: center;
+  margin-bottom: 2rem;
+}
+
+.stageLabel {
+  font-size: 1rem;
+  color: #4b5563;
+  font-weight: 500;
+}
+
+.progressTrack {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin: 2rem 0;
+  padding: 0 1rem;
+  position: relative;
+}
+
+.progressNode {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  position: relative;
+}
+
+.nodeContent {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.5rem;
+  z-index: 2;
+}
+
+.dot {
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  background: #e5e7eb;
+  transition: all 0.3s ease;
+}
+
+.label {
+  font-size: 1rem;
+  color: #9ca3af;
+  transition: all 0.3s ease;
+}
+
+.connector {
+  flex: 1;
+  height: 2px;
+  background: #e5e7eb;
+  margin: 0 0.5rem;
+  transition: all 0.3s ease;
+}
+
+.progressNode.completed .dot {
+  background: #4f46e5;
+  box-shadow: 0 0 0 4px rgba(79, 70, 229, 0.2);
+}
+
+.progressNode.completed .label {
+  color: #4f46e5;
+}
+
+.progressNode.completed .connector {
+  background: #4f46e5;
+}
+
+.progressNode.current .dot {
+  background: #4f46e5;
+  animation: pulse 2s infinite;
+}
+
+.progressNode.current .label {
+  color: #4f46e5;
+  font-weight: 500;
+}
+
+.progressText {
+  position: absolute;
+  right: 8px;
+  top: 50%;
+  transform: translateY(-50%);
+  color: white;
+  font-size: 0.75rem;
+  font-weight: 600;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+}
+
+.timer {
+  text-align: center;
+  color: #6b7280;
+  font-size: 0.875rem;
+  margin-top: 1rem;
+}
+
+.details {
+  margin-top: 1.5rem;
+  padding-top: 1.5rem;
+  border-top: 1px solid #f3f4f6;
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  animation: fadeIn 0.3s ease;
+}
+
+.documentLink {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.75rem 1rem;
+  background: #4f46e5;
+  color: white;
+  text-decoration: none;
+  border-radius: 6px;
+  font-weight: 500;
+  transition: all 0.2s;
+  justify-content: center;
+}
+
+.documentLink:hover {
+  background: #4338ca;
+  transform: translateY(-1px);
+}
+
+.emailStatus {
+  text-align: center;
+  color: #059669;
+  font-size: 0.875rem;
+  padding: 0.5rem;
+  background: #f0fdf4;
+  border-radius: 4px;
+}
+
+/* Success Message Styles */
+.successMessage h3 {
+  color: #059669;
+  font-size: 1.5rem;
+  margin-bottom: 1rem;
+}
+
+.successMessage p {
+  color: #374151;
+  font-size: 1rem;
+  line-height: 1.5;
+  margin-bottom: 0.75rem;
+}
+
+.successMessage .note {
+  color: #6b7280;
+  font-size: 0.875rem;
+  margin-top: 1rem;
+}
+
+.successMessage .note a {
+  color: #4f46e5;
+  text-decoration: none;
+}
+
+.successMessage .note a:hover {
+  text-decoration: underline;
+}
+
+/* Animations */
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes slideUp {
+  from {
+    opacity: 0;
+    transform: translateY(30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes bounce {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-4px); }
+}
+
+@keyframes pulse {
+  0% { box-shadow: 0 0 0 0 rgba(79, 70, 229, 0.4); }
+  70% { box-shadow: 0 0 0 10px rgba(79, 70, 229, 0); }
+  100% { box-shadow: 0 0 0 0 rgba(79, 70, 229, 0); }
+}
+
+@keyframes shimmer {
+  0% { background-position: 200% 0; }
+  100% { background-position: -200% 0; }
+}
+
+.slideUp {
+  animation: slideUp 0.5s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.bounceIn {
+  animation: bounceIn 0.8s cubic-bezier(0.36, 0, 0.66, 1);
+  margin-bottom: 1rem;
+  color: #059669;
+  font-size: 2rem;
+}
+
+.fadeInUp {
+  animation: fadeInUp 0.6s ease forwards;
+  opacity: 0;
+  transform: translateY(20px);
+}
+
+.celebrationWrapper {
+  position: relative;
+  margin-bottom: 1.5rem;
+}
+
+.successIcon {
+  animation: scaleIn 0.5s ease forwards;
+}
+
+.confetti {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 100px;
+  height: 100px;
+  pointer-events: none;
+}
+
+.confetti::before,
+.confetti::after {
+  content: '';
+  position: absolute;
+  width: 8px;
+  height: 8px;
+  border-radius: 1px;
+  animation: confetti 1s ease-out forwards;
+}
+
+.confetti::before {
+  background-color: #4CAF50;
+  transform: rotate(45deg);
+}
+
+.confetti::after {
+  background-color: #FFD700;
+  transform: rotate(-45deg);
+}
+
+.messageContainer {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+  margin: 2rem 0;
+}
+
+.timeEstimate {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  color: #4B5563;
+  animation: fadeIn 0.6s ease 0.3s forwards;
+  opacity: 0;
+}
+
+.clockIcon {
+  animation: pulse 2s infinite;
+  color: #4CAF50;
+}
+
+.savingsMessage {
+  background: linear-gradient(135deg, #f0fff4 0%, #dcfce7 100%);
+  padding: 1rem;
+  border-radius: 8px;
+  animation: fadeIn 0.6s ease 0.6s forwards;
+  opacity: 0;
+}
+
+.highlight {
+  color: #059669;
+  font-weight: 600;
+  font-size: 1.1rem;
+}
+
+.shareSection {
+  margin-top: 1rem;
+  animation: fadeIn 0.6s ease 0.9s forwards;
+  opacity: 0;
+}
+
+.sharePrompt {
+  color: #4B5563;
+  margin-bottom: 1rem;
+}
+
+.shareButton {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  background-color: #4F46E5;
+  color: white;
+  padding: 0.75rem 1.5rem;
+  border-radius: 8px;
+  border: none;
+  cursor: pointer;
+  font-weight: 500;
+  transition: all 0.2s;
+  margin: 0 auto;
+}
+
+.shareButton:hover {
+  background-color: #4338CA;
+  transform: translateY(-2px);
+}
+
+.pulseButton {
+  animation: buttonPulse 2s infinite;
+}
+
+.processingText {
+  color: #4B5563;
+  font-size: 1.1rem;
+  animation: fadeInOut 2s infinite;
+}
+
+/* Enhanced Animations */
+@keyframes scaleIn {
+  from {
+    transform: scale(0);
+    opacity: 0;
+  }
+  to {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
+
+@keyframes bounceIn {
+  0% {
+    transform: scale(0.3);
+    opacity: 0;
+  }
+  50% {
+    transform: scale(1.05);
+  }
+  70% {
+    transform: scale(0.9);
+  }
+  100% {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
+
+@keyframes fadeInUp {
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes confetti {
+  0% {
+    transform: translate(0, 0) rotate(0deg);
+    opacity: 1;
+  }
+  100% {
+    transform: translate(var(--x, 20px), var(--y, -20px)) rotate(var(--r, 90deg));
+    opacity: 0;
+  }
+}
+
+@keyframes buttonPulse {
+  0% {
+    box-shadow: 0 0 0 0 rgba(76, 175, 80, 0.4);
+  }
+  70% {
+    box-shadow: 0 0 0 10px rgba(76, 175, 80, 0);
+  }
+  100% {
+    box-shadow: 0 0 0 0 rgba(76, 175, 80, 0);
+  }
+}
+
+@keyframes fadeInOut {
+  0%, 100% { opacity: 0.7; }
+  50% { opacity: 1; }
+} 

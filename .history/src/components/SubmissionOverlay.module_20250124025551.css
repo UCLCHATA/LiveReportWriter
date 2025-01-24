@@ -1,0 +1,374 @@
+.overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.7);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+}
+
+.content {
+  background-color: white;
+  padding: 2rem;
+  border-radius: 8px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  position: relative;
+  max-width: 500px;
+  width: 90%;
+  text-align: center;
+}
+
+.closeButton {
+  position: absolute;
+  top: 1rem;
+  right: 1rem;
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: #666;
+  padding: 0.5rem;
+  border-radius: 50%;
+  transition: background-color 0.2s;
+}
+
+.closeButton:hover {
+  background-color: #f0f0f0;
+}
+
+.progressBar {
+  width: 100%;
+  height: 4px;
+  background-color: #f0f0f0;
+  border-radius: 2px;
+  margin: 1rem 0;
+  overflow: hidden;
+}
+
+.progressFill {
+  height: 100%;
+  background-color: #4CAF50;
+  transition: width 0.3s ease-in-out;
+}
+
+.stage {
+  margin-top: 1.5rem;
+}
+
+.notification {
+  padding: 2rem;
+  border-radius: 8px;
+  text-align: center;
+}
+
+.successMessage {
+  background-color: #f0fff4;
+  border: 1px solid #c6f6d5;
+}
+
+.errorMessage {
+  background-color: #fff5f5;
+  border: 1px solid #fed7d7;
+}
+
+.icon {
+  margin-bottom: 1rem;
+}
+
+.successMessage .icon {
+  color: #48bb78;
+}
+
+.errorMessage .icon {
+  color: #f56565;
+}
+
+.stageMessage {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1rem;
+}
+
+.spinner {
+  width: 40px;
+  height: 40px;
+  border: 3px solid #f0f0f0;
+  border-top: 3px solid #4CAF50;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+.clearButton, .retryButton {
+  margin-top: 1.5rem;
+  padding: 0.75rem 1.5rem;
+  border-radius: 4px;
+  border: none;
+  cursor: pointer;
+  font-weight: 500;
+  transition: background-color 0.2s;
+}
+
+.clearButton {
+  background-color: #4CAF50;
+  color: white;
+}
+
+.clearButton:hover {
+  background-color: #43a047;
+}
+
+.retryButton {
+  background-color: #f56565;
+  color: white;
+}
+
+.retryButton:hover {
+  background-color: #e53e3e;
+}
+
+.note {
+  margin-top: 1rem;
+  font-size: 0.9rem;
+  color: #666;
+}
+
+.note a {
+  color: #4CAF50;
+  text-decoration: none;
+}
+
+.note a:hover {
+  text-decoration: underline;
+}
+
+.modal {
+  background: white;
+  border-radius: 12px;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+  width: 90%;
+  max-width: 600px;
+  overflow: hidden;
+  animation: slideUp 0.4s ease;
+}
+
+.header {
+  padding: 1.25rem;
+  border-bottom: 1px solid #f3f4f6;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.header h2 {
+  margin: 0;
+  font-size: 1.25rem;
+  color: #111827;
+  font-weight: 600;
+}
+
+.stageIndicator {
+  text-align: center;
+  margin-bottom: 2rem;
+}
+
+.stageLabel {
+  font-size: 1rem;
+  color: #4b5563;
+  font-weight: 500;
+}
+
+.progressTrack {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin: 2rem 0;
+  padding: 0 1rem;
+  position: relative;
+}
+
+.progressNode {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  position: relative;
+}
+
+.nodeContent {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.5rem;
+  z-index: 2;
+}
+
+.dot {
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  background: #e5e7eb;
+  transition: all 0.3s ease;
+}
+
+.label {
+  font-size: 1rem;
+  color: #9ca3af;
+  transition: all 0.3s ease;
+}
+
+.connector {
+  flex: 1;
+  height: 2px;
+  background: #e5e7eb;
+  margin: 0 0.5rem;
+  transition: all 0.3s ease;
+}
+
+.progressNode.completed .dot {
+  background: #4f46e5;
+  box-shadow: 0 0 0 4px rgba(79, 70, 229, 0.2);
+}
+
+.progressNode.completed .label {
+  color: #4f46e5;
+}
+
+.progressNode.completed .connector {
+  background: #4f46e5;
+}
+
+.progressNode.current .dot {
+  background: #4f46e5;
+  animation: pulse 2s infinite;
+}
+
+.progressNode.current .label {
+  color: #4f46e5;
+  font-weight: 500;
+}
+
+.progressText {
+  position: absolute;
+  right: 8px;
+  top: 50%;
+  transform: translateY(-50%);
+  color: white;
+  font-size: 0.75rem;
+  font-weight: 600;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+}
+
+.timer {
+  text-align: center;
+  color: #6b7280;
+  font-size: 0.875rem;
+  margin-top: 1rem;
+}
+
+.details {
+  margin-top: 1.5rem;
+  padding-top: 1.5rem;
+  border-top: 1px solid #f3f4f6;
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  animation: fadeIn 0.3s ease;
+}
+
+.documentLink {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.75rem 1rem;
+  background: #4f46e5;
+  color: white;
+  text-decoration: none;
+  border-radius: 6px;
+  font-weight: 500;
+  transition: all 0.2s;
+  justify-content: center;
+}
+
+.documentLink:hover {
+  background: #4338ca;
+  transform: translateY(-1px);
+}
+
+.emailStatus {
+  text-align: center;
+  color: #059669;
+  font-size: 0.875rem;
+  padding: 0.5rem;
+  background: #f0fdf4;
+  border-radius: 4px;
+}
+
+/* Success Message Styles */
+.successMessage h3 {
+  color: #059669;
+  font-size: 1.5rem;
+  margin-bottom: 1rem;
+}
+
+.successMessage p {
+  color: #374151;
+  font-size: 1rem;
+  line-height: 1.5;
+  margin-bottom: 0.75rem;
+}
+
+.successMessage .note {
+  color: #6b7280;
+  font-size: 0.875rem;
+  margin-top: 1rem;
+}
+
+.successMessage .note a {
+  color: #4f46e5;
+  text-decoration: none;
+}
+
+.successMessage .note a:hover {
+  text-decoration: underline;
+}
+
+/* Animations */
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes slideUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes bounce {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-4px); }
+}
+
+@keyframes pulse {
+  0% { box-shadow: 0 0 0 0 rgba(79, 70, 229, 0.4); }
+  70% { box-shadow: 0 0 0 10px rgba(79, 70, 229, 0); }
+  100% { box-shadow: 0 0 0 0 rgba(79, 70, 229, 0); }
+}
+
+@keyframes shimmer {
+  0% { background-position: 200% 0; }
+  100% { background-position: -200% 0; }
+} 

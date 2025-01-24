@@ -11,13 +11,7 @@ const CONFIG = {
         Logs: 'API_Logs'
     },
     columns: {
-        // Status tracking columns
-        reportStatus: 'Report_Status',
-        reportUrl: 'Report_URL',
-        logsUrl: 'Logs_URL',
-        reportGenerated: 'Report_Generated',
-        
-        // Existing column mappings
+        // New column mapping based on provided structure
         chataId: 'CHATA_ID',
         clinicName: 'Clinic_Name',
         clinicianName: 'Clinician_Name',
@@ -97,9 +91,7 @@ const CONFIG = {
         differentialDiagnosis: 'Differential_Diagnosis',
         // Status tracking
         processedFlag: 'Report_Generated',
-        documentUrl: 'Report_URL',
-        reportStatus: 'Report_Status',
-        logsUrl: 'Logs_URL'
+        documentUrl: 'Report_URL'
     }
 };
 
@@ -474,13 +466,6 @@ function constructPrompt(formData, placeholderMap) {
     const systemPrompt = `You are a clinical psychologist at CHATA Clinic London, writing an autism assessment report.
     Your task is to generate content for specific placeholders using structured assessment data.
 
-    CRITICAL OBJECTIVITY RULES:
-    1. Use ONLY information provided in the assessment data
-    2. DO NOT create or infer observations not present in the data
-    3. DO NOT embellish or add hypothetical scenarios
-    4. If data is missing for a section, acknowledge the limitation
-    5. Base all descriptions on actual observations provided
-
     CRITICAL FORMATTING RULES:
     1. NEVER use numerical scores or ratings (e.g., "4 out of 5") - instead describe the level descriptively
     2. NEVER use quotation marks around observations - integrate them naturally into sentences
@@ -517,35 +502,6 @@ function constructPrompt(formData, placeholderMap) {
     3. Assessment References:
        - Technical sections: Can reference specific tools and scores
        - Parent sections: Focus on observations and real-world examples
-
-    4. Clinical Observation Pattern:
-       Observation → Pattern → Impact → Support Need
-       Example:
-       - Raw Observation: "Hand-flapping when excited about trains"
-       - Pattern: "Movement-based self-expression during high interest activities"
-       - Impact: "Helps process positive emotions and maintain engagement"
-       - Support Need: "Opportunities for movement during learning activities"
-
-    5. Enhanced Clinical Terms Translation:
-       - "Echolalia" → "repeats specific phrases in [specific context], which helps with [function]"
-       - "Joint attention" → "shared focus during [specific activity]"
-       - "Sensory seeking" → "actively explores surroundings through [specific sense]"
-       - "Executive function" → "skills in organizing, planning, and managing [specific tasks]"
-
-    6. Support Needs Framework:
-       Pattern + Impact + Context = Support Strategy
-       Example:
-       - Pattern: Difficulty with unexpected changes
-       - Impact: Increased anxiety in transitions
-       - Context: School environment
-       - Strategy: Visual schedules + transition warnings
-
-    7. Consistency Validation Rules:
-       - Each observation must link to a pattern
-       - Each pattern must have clear real-world impact
-       - Each impact must connect to specific support needs
-       - All support needs must be based on documented observations
-
 
     FORMATTING REQUIREMENTS:
     1. DO NOT use quotation marks around observations or phrases
@@ -602,24 +558,21 @@ function constructPrompt(formData, placeholderMap) {
 
     ASSESSMENT SCALES AND INTERPRETATIONS:
 
-    1. Sensory Profile Scoring (0-5):
-    0 - Skipped by User
+    1. Sensory Profile Scoring (1-5):
     1 - Significantly Under-responsive: Minimal response to sensory input
     2 - Under-responsive: Reduced response to sensory input
     3 - Typical: Age-appropriate sensory responses
     4 - Over-responsive: Heightened sensitivity to sensory input
     5 - Significantly Over-responsive: Intense reactions to sensory input
 
-    2. Social Communication Scoring (0-5):
-    0 - Skipped by User
+    2. Social Communication Scoring (1-5):
     1 - Age Appropriate: Skills matching developmental expectations
     2 - Subtle Differences: Minor variations from typical patterns
     3 - Emerging: Developing but inconsistent skills
     4 - Limited: Significant differences from age expectations
     5 - Significantly Limited: Marked differences requiring substantial support
 
-    3. Restricted Patterns Impact (0-5):
-    0 - Skipped by User
+    3. Restricted Patterns Impact (1-5):
     1 - Not Present: No observable impact
     2 - Minimal Impact: Occasional occurrence, minimal effect
     3 - Moderate Impact: Regular occurrence, noticeable effect
@@ -629,8 +582,7 @@ function constructPrompt(formData, placeholderMap) {
     INPUT FORMAT:
     The data includes:
     1. Sensory Profile
-    - Scores (0-5 scale with specific interpretations):
-        0: Skipped by User
+    - Scores (1-5 scale with specific interpretations):
         1: Significantly Under-responsive
         2: Under-responsive
         3: Typical
@@ -641,8 +593,7 @@ function constructPrompt(formData, placeholderMap) {
     - Consider impact on daily functioning and environmental adaptations
 
     2. Social Communication Profile
-    - Scores (0-5 scale with specific interpretations):
-        0: Skipped by User
+    - Scores (1-5 scale with specific interpretations):
         1: Age Appropriate
         2: Subtle Differences
         3: Emerging
@@ -657,8 +608,7 @@ function constructPrompt(formData, placeholderMap) {
         * Play Skills: Imaginative play, structured vs. unstructured
 
     3. Restricted Patterns Profile
-    - Scores (0-5 scale with specific interpretations):
-        0: Skipped by User
+    - Scores (1-5 scale with specific interpretations):
         1: Not Present
         2: Minimal Impact
         3: Moderate Impact
@@ -726,7 +676,7 @@ function constructPrompt(formData, placeholderMap) {
     2. Use clear, professional language
     3. For technical sections (T-series):
     - Use clinical terminology
-    - Include score interpretations but not the scores
+    - Include score interpretations
     - Reference assessment tools
     - Maintain professional tone
     - Connect findings to clinical implications
@@ -801,35 +751,7 @@ function constructPrompt(formData, placeholderMap) {
     5. Focus on patterns and observations, not metrics
     6. Describe support needs based on observed patterns
     7. Use specific examples to illustrate points
-    8. Consider developmental context in all descriptions
-
-    LANGUAGE IMPROVEMENT GUIDELINES:
-    1. Minimize use of "your child" - instead vary language naturally:
-       Instead of: "Your child shows strong visual skills"
-       Use: "John demonstrates strong visual skills" or "Observations indicate strong visual processing"
-    2. Ensure natural flow between sentences and paragraphs
-    3. Use consistent terminology within sections
-    4. Maintain professional tone while being accessible
-
-    SECTION-SPECIFIC ENHANCEMENTS:
-    Technical Sections (T-series):
-    - Use precise clinical terminology
-    - Reference specific DSM-5 criteria
-    - Include detailed assessment interpretations
-    - Integrate quantitative data appropriately
-    
-    Parent Sections (C-series):
-    - Focus on observed patterns without mentioning scores
-    - Use natural, descriptive language
-    - Connect observations to daily life impact
-    - Avoid clinical jargon
-
-    DATA INTEGRATION REQUIREMENTS:
-    1. Only reference observations documented in the assessment
-    2. Use provided scores to inform descriptions without stating numbers
-    3. Connect developmental history to current presentation
-    4. Link assessment findings directly to recommendations
-    5. Ensure all examples come from provided data`;
+    8. Consider developmental context in all descriptions`;
 
     const userPrompt = {
         task: "Generate content for specified placeholders",
@@ -1280,49 +1202,49 @@ function populateTemplate(templateDoc, responses) {
     // Track replacements for logging
     const replacementLog = [];
     
-    // First, handle LLM responses
     responses.forEach(response => {
         const id = response.id;
         let content = response.content;
         Logger.log(`\nProcessing content for ID: ${id}`);
+        Logger.log(`Original content length: ${content.length} chars`);
         
-        // Special handling for bullet point placeholders
-        if (id.endsWith('-Bullets')) {
-            content = content.split('\n').map(line => {
-                if (line.trim().startsWith('-')) {
-                    // Convert "- " to actual bullet point
-                    return line.replace(/^-\s+/, '• ');
-                }
-                return line;
-            }).join('\n');
-        }
-        
-        // Clean up content
+        // Enhanced content cleanup
         content = content
-            .replace(/\\n/g, '\n')
-            .replace(/\\"/g, '"')
-            .replace(/\\t/g, ' ')
-            .replace(/\\\\/g, '')
-            .replace(/\*\*(.*?)\*\*/g, '$1')
-            .replace(/\*(.*?)\*/g, '$1')
-            .replace(/_(.*?)_/g, '$1')
-            .replace(/`(.*?)`/g, '$1')
-            .replace(/\[(.*?)\]/g, '$1')
-            .replace(/["']([^"']+)["']/g, '$1')
-            .replace(/"([^"]+)"/g, '$1')
-            .replace(/\s+/g, ' ')
-            .replace(/\n\s*\n\s*\n/g, '\n\n')
-            .replace(/^\s+|\s+$/g, '')
-            .replace(/\s*\.\s*/g, '. ')
-            .replace(/\s*,\s*/g, ', ')
-            .replace(/\s+\./g, '.')
-            .replace(/\s+,/g, ',')
-            .replace(/\s+;/g, ';')
-            .replace(/\(\s+/g, '(')
-            .replace(/\s+\)/g, ')')
-            .trim();
+            // Remove JSON/programming artifacts
+            .replace(/\\n/g, '\n')                    // Convert escaped newlines to actual newlines
+            .replace(/\\"/g, '"')                     // Convert escaped quotes to regular quotes
+            .replace(/\\t/g, ' ')                     // Convert tabs to spaces
+            .replace(/\\\\/g, '')                     // Remove escaped backslashes
+            
+            // Remove markdown and special formatting
+            .replace(/\*\*(.*?)\*\*/g, '$1')         // Remove bold markdown
+            .replace(/\*(.*?)\*/g, '$1')             // Remove italics markdown
+            .replace(/_(.*?)_/g, '$1')               // Remove underscore formatting
+            .replace(/`(.*?)`/g, '$1')               // Remove code formatting
+            .replace(/\[(.*?)\]/g, '$1')             // Remove square brackets
+            
+            // Clean up quotes and observations
+            .replace(/["']([^"']+)["']/g, '$1')      // Remove quotes around phrases
+            .replace(/"([^"]+)"/g, '$1')             // Remove any remaining double quotes
+            
+            // Clean up whitespace and line breaks
+            .replace(/\s+/g, ' ')                    // Collapse multiple spaces
+            .replace(/\n\s*\n\s*\n/g, '\n\n')       // Collapse multiple newlines
+            .replace(/^\s+|\s+$/g, '')              // Trim whitespace
+            .replace(/\s*\.\s*/g, '. ')             // Standardize period spacing
+            .replace(/\s*,\s*/g, ', ')              // Standardize comma spacing
+            
+            // Final cleanup
+            .replace(/\s+\./g, '.')                  // Remove spaces before periods
+            .replace(/\s+,/g, ',')                   // Remove spaces before commas
+            .replace(/\s+;/g, ';')                   // Remove spaces before semicolons
+            .replace(/\(\s+/g, '(')                  // Remove spaces after opening parentheses
+            .replace(/\s+\)/g, ')')                  // Remove spaces before closing parentheses
+            .trim();                                 // Final trim
         
-        // Replace placeholder
+        Logger.log(`Cleaned content length: ${content.length} chars`);
+        
+        // Search for exact pattern
         const exactPattern = `{{${id}}}`;
         const range = body.findText(exactPattern);
         
@@ -1332,12 +1254,16 @@ function populateTemplate(templateDoc, responses) {
                 const startOffset = range.getStartOffset();
                 const endOffsetInclusive = range.getEndOffsetInclusive();
                 
+                // Delete the placeholder
                 const textElement = element.asText();
                 textElement.deleteText(startOffset, endOffsetInclusive);
+                
+                // Insert new content with consistent formatting
                 const insertedText = textElement.insertText(startOffset, content);
                 
                 // Apply consistent formatting
-                insertedText.setFontFamily('Arial')
+                insertedText.setBackgroundColor('#FFFF00')  // Yellow highlight
+                          .setFontFamily('Arial')
                           .setFontSize(11)
                           .setBold(false)
                           .setItalic(false)
@@ -1358,80 +1284,15 @@ function populateTemplate(templateDoc, responses) {
                     error: e.message
                 });
             }
+        } else {
+            Logger.log(`Pattern "${exactPattern}" not found in document`);
+            replacementLog.push({
+                id: id,
+                success: false,
+                error: 'Placeholder not found in document'
+            });
         }
     });
-    
-    // Now handle specific placeholders from sheet data
-    const ss = getSpreadsheet();
-    const sheet = ss.getSheetByName(CONFIG.sheets.R3);
-    const data = sheet.getDataRange().getValues();
-    const headers = data[0];
-    const firstRow = data[1]; // First data row
-    
-    const specificReplacements = {
-        'Clinic_Name': firstRow[headers.indexOf(CONFIG.columns.clinicName)],
-        'Child_Name': `${firstRow[headers.indexOf(CONFIG.columns.childFirstName)]} ${firstRow[headers.indexOf(CONFIG.columns.childSecondName)]}`,
-        'PARENT_NAME': firstRow[headers.indexOf(CONFIG.columns.childSecondName)],
-        'Age': firstRow[headers.indexOf(CONFIG.columns.childAge)],
-        'Clinician_Name': firstRow[headers.indexOf(CONFIG.columns.clinicianName)]
-    };
-    
-    // Replace specific placeholders
-    Object.entries(specificReplacements).forEach(([key, value]) => {
-        if (!value) {
-            Logger.log(`Warning: No value found for ${key}`);
-            return;
-        }
-        
-        const pattern = `{{${key}}}`;
-        let range;
-        while ((range = body.findText(pattern)) !== null) {
-            try {
-                const element = range.getElement();
-                const startOffset = range.getStartOffset();
-                const endOffsetInclusive = range.getEndOffsetInclusive();
-                
-                const textElement = element.asText();
-                textElement.deleteText(startOffset, endOffsetInclusive);
-                textElement.insertText(startOffset, value);
-                
-                Logger.log(`Successfully replaced "${pattern}" with "${value}"`);
-                replacementLog.push({
-                    id: key,
-                    success: true,
-                    value: value
-                });
-            } catch (e) {
-                Logger.log(`Error replacing ${pattern}: ${e.message}`);
-                replacementLog.push({
-                    id: key,
-                    success: false,
-                    error: e.message
-                });
-            }
-        }
-    });
-    
-    // Finally, replace all instances of "John" with Child_Name
-    const childName = specificReplacements['Child_Name'];
-    if (childName) {
-        let range;
-        while ((range = body.findText('John')) !== null) {
-            try {
-                const element = range.getElement();
-                const startOffset = range.getStartOffset();
-                const endOffsetInclusive = range.getEndOffsetInclusive();
-                
-                const textElement = element.asText();
-                textElement.deleteText(startOffset, endOffsetInclusive);
-                textElement.insertText(startOffset, childName);
-                
-                Logger.log(`Replaced "John" with "${childName}"`);
-            } catch (e) {
-                Logger.log(`Error replacing "John": ${e.message}`);
-            }
-        }
-    }
     
     doc.saveAndClose();
     
@@ -1558,12 +1419,9 @@ async function generateReport(chataId) {
         Logger.log(logMessage);
     };
     
-    let formData = null;
-    let templateResult = null;
-    
     try {
         logCapture(`Starting report generation for CHATA_ID: ${chataId}`);
-        
+        // If no chataId provided, try to get TEST_CHATA_ID from script properties
         if (!chataId) {
             chataId = PropertiesService.getScriptProperties().getProperty('TEST_CHATA_ID');
             if (!chataId) {
@@ -1572,130 +1430,166 @@ async function generateReport(chataId) {
             Logger.log(`Using TEST_CHATA_ID: ${chataId}`);
         }
         
+        Logger.log(`\n=== Starting report generation for CHATA_ID: ${chataId} ===`);
+        
         const ss = getSpreadsheet();
         const logsSheet = initializeLogsSheet(ss);
         
-        // 1. Get form data first - we need this for notifications
-        formData = getFormData(chataId);
-        Logger.log('Retrieved form data');
-        logToSheet(logsSheet, 'Data Retrieval', 'Form Data', 'Retrieved assessment data', 'Success', chataId);
+        try {
+            // 1. Create template copy
+            const template = createTemplateCopy(chataId);
+            if (!template.success) throw new Error(`Template creation failed: ${template.error}`);
+            Logger.log(`Created template: ${template.docUrl}`);
+            logToSheet(logsSheet, 'Template Creation', 'All', 'Created template document', template.docUrl, chataId);
 
-        // 2. Create template copy
-        templateResult = createTemplateCopy(chataId);
-        if (!templateResult.success) throw new Error(`Template creation failed: ${templateResult.error}`);
-        Logger.log(`Created template: ${templateResult.docUrl}`);
-        logToSheet(logsSheet, 'Template Creation', 'All', 'Created template document', templateResult.docUrl, chataId);
+            // 2. Get form data
+            const formData = getFormData(chataId);
+            Logger.log('Retrieved form data');
+            logToSheet(logsSheet, 'Data Retrieval', 'Form Data', 'Retrieved assessment data', 'Success', chataId);
 
-        // 3. Get placeholder mapping and chunk it
-        const placeholderMap = getPlaceholderMap();
-        const chunks = chunkPlaceholders(placeholderMap);
-        Logger.log(`Processing ${chunks.length} chunks of placeholders`);
+            // 4. Get placeholder mapping and chunk it
+            const placeholderMap = getPlaceholderMap();
+            const chunks = chunkPlaceholders(placeholderMap);
+            Logger.log(`Processing ${chunks.length} chunks of placeholders`);
 
-        // Save system prompt for debugging
-        const systemPrompt = constructPrompt(formData, placeholderMap).systemPrompt;
-        const systemPromptDoc = saveDetailedLog('System_Prompt', systemPrompt, chataId);
-        logToSheet(logsSheet, 'Prompt Construction', 'System', 'Generated system prompt', systemPromptDoc, chataId);
-
-        // 4. Process each chunk
-        const allResponses = [];
-        for (let i = 0; i < chunks.length; i++) {
-            Logger.log(`Processing chunk ${i + 1}/${chunks.length}`);
-            const chunk = chunks[i];
-            
-            const chunkPrompt = constructPrompt(formData, chunk);
-            const promptDoc = saveDetailedLog(
-                `Chunk_${i + 1}_Prompt`,
-                JSON.stringify({
-                    metadata: {
-                        chunk: i + 1,
-                        total_chunks: chunks.length,
-                        placeholders: Object.keys(chunk)
-                    },
-                    prompt: chunkPrompt.userPrompt
-                }, null, 2),
+            // Save system prompt for debugging
+            const systemPrompt = constructPrompt(formData, placeholderMap).systemPrompt;
+            const systemPromptDoc = saveDetailedLog(
+                'System_Prompt',
+                systemPrompt,
                 chataId
             );
-            logToSheet(logsSheet, 'Chunk Processing', `Chunk ${i + 1}`, 'Generated prompt', promptDoc, chataId);
+            logToSheet(logsSheet, 'Prompt Construction', 'System', 'Generated system prompt', systemPromptDoc, chataId);
 
-            const response = await generateChunkContent(chunk, formData, chunkPrompt.systemPrompt);
-            const responseDoc = saveDetailedLog(
-                `Chunk_${i + 1}_Response`,
-                response,
-                chataId
-            );
-            logToSheet(logsSheet, 'Chunk Processing', `Chunk ${i + 1}`, 'Generated content', responseDoc, chataId);
+            // 5. Process each chunk
+            const allResponses = [];
+            for (let i = 0; i < chunks.length; i++) {
+                Logger.log(`Processing chunk ${i + 1}/${chunks.length}`);
+                const chunk = chunks[i];
+                
+                // Save chunk prompt
+                const chunkPrompt = constructPrompt(formData, chunk);
+                const promptDoc = saveDetailedLog(
+                    `Chunk_${i + 1}_Prompt`,
+                    JSON.stringify({
+                        metadata: {
+                            chunk: i + 1,
+                            total_chunks: chunks.length,
+                            placeholders: Object.keys(chunk)
+                        },
+                        prompt: chunkPrompt.userPrompt
+                    }, null, 2),
+                    chataId
+                );
+                logToSheet(logsSheet, 'Chunk Processing', `Chunk ${i + 1}`, 'Generated prompt', promptDoc, chataId);
 
-            const processedResponse = processLLMResponse(response);
-            if (!processedResponse.success) {
-                throw new Error(`Failed to process chunk ${i + 1}: ${processedResponse.error}`);
-            }
+                // Generate and process chunk content
+                const response = await generateChunkContent(chunk, formData, chunkPrompt.systemPrompt);
+                const responseDoc = saveDetailedLog(
+                    `Chunk_${i + 1}_Response`,
+                    response,
+                    chataId
+                );
+                logToSheet(logsSheet, 'Chunk Processing', `Chunk ${i + 1}`, 'Generated content', responseDoc, chataId);
 
-            allResponses.push(...processedResponse.content);
-        }
-
-        // 5. Populate template with responses
-        Logger.log('Populating template with responses...');
-        const replacementLog = populateTemplate(templateResult.docId, allResponses);
-        
-        // Save replacement log
-        const replacementLogDoc = saveDetailedLog(
-            'Replacement_Log',
-            JSON.stringify(replacementLog, null, 2),
-            chataId
-        );
-        logToSheet(logsSheet, 'Template Population', 'All', 'Populated template with responses', replacementLogDoc, chataId);
-
-        // Count successful replacements
-        const successful = replacementLog.filter(r => r.success).length;
-        const failed = replacementLog.filter(r => !r.success).length;
-
-        if (failed > 0) {
-            throw new Error(`Template population incomplete: ${failed} replacements failed`);
-        }
-
-        // 6. Send success notification
-        Logger.log('Sending success notification...');
-        sendEmailNotification(formData, templateResult.docUrl);
-        logToSheet(logsSheet, 'Notification', 'Email', 'Sent success notification', 'Success', chataId);
-
-        // 7. Return success result
-        return {
-            success: true,
-            templateUrl: templateResult.docUrl,
-            generatedContent: allResponses,
-            logs: {
-                systemPrompt: systemPromptDoc,
-                replacementLog: replacementLogDoc
-            },
-            progress: {
-                status: 'complete',
-                message: 'Report generation successful',
-                step: 7,
-                totalSteps: 7,
-                details: {
-                    documentUrl: templateResult.docUrl,
-                    timestamp: new Date().toISOString()
+                const processedResponse = processLLMResponse(response);
+                if (!processedResponse.success) {
+                    throw new Error(`Failed to process chunk ${i + 1}: ${processedResponse.error}`);
                 }
-            }
-        };
 
+                allResponses.push(...processedResponse.content);
+            }
+
+            // 6. Populate template with responses
+            Logger.log('Populating template with responses...');
+            const replacementLog = populateTemplate(template.docId, allResponses);
+            
+            // Save replacement log
+            const replacementLogDoc = saveDetailedLog(
+                'Replacement_Log',
+                JSON.stringify(replacementLog, null, 2),
+                chataId
+            );
+            logToSheet(logsSheet, 'Template Population', 'All', 'Populated template with responses', replacementLogDoc, chataId);
+
+            // 8. Return results
+            return {
+                success: true,
+                templateUrl: template.docUrl,
+                generatedContent: allResponses,
+                rawResponse: allResponses.map(r => `##${r.id}##\n${r.content}\n##END##`).join('\n\n'),
+                logs: {
+                    systemPrompt: systemPromptDoc,
+                    replacementLog: replacementLogDoc
+                },
+                progress: {
+                    status: 'complete',
+                    message: 'Report generation successful',
+                    step: 8,
+                    totalSteps: 8,
+                    details: {
+                        documentUrl: template.docUrl,
+                        timestamp: new Date().toISOString()
+                    }
+                }
+            };
+
+        } catch (error) {
+            logCapture(`Error in generateReport: ${error.message}`);
+            logCapture(`Stack trace: ${error.stack}`);
+            
+            // Get form data for error notification
+            try {
+                const formData = getFormData(chataId);
+                sendErrorNotification(formData, error, logs);
+            } catch (dataError) {
+                logCapture(`Failed to get form data for error notification: ${dataError.message}`);
+                // Create minimal form data for error notification
+                const minimalFormData = {
+                    [CONFIG.columns.chataId]: chataId,
+                    [CONFIG.columns.clinicianEmail]: Session.getEffectiveUser().getEmail(),
+                    [CONFIG.columns.clinicianName]: 'Clinician',
+                    [CONFIG.columns.childFirstName]: 'Unknown',
+                    [CONFIG.columns.childSecondName]: 'Child'
+                };
+                sendErrorNotification(minimalFormData, error, logs);
+            }
+            
+            return {
+                success: false,
+                error: error.message,
+                logs: logs,
+                progress: {
+                    status: 'error',
+                    message: error.message,
+                    step: 0,
+                    totalSteps: 8,
+                    details: {
+                        timestamp: new Date().toISOString(),
+                        stack: error.stack
+                    }
+                }
+            };
+        }
     } catch (error) {
         logCapture(`Error in generateReport: ${error.message}`);
         logCapture(`Stack trace: ${error.stack}`);
         
-        // Only send error notification if we have formData and after all processing is complete
-        if (formData) {
+        // Get form data for error notification
+        try {
+            const formData = getFormData(chataId);
             sendErrorNotification(formData, error, logs);
-            logCapture('Error notification sent');
-        }
-        
-        // If template was created but failed later, add template URL to error details
-        const errorDetails = {
-            timestamp: new Date().toISOString(),
-            stack: error.stack
-        };
-        if (templateResult && templateResult.docUrl) {
-            errorDetails.templateUrl = templateResult.docUrl;
+        } catch (dataError) {
+            logCapture(`Failed to get form data for error notification: ${dataError.message}`);
+            // Create minimal form data for error notification
+            const minimalFormData = {
+                [CONFIG.columns.chataId]: chataId,
+                [CONFIG.columns.clinicianEmail]: Session.getEffectiveUser().getEmail(),
+                [CONFIG.columns.clinicianName]: 'Clinician',
+                [CONFIG.columns.childFirstName]: 'Unknown',
+                [CONFIG.columns.childSecondName]: 'Child'
+            };
+            sendErrorNotification(minimalFormData, error, logs);
         }
         
         return {
@@ -1706,14 +1600,17 @@ async function generateReport(chataId) {
                 status: 'error',
                 message: error.message,
                 step: 0,
-                totalSteps: 7,
-                details: errorDetails
+                totalSteps: 8,
+                details: {
+                    timestamp: new Date().toISOString(),
+                    stack: error.stack
+                }
             }
         };
     }
 }
 
-// Modified processPendingReports function with enhanced status tracking
+// Function to process pending reports in batch
 function processPendingReports() {
     try {
         Logger.log('Starting batch processing of pending reports...');
@@ -1727,33 +1624,25 @@ function processPendingReports() {
         const data = sheet.getDataRange().getValues();
         const headers = data[0];
         
-        // Get all required column indices
+        // Get column indices
         const chataIdCol = headers.indexOf(CONFIG.columns.chataId);
         const processedFlagCol = headers.indexOf(CONFIG.columns.processedFlag);
         const documentUrlCol = headers.indexOf(CONFIG.columns.documentUrl);
-        const statusCol = headers.indexOf('Report_Status');
-        const logsUrlCol = headers.indexOf('Logs_URL');
         
-        if (chataIdCol === -1 || processedFlagCol === -1 || documentUrlCol === -1 || 
-            statusCol === -1 || logsUrlCol === -1) {
+        if (chataIdCol === -1 || processedFlagCol === -1 || documentUrlCol === -1) {
             throw new Error('Required columns not found in sheet');
         }
         
-        // Find unprocessed rows (no status or status is 'Failed')
+        // Find unprocessed rows
         const pendingRows = [];
         data.forEach((row, index) => {
             if (index === 0) return; // Skip header row
             
             const chataId = row[chataIdCol];
-            const status = row[statusCol];
             const processed = row[processedFlagCol];
+            const hasUrl = row[documentUrlCol];
             
-            // Only process if:
-            // 1. Has CHATA_ID
-            // 2. Not already processed OR status is 'Failed'
-            // 3. Status is empty, 'Pending', or 'Failed'
-            if (chataId && (!processed || status === 'Failed') && 
-                (!status || status === 'Pending' || status === 'Failed')) {
+            if (chataId && !processed && !hasUrl) {
                 pendingRows.push({
                     rowIndex: index + 1,
                     chataId: chataId,
@@ -1769,10 +1658,6 @@ function processPendingReports() {
             try {
                 Logger.log(`Processing report for CHATA_ID: ${pending.chataId}`);
                 
-                // Update status to Processing
-                sheet.getRange(pending.rowIndex, statusCol + 1).setValue('Processing');
-                sheet.getRange(pending.rowIndex, statusCol + 1).setNote(new Date().toISOString());
-                
                 // Create form data object
                 const formData = {};
                 headers.forEach((header, index) => {
@@ -1782,16 +1667,13 @@ function processPendingReports() {
                 // Generate report
                 const result = generateReport(pending.chataId);
                 
+                // Update sheet with results
                 if (result.success) {
-                    // Update all tracking columns
                     sheet.getRange(pending.rowIndex, documentUrlCol + 1).setValue(result.templateUrl);
                     sheet.getRange(pending.rowIndex, processedFlagCol + 1).setValue(true);
-                    sheet.getRange(pending.rowIndex, statusCol + 1).setValue('Completed');
                     
-                    // Add logs URL if available
-                    if (result.logs && result.logs.replacementLog) {
-                        sheet.getRange(pending.rowIndex, logsUrlCol + 1).setValue(result.logs.replacementLog);
-                    }
+                    // Send notification
+                    sendEmailNotification(formData, result.templateUrl);
                     
                     return {
                         chataId: pending.chataId,
@@ -1799,16 +1681,8 @@ function processPendingReports() {
                         documentUrl: result.templateUrl
                     };
                 } else {
-                    // Update status for failed generation
-                    sheet.getRange(pending.rowIndex, statusCol + 1).setValue('Failed');
-                    sheet.getRange(pending.rowIndex, statusCol + 1)
-                         .setNote(`Failed at ${new Date().toISOString()}: ${result.error}`);
-                    
-                    // Add error logs URL if available
-                    if (result.logs && result.logs.replacementLog) {
-                        sheet.getRange(pending.rowIndex, logsUrlCol + 1).setValue(result.logs.replacementLog);
-                    }
-                    
+                    // Handle failure
+                    sendErrorNotification(formData, result.error);
                     return {
                         chataId: pending.chataId,
                         success: false,
@@ -1816,11 +1690,6 @@ function processPendingReports() {
                     };
                 }
             } catch (error) {
-                // Update status for processing error
-                sheet.getRange(pending.rowIndex, statusCol + 1).setValue('Failed');
-                sheet.getRange(pending.rowIndex, statusCol + 1)
-                     .setNote(`Error at ${new Date().toISOString()}: ${error.message}`);
-                
                 Logger.log(`Error processing CHATA_ID ${pending.chataId}: ${error.message}`);
                 return {
                     chataId: pending.chataId,
@@ -1856,29 +1725,17 @@ function processPendingReports() {
     }
 }
 
-// Enhanced sendEmailNotification function
+// Function to send email notification
 function sendEmailNotification(formData, documentUrl) {
-    Logger.log('Preparing to send email notification...');
-    
     const clinicianEmail = formData[CONFIG.columns.clinicianEmail];
     if (!clinicianEmail) {
         Logger.log('No clinician email found for notification');
-        return false;
+        return;
     }
     
     const childName = `${formData[CONFIG.columns.childFirstName]} ${formData[CONFIG.columns.childSecondName]}`;
     const subject = `Assessment Report Ready - ${childName}`;
-    
-    try {
-        // Verify document exists and is accessible
-        const doc = DriveApp.getFileById(extractDocIdFromUrl(documentUrl));
-        Logger.log('Verifying document sharing settings...');
-        
-        // Ensure document is shared properly
-        doc.setSharing(DriveApp.Access.ANYONE_WITH_LINK, DriveApp.Permission.VIEW);
-        doc.addEditor(clinicianEmail);
-        
-        const body = `Dear ${formData[CONFIG.columns.clinicianName]},
+    const body = `Dear ${formData[CONFIG.columns.clinicianName]},
 
 The assessment report for ${childName} has been generated and is ready for your review.
 
@@ -1903,22 +1760,16 @@ Please choose the option that works best for your workflow. The original documen
 
 Best regards,
 CHATA Clinic Assessment System`;
-        
+    
+    try {
         MailApp.sendEmail({
             to: clinicianEmail,
             subject: subject,
             body: body
         });
-        
-        Logger.log(`Success notification email sent to ${clinicianEmail}`);
-        Logger.log(`Document URL: ${documentUrl}`);
-        Logger.log(`Sharing settings: Anyone with link (view), ${clinicianEmail} (edit)`);
-        
-        return true;
+        Logger.log(`Notification email sent to ${clinicianEmail}`);
     } catch (error) {
         Logger.log(`Error sending notification email: ${error.message}`);
-        Logger.log(`Failed email details - To: ${clinicianEmail}, Subject: ${subject}`);
-        throw error; // Propagate error to calling function
     }
 }
 
@@ -1996,7 +1847,7 @@ function ensureRequiredColumns() {
         const headers = sheet.getRange(1, 1, 1, sheet.getLastColumn()).getValues()[0];
         Logger.log('Current headers:', headers);
         
-        // Define required columns including status tracking columns
+        // Define required columns
         const requiredColumns = [
             CONFIG.columns.chataId,
             CONFIG.columns.processedFlag,
@@ -2004,11 +1855,7 @@ function ensureRequiredColumns() {
             CONFIG.columns.clinicianEmail,
             CONFIG.columns.clinicianName,
             CONFIG.columns.childFirstName,
-            CONFIG.columns.childSecondName,
-            'Report_Status',    // Status tracking column
-            'Report_URL',       // Document URL column
-            'Logs_URL',         // Logs URL column
-            'Report_Generated'  // Processing flag column
+            CONFIG.columns.childSecondName
         ];
         
         // Check which columns are missing
@@ -2021,12 +1868,6 @@ function ensureRequiredColumns() {
             missingColumns.forEach(column => {
                 const lastCol = sheet.getLastColumn();
                 sheet.getRange(1, lastCol + 1).setValue(column);
-                
-                // Add header formatting
-                const headerCell = sheet.getRange(1, lastCol + 1);
-                headerCell.setBackground('#E8EAF6')  // Light blue background
-                         .setFontWeight('bold')
-                         .setHorizontalAlignment('center');
             });
             
             Logger.log('Added missing columns successfully');
@@ -2374,265 +2215,4 @@ CHATA System Test`;
             error: error.message
         };
     }
-}
-
-// Add trigger handler functions
-function onFormSubmit(e) {
-    try {
-        Logger.log('Form submission trigger received');
-        
-        // If event object exists, get the row data
-        let chataId;
-        if (e && e.namedValues) {
-            const headers = Object.keys(e.namedValues);
-            const chataIdCol = headers.find(h => h === CONFIG.columns.chataId);
-            if (chataIdCol) {
-                chataId = e.namedValues[chataIdCol][0];
-            }
-        }
-        
-        // If no CHATA_ID found in event, try to get from last row
-        if (!chataId) {
-            const ss = getSpreadsheet();
-            const sheet = ss.getSheetByName(CONFIG.sheets.R3);
-            const lastRow = sheet.getLastRow();
-            const headers = sheet.getRange(1, 1, 1, sheet.getLastColumn()).getValues()[0];
-            const chataIdCol = headers.indexOf(CONFIG.columns.chataId) + 1;
-            chataId = sheet.getRange(lastRow, chataIdCol).getValue();
-        }
-        
-        if (!chataId) {
-            throw new Error('Could not find CHATA_ID in submitted data');
-        }
-        
-        Logger.log(`Processing submission for CHATA_ID: ${chataId}`);
-        
-        // Generate report
-        const result = generateReport(chataId);
-        
-        Logger.log(`Report generation ${result.success ? 'completed' : 'failed'} for ${chataId}`);
-        return result;
-        
-    } catch (error) {
-        Logger.log(`Error in onFormSubmit: ${error.message}`);
-        return {
-            success: false,
-            error: error.message
-        };
-    }
-}
-
-// Function to set up triggers - with both edit and change triggers
-function setupTrigger() {
-    try {
-        Logger.log('Setting up spreadsheet triggers...');
-        
-        // Remove ALL existing triggers
-        const triggers = ScriptApp.getProjectTriggers();
-        triggers.forEach(trigger => {
-            ScriptApp.deleteTrigger(trigger);
-            Logger.log('Removed existing trigger');
-        });
-        
-        const ss = getSpreadsheet();
-        
-        // 1. Create onChange trigger for new rows
-        const changeTrigger = ScriptApp.newTrigger('onChange')
-            .forSpreadsheet(ss)
-            .onChange()
-            .create();
-        
-        Logger.log('Change trigger created successfully');
-        
-        // 2. Create time-based trigger for processPendingReports (every 5 minutes)
-        const timeTrigger = ScriptApp.newTrigger('processPendingReports')
-            .timeBased()
-            .everyMinutes(5)
-            .create();
-        
-        Logger.log('Time-based trigger created successfully');
-        
-        Logger.log('Trigger details:', {
-            changeTrigger: {
-                handlerFunction: changeTrigger.getHandlerFunction(),
-                eventType: changeTrigger.getEventType(),
-                source: changeTrigger.getTriggerSource()
-            },
-            timeTrigger: {
-                handlerFunction: timeTrigger.getHandlerFunction(),
-                eventType: timeTrigger.getEventType(),
-                frequency: 'Every 5 minutes'
-            }
-        });
-        
-        return true;
-    } catch (error) {
-        Logger.log(`Failed to set up triggers: ${error.message}`);
-        throw error;
-    }
-}
-
-// Add this at the start, after CONFIG
-function initializeScript() {
-    try {
-        Logger.log('Initializing script...');
-        
-        // 1. Run basic setup
-        setup();
-        
-        // 2. Set up trigger for new rows
-        setupTrigger();
-        
-        // 3. Ensure required columns exist
-        ensureRequiredColumns();
-        
-        Logger.log('Script initialization complete');
-        return {
-            success: true,
-            message: 'Script initialized successfully'
-        };
-    } catch (error) {
-        Logger.log(`Initialization failed: ${error.message}`);
-        return {
-            success: false,
-            error: error.message
-        };
-    }
-}
-
-// Function to handle spreadsheet edits - enhanced version with safety checks
-function onEdit(e) {
-    try {
-        Logger.log('Edit trigger received');
-        
-        // Safety check for event object
-        if (!e) {
-            Logger.log('No event object received');
-            return;
-        }
-
-        // Get the edited range information - with safety checks
-        const range = e.range;
-        if (!range) {
-            Logger.log('No range information in edit event');
-            return;
-        }
-
-        const sheet = range.getSheet();
-        if (!sheet) {
-            Logger.log('Could not get sheet from edit event');
-            return;
-        }
-
-        const sheetName = sheet.getName();
-        Logger.log(`Sheet being edited: ${sheetName}`);
-        
-        // Only process if edit is in R3_Form sheet
-        if (sheetName !== CONFIG.sheets.R3) {
-            Logger.log('Edit was not in R3_Form sheet, ignoring');
-            return;
-        }
-        
-        // Get the row that was edited
-        const row = range.getRow();
-        if (row === 1) {
-            Logger.log('Edit was in header row, ignoring');
-            return;
-        }
-        
-        // Get all data for this row
-        const rowData = sheet.getRange(row, 1, 1, sheet.getLastColumn()).getValues()[0];
-        const headers = sheet.getRange(1, 1, 1, sheet.getLastColumn()).getValues()[0];
-        
-        // Find CHATA_ID for this row
-        const chataIdIndex = headers.indexOf(CONFIG.columns.chataId);
-        const chataId = rowData[chataIdIndex];
-        
-        if (!chataId) {
-            Logger.log('No CHATA_ID found in edited row, ignoring');
-            return;
-        }
-        
-        // Check if report is already generated
-        const statusIndex = headers.indexOf(CONFIG.columns.reportStatus);
-        const reportStatus = rowData[statusIndex];
-        
-        if (reportStatus === 'Completed') {
-            Logger.log(`Report for ${chataId} is already completed, ignoring edit`);
-            return;
-        }
-        
-        Logger.log(`Processing edit for CHATA_ID: ${chataId}`);
-        
-        // Generate report
-        const result = generateReport(chataId);
-        
-        Logger.log(`Report generation ${result.success ? 'completed' : 'failed'} for ${chataId}`);
-        return result;
-        
-    } catch (error) {
-        Logger.log(`Error in onEdit: ${error.message}`);
-        return {
-            success: false,
-            error: error.message
-        };
-    }
-}
-
-// Function to handle spreadsheet changes (new rows, etc.)
-function onChange(e) {
-    try {
-        Logger.log('Change trigger received');
-        Logger.log('Event details:', JSON.stringify(e));
-        
-        // Get the active sheet
-        const ss = getSpreadsheet();
-        const sheet = ss.getSheetByName(CONFIG.sheets.R3);
-        if (!sheet) {
-            Logger.log('R3_Form sheet not found');
-            return;
-        }
-        
-        // Get the last row
-        const lastRow = sheet.getLastRow();
-        const headers = sheet.getRange(1, 1, 1, sheet.getLastColumn()).getValues()[0];
-        
-        // Get data from the last row
-        const rowData = sheet.getRange(lastRow, 1, 1, sheet.getLastColumn()).getValues()[0];
-        
-        // Find CHATA_ID for this row
-        const chataIdIndex = headers.indexOf(CONFIG.columns.chataId);
-        const chataId = rowData[chataIdIndex];
-        
-        if (!chataId) {
-            Logger.log('No CHATA_ID found in last row, ignoring');
-            return;
-        }
-        
-        // Check if report is already generated
-        const statusIndex = headers.indexOf(CONFIG.columns.reportStatus);
-        const reportStatus = rowData[statusIndex];
-        
-        if (reportStatus === 'Completed') {
-            Logger.log(`Report for ${chataId} is already completed, ignoring change`);
-            return;
-        }
-        
-        Logger.log(`Processing new data for CHATA_ID: ${chataId}`);
-        
-        // Generate report
-        const result = generateReport(chataId);
-        
-        Logger.log(`Report generation ${result.success ? 'completed' : 'failed'} for ${chataId}`);
-        return result;
-        
-    } catch (error) {
-        Logger.log(`Error in onChange: ${error.message}`);
-        return {
-            success: false,
-            error: error.message
-        };
-    }
-}
-
-// ... existing code ... 
+} 

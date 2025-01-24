@@ -2422,7 +2422,7 @@ function onFormSubmit(e) {
     }
 }
 
-// Function to set up triggers - with both edit and change triggers
+// Function to set up triggers - consolidated version with both triggers
 function setupTrigger() {
     try {
         Logger.log('Setting up spreadsheet triggers...');
@@ -2436,13 +2436,13 @@ function setupTrigger() {
         
         const ss = getSpreadsheet();
         
-        // 1. Create onChange trigger for new rows
-        const changeTrigger = ScriptApp.newTrigger('onChange')
+        // 1. Create edit trigger
+        const editTrigger = ScriptApp.newTrigger('onEdit')
             .forSpreadsheet(ss)
-            .onChange()
+            .onEdit()
             .create();
         
-        Logger.log('Change trigger created successfully');
+        Logger.log('Edit trigger created successfully');
         
         // 2. Create time-based trigger for processPendingReports (every 5 minutes)
         const timeTrigger = ScriptApp.newTrigger('processPendingReports')
@@ -2453,10 +2453,10 @@ function setupTrigger() {
         Logger.log('Time-based trigger created successfully');
         
         Logger.log('Trigger details:', {
-            changeTrigger: {
-                handlerFunction: changeTrigger.getHandlerFunction(),
-                eventType: changeTrigger.getEventType(),
-                source: changeTrigger.getTriggerSource()
+            editTrigger: {
+                handlerFunction: editTrigger.getHandlerFunction(),
+                eventType: editTrigger.getEventType(),
+                source: editTrigger.getTriggerSource()
             },
             timeTrigger: {
                 handlerFunction: timeTrigger.getHandlerFunction(),
@@ -2572,62 +2572,6 @@ function onEdit(e) {
         
     } catch (error) {
         Logger.log(`Error in onEdit: ${error.message}`);
-        return {
-            success: false,
-            error: error.message
-        };
-    }
-}
-
-// Function to handle spreadsheet changes (new rows, etc.)
-function onChange(e) {
-    try {
-        Logger.log('Change trigger received');
-        Logger.log('Event details:', JSON.stringify(e));
-        
-        // Get the active sheet
-        const ss = getSpreadsheet();
-        const sheet = ss.getSheetByName(CONFIG.sheets.R3);
-        if (!sheet) {
-            Logger.log('R3_Form sheet not found');
-            return;
-        }
-        
-        // Get the last row
-        const lastRow = sheet.getLastRow();
-        const headers = sheet.getRange(1, 1, 1, sheet.getLastColumn()).getValues()[0];
-        
-        // Get data from the last row
-        const rowData = sheet.getRange(lastRow, 1, 1, sheet.getLastColumn()).getValues()[0];
-        
-        // Find CHATA_ID for this row
-        const chataIdIndex = headers.indexOf(CONFIG.columns.chataId);
-        const chataId = rowData[chataIdIndex];
-        
-        if (!chataId) {
-            Logger.log('No CHATA_ID found in last row, ignoring');
-            return;
-        }
-        
-        // Check if report is already generated
-        const statusIndex = headers.indexOf(CONFIG.columns.reportStatus);
-        const reportStatus = rowData[statusIndex];
-        
-        if (reportStatus === 'Completed') {
-            Logger.log(`Report for ${chataId} is already completed, ignoring change`);
-            return;
-        }
-        
-        Logger.log(`Processing new data for CHATA_ID: ${chataId}`);
-        
-        // Generate report
-        const result = generateReport(chataId);
-        
-        Logger.log(`Report generation ${result.success ? 'completed' : 'failed'} for ${chataId}`);
-        return result;
-        
-    } catch (error) {
-        Logger.log(`Error in onChange: ${error.message}`);
         return {
             success: false,
             error: error.message

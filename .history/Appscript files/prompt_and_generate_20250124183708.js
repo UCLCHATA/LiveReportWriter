@@ -2422,53 +2422,29 @@ function onFormSubmit(e) {
     }
 }
 
-// Function to set up triggers - with both edit and change triggers
+// Function to set up triggers
 function setupTrigger() {
     try {
-        Logger.log('Setting up spreadsheet triggers...');
-        
-        // Remove ALL existing triggers
+        // Remove any existing triggers
         const triggers = ScriptApp.getProjectTriggers();
         triggers.forEach(trigger => {
-            ScriptApp.deleteTrigger(trigger);
-            Logger.log('Removed existing trigger');
-        });
-        
-        const ss = getSpreadsheet();
-        
-        // 1. Create onChange trigger for new rows
-        const changeTrigger = ScriptApp.newTrigger('onChange')
-            .forSpreadsheet(ss)
-            .onChange()
-            .create();
-        
-        Logger.log('Change trigger created successfully');
-        
-        // 2. Create time-based trigger for processPendingReports (every 5 minutes)
-        const timeTrigger = ScriptApp.newTrigger('processPendingReports')
-            .timeBased()
-            .everyMinutes(5)
-            .create();
-        
-        Logger.log('Time-based trigger created successfully');
-        
-        Logger.log('Trigger details:', {
-            changeTrigger: {
-                handlerFunction: changeTrigger.getHandlerFunction(),
-                eventType: changeTrigger.getEventType(),
-                source: changeTrigger.getTriggerSource()
-            },
-            timeTrigger: {
-                handlerFunction: timeTrigger.getHandlerFunction(),
-                eventType: timeTrigger.getEventType(),
-                frequency: 'Every 5 minutes'
+            if (trigger.getHandlerFunction() === 'onFormSubmit') {
+                ScriptApp.deleteTrigger(trigger);
             }
         });
         
+        // Create new trigger
+        const ss = getSpreadsheet();
+        ScriptApp.newTrigger('onFormSubmit')
+            .forSpreadsheet(ss)
+            .onFormSubmit()
+            .create();
+        
+        Logger.log('Form submit trigger created successfully');
         return true;
     } catch (error) {
-        Logger.log(`Failed to set up triggers: ${error.message}`);
-        throw error;
+        Logger.log(`Error setting up trigger: ${error.message}`);
+        return false;
     }
 }
 
@@ -2500,32 +2476,43 @@ function initializeScript() {
     }
 }
 
-// Function to handle spreadsheet edits - enhanced version with safety checks
+// Modify setupTrigger to be more robust
+function setupTrigger() {
+    try {
+        Logger.log('Setting up spreadsheet trigger...');
+        
+        // Remove existing triggers
+        const triggers = ScriptApp.getProjectTriggers();
+        triggers.forEach(trigger => {
+            if (trigger.getHandlerFunction() === 'onFormSubmit') {
+                ScriptApp.deleteTrigger(trigger);
+                Logger.log('Removed existing trigger');
+            }
+        });
+        
+        // Create new trigger for spreadsheet changes
+        const ss = getSpreadsheet();
+        ScriptApp.newTrigger('onFormSubmit')
+            .forSpreadsheet(ss)
+            .onFormSubmit()
+            .create();
+        
+        Logger.log('New trigger created successfully');
+        return true;
+    } catch (error) {
+        Logger.log(`Failed to set up trigger: ${error.message}`);
+        throw error; // Propagate error up
+    }
+}
+
+// Function to handle spreadsheet edits
 function onEdit(e) {
     try {
         Logger.log('Edit trigger received');
         
-        // Safety check for event object
-        if (!e) {
-            Logger.log('No event object received');
-            return;
-        }
-
-        // Get the edited range information - with safety checks
-        const range = e.range;
-        if (!range) {
-            Logger.log('No range information in edit event');
-            return;
-        }
-
-        const sheet = range.getSheet();
-        if (!sheet) {
-            Logger.log('Could not get sheet from edit event');
-            return;
-        }
-
+        // Get the edited range information
+        const sheet = e.source.getActiveSheet();
         const sheetName = sheet.getName();
-        Logger.log(`Sheet being edited: ${sheetName}`);
         
         // Only process if edit is in R3_Form sheet
         if (sheetName !== CONFIG.sheets.R3) {
@@ -2534,7 +2521,7 @@ function onEdit(e) {
         }
         
         // Get the row that was edited
-        const row = range.getRow();
+        const row = e.range.getRow();
         if (row === 1) {
             Logger.log('Edit was in header row, ignoring');
             return;
@@ -2579,59 +2566,32 @@ function onEdit(e) {
     }
 }
 
-// Function to handle spreadsheet changes (new rows, etc.)
-function onChange(e) {
+// Modify setupTrigger to handle edit events
+function setupTrigger() {
     try {
-        Logger.log('Change trigger received');
-        Logger.log('Event details:', JSON.stringify(e));
+        Logger.log('Setting up spreadsheet trigger...');
         
-        // Get the active sheet
+        // Remove existing triggers
+        const triggers = ScriptApp.getProjectTriggers();
+        triggers.forEach(trigger => {
+            if (trigger.getHandlerFunction() === 'onEdit' || trigger.getHandlerFunction() === 'onFormSubmit') {
+                ScriptApp.deleteTrigger(trigger);
+                Logger.log('Removed existing trigger');
+            }
+        });
+        
+        // Create new trigger for spreadsheet edits
         const ss = getSpreadsheet();
-        const sheet = ss.getSheetByName(CONFIG.sheets.R3);
-        if (!sheet) {
-            Logger.log('R3_Form sheet not found');
-            return;
-        }
+        ScriptApp.newTrigger('onEdit')
+            .forSpreadsheet(ss)
+            .onEdit()
+            .create();
         
-        // Get the last row
-        const lastRow = sheet.getLastRow();
-        const headers = sheet.getRange(1, 1, 1, sheet.getLastColumn()).getValues()[0];
-        
-        // Get data from the last row
-        const rowData = sheet.getRange(lastRow, 1, 1, sheet.getLastColumn()).getValues()[0];
-        
-        // Find CHATA_ID for this row
-        const chataIdIndex = headers.indexOf(CONFIG.columns.chataId);
-        const chataId = rowData[chataIdIndex];
-        
-        if (!chataId) {
-            Logger.log('No CHATA_ID found in last row, ignoring');
-            return;
-        }
-        
-        // Check if report is already generated
-        const statusIndex = headers.indexOf(CONFIG.columns.reportStatus);
-        const reportStatus = rowData[statusIndex];
-        
-        if (reportStatus === 'Completed') {
-            Logger.log(`Report for ${chataId} is already completed, ignoring change`);
-            return;
-        }
-        
-        Logger.log(`Processing new data for CHATA_ID: ${chataId}`);
-        
-        // Generate report
-        const result = generateReport(chataId);
-        
-        Logger.log(`Report generation ${result.success ? 'completed' : 'failed'} for ${chataId}`);
-        return result;
-        
+        Logger.log('New edit trigger created successfully');
+        return true;
     } catch (error) {
-        Logger.log(`Error in onChange: ${error.message}`);
-        return {
-            success: false,
-            error: error.message
-        };
+        Logger.log(`Failed to set up trigger: ${error.message}`);
+        throw error;
     }
 }
 

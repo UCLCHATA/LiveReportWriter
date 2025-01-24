@@ -179,21 +179,17 @@ export class SubmissionService {
     try {
       console.log('Starting submission process for CHATA ID:', globalState.chataId);
 
-      // Validate submission data first
-      console.log('Validating submission data...');
+      // Validate submission data
       if (!this.validateSubmissionData(globalState)) {
-        console.log('❌ Validation failed - submission blocked');
-        return {
-          success: false,
-          error: 'Please complete all required fields before submitting.'
-        };
+        throw new Error('Invalid submission data');
       }
-      console.log('✓ Validation passed');
 
-      // Only proceed with data preparation and submission if validation passed
-      console.log('Preparing submission data...');
-      const submissionData = this.prepareSubmissionData(globalState, includeImages, chartElement ? 
-        await this.captureChartImage(chartElement) : null);
+      // Capture chart image if needed
+      const chartImage = includeImages && chartElement ? 
+        await this.captureChartImage(chartElement) : null;
+
+      // Prepare data for submission
+      const submissionData = this.prepareSubmissionData(globalState, includeImages, chartImage);
       
       console.log('Submitting data to Sheety:', {
         chataId: submissionData.chataId,
@@ -206,14 +202,14 @@ export class SubmissionService {
           behaviorInterests: !!submissionData.behaviorInterests,
           milestones: !!submissionData.milestoneTimelineData,
           assessmentLog: !!submissionData.assessmentLogData,
-          chartImage: !!submissionData.radarChartImage?.data
+          chartImage: !!chartImage
         }
       });
 
       // Submit to Sheety
       const response = await submitFormData(submissionData);
 
-      console.log('✓ Submission completed successfully:', {
+      console.log('Submission completed successfully:', {
         chataId: submissionData.chataId,
         timestamp: submissionData.timestamp
       });

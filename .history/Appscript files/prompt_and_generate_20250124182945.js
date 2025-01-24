@@ -11,13 +11,7 @@ const CONFIG = {
         Logs: 'API_Logs'
     },
     columns: {
-        // Status tracking columns
-        reportStatus: 'Report_Status',
-        reportUrl: 'Report_URL',
-        logsUrl: 'Logs_URL',
-        reportGenerated: 'Report_Generated',
-        
-        // Existing column mappings
+        // New column mapping based on provided structure
         chataId: 'CHATA_ID',
         clinicName: 'Clinic_Name',
         clinicianName: 'Clinician_Name',
@@ -1996,7 +1990,7 @@ function ensureRequiredColumns() {
         const headers = sheet.getRange(1, 1, 1, sheet.getLastColumn()).getValues()[0];
         Logger.log('Current headers:', headers);
         
-        // Define required columns including status tracking columns
+        // Define required columns
         const requiredColumns = [
             CONFIG.columns.chataId,
             CONFIG.columns.processedFlag,
@@ -2004,11 +1998,7 @@ function ensureRequiredColumns() {
             CONFIG.columns.clinicianEmail,
             CONFIG.columns.clinicianName,
             CONFIG.columns.childFirstName,
-            CONFIG.columns.childSecondName,
-            'Report_Status',    // Status tracking column
-            'Report_URL',       // Document URL column
-            'Logs_URL',         // Logs URL column
-            'Report_Generated'  // Processing flag column
+            CONFIG.columns.childSecondName
         ];
         
         // Check which columns are missing
@@ -2021,12 +2011,6 @@ function ensureRequiredColumns() {
             missingColumns.forEach(column => {
                 const lastCol = sheet.getLastColumn();
                 sheet.getRange(1, lastCol + 1).setValue(column);
-                
-                // Add header formatting
-                const headerCell = sheet.getRange(1, lastCol + 1);
-                headerCell.setBackground('#E8EAF6')  // Light blue background
-                         .setFontWeight('bold')
-                         .setHorizontalAlignment('center');
             });
             
             Logger.log('Added missing columns successfully');
@@ -2422,53 +2406,29 @@ function onFormSubmit(e) {
     }
 }
 
-// Function to set up triggers - with both edit and change triggers
+// Function to set up triggers
 function setupTrigger() {
     try {
-        Logger.log('Setting up spreadsheet triggers...');
-        
-        // Remove ALL existing triggers
+        // Remove any existing triggers
         const triggers = ScriptApp.getProjectTriggers();
         triggers.forEach(trigger => {
-            ScriptApp.deleteTrigger(trigger);
-            Logger.log('Removed existing trigger');
-        });
-        
-        const ss = getSpreadsheet();
-        
-        // 1. Create onChange trigger for new rows
-        const changeTrigger = ScriptApp.newTrigger('onChange')
-            .forSpreadsheet(ss)
-            .onChange()
-            .create();
-        
-        Logger.log('Change trigger created successfully');
-        
-        // 2. Create time-based trigger for processPendingReports (every 5 minutes)
-        const timeTrigger = ScriptApp.newTrigger('processPendingReports')
-            .timeBased()
-            .everyMinutes(5)
-            .create();
-        
-        Logger.log('Time-based trigger created successfully');
-        
-        Logger.log('Trigger details:', {
-            changeTrigger: {
-                handlerFunction: changeTrigger.getHandlerFunction(),
-                eventType: changeTrigger.getEventType(),
-                source: changeTrigger.getTriggerSource()
-            },
-            timeTrigger: {
-                handlerFunction: timeTrigger.getHandlerFunction(),
-                eventType: timeTrigger.getEventType(),
-                frequency: 'Every 5 minutes'
+            if (trigger.getHandlerFunction() === 'onFormSubmit') {
+                ScriptApp.deleteTrigger(trigger);
             }
         });
         
+        // Create new trigger
+        const ss = getSpreadsheet();
+        ScriptApp.newTrigger('onFormSubmit')
+            .forSpreadsheet(ss)
+            .onFormSubmit()
+            .create();
+        
+        Logger.log('Form submit trigger created successfully');
         return true;
     } catch (error) {
-        Logger.log(`Failed to set up triggers: ${error.message}`);
-        throw error;
+        Logger.log(`Error setting up trigger: ${error.message}`);
+        return false;
     }
 }
 
@@ -2500,138 +2460,32 @@ function initializeScript() {
     }
 }
 
-// Function to handle spreadsheet edits - enhanced version with safety checks
-function onEdit(e) {
+// Modify setupTrigger to be more robust
+function setupTrigger() {
     try {
-        Logger.log('Edit trigger received');
+        Logger.log('Setting up spreadsheet trigger...');
         
-        // Safety check for event object
-        if (!e) {
-            Logger.log('No event object received');
-            return;
-        }
-
-        // Get the edited range information - with safety checks
-        const range = e.range;
-        if (!range) {
-            Logger.log('No range information in edit event');
-            return;
-        }
-
-        const sheet = range.getSheet();
-        if (!sheet) {
-            Logger.log('Could not get sheet from edit event');
-            return;
-        }
-
-        const sheetName = sheet.getName();
-        Logger.log(`Sheet being edited: ${sheetName}`);
+        // Remove existing triggers
+        const triggers = ScriptApp.getProjectTriggers();
+        triggers.forEach(trigger => {
+            if (trigger.getHandlerFunction() === 'onFormSubmit') {
+                ScriptApp.deleteTrigger(trigger);
+                Logger.log('Removed existing trigger');
+            }
+        });
         
-        // Only process if edit is in R3_Form sheet
-        if (sheetName !== CONFIG.sheets.R3) {
-            Logger.log('Edit was not in R3_Form sheet, ignoring');
-            return;
-        }
-        
-        // Get the row that was edited
-        const row = range.getRow();
-        if (row === 1) {
-            Logger.log('Edit was in header row, ignoring');
-            return;
-        }
-        
-        // Get all data for this row
-        const rowData = sheet.getRange(row, 1, 1, sheet.getLastColumn()).getValues()[0];
-        const headers = sheet.getRange(1, 1, 1, sheet.getLastColumn()).getValues()[0];
-        
-        // Find CHATA_ID for this row
-        const chataIdIndex = headers.indexOf(CONFIG.columns.chataId);
-        const chataId = rowData[chataIdIndex];
-        
-        if (!chataId) {
-            Logger.log('No CHATA_ID found in edited row, ignoring');
-            return;
-        }
-        
-        // Check if report is already generated
-        const statusIndex = headers.indexOf(CONFIG.columns.reportStatus);
-        const reportStatus = rowData[statusIndex];
-        
-        if (reportStatus === 'Completed') {
-            Logger.log(`Report for ${chataId} is already completed, ignoring edit`);
-            return;
-        }
-        
-        Logger.log(`Processing edit for CHATA_ID: ${chataId}`);
-        
-        // Generate report
-        const result = generateReport(chataId);
-        
-        Logger.log(`Report generation ${result.success ? 'completed' : 'failed'} for ${chataId}`);
-        return result;
-        
-    } catch (error) {
-        Logger.log(`Error in onEdit: ${error.message}`);
-        return {
-            success: false,
-            error: error.message
-        };
-    }
-}
-
-// Function to handle spreadsheet changes (new rows, etc.)
-function onChange(e) {
-    try {
-        Logger.log('Change trigger received');
-        Logger.log('Event details:', JSON.stringify(e));
-        
-        // Get the active sheet
+        // Create new trigger for spreadsheet changes
         const ss = getSpreadsheet();
-        const sheet = ss.getSheetByName(CONFIG.sheets.R3);
-        if (!sheet) {
-            Logger.log('R3_Form sheet not found');
-            return;
-        }
+        ScriptApp.newTrigger('onFormSubmit')
+            .forSpreadsheet(ss)
+            .onFormSubmit()
+            .create();
         
-        // Get the last row
-        const lastRow = sheet.getLastRow();
-        const headers = sheet.getRange(1, 1, 1, sheet.getLastColumn()).getValues()[0];
-        
-        // Get data from the last row
-        const rowData = sheet.getRange(lastRow, 1, 1, sheet.getLastColumn()).getValues()[0];
-        
-        // Find CHATA_ID for this row
-        const chataIdIndex = headers.indexOf(CONFIG.columns.chataId);
-        const chataId = rowData[chataIdIndex];
-        
-        if (!chataId) {
-            Logger.log('No CHATA_ID found in last row, ignoring');
-            return;
-        }
-        
-        // Check if report is already generated
-        const statusIndex = headers.indexOf(CONFIG.columns.reportStatus);
-        const reportStatus = rowData[statusIndex];
-        
-        if (reportStatus === 'Completed') {
-            Logger.log(`Report for ${chataId} is already completed, ignoring change`);
-            return;
-        }
-        
-        Logger.log(`Processing new data for CHATA_ID: ${chataId}`);
-        
-        // Generate report
-        const result = generateReport(chataId);
-        
-        Logger.log(`Report generation ${result.success ? 'completed' : 'failed'} for ${chataId}`);
-        return result;
-        
+        Logger.log('New trigger created successfully');
+        return true;
     } catch (error) {
-        Logger.log(`Error in onChange: ${error.message}`);
-        return {
-            success: false,
-            error: error.message
-        };
+        Logger.log(`Failed to set up trigger: ${error.message}`);
+        throw error; // Propagate error up
     }
 }
 
