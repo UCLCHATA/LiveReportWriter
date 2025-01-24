@@ -21,10 +21,11 @@ export interface ApiError extends Error {
 }
 
 // Define alert message types for consistency
-const ALERT_MESSAGES = {
+export const ALERT_MESSAGES = {
   SUBMISSION_SUCCESS: '✓ Form submitted successfully! Your report will be generated and emailed to you shortly.',
   SUBMISSION_ERROR: (message: string) => `❌ Form submission failed: ${message}\nPlease try again or contact support if the problem persists.`,
-  INVALID_CHATA_ID: 'Submission Error: Invalid CHATA ID. Please check and try again.'
+  INVALID_CHATA_ID: 'Submission Error: Invalid CHATA ID. Please check and try again.',
+  INVALID_DATA: 'Please fill in all required fields before submitting.'
 } as const;
 
 // Strict column ordering for Sheety submissions

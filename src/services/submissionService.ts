@@ -2,6 +2,7 @@ import { submitFormData } from './api';
 import type { GlobalFormState } from '../types';
 import html2canvas from 'html2canvas';
 import { prepareFormDataForSubmission } from './dataPreparation';
+import { ALERT_MESSAGES } from './api';
 
 interface SubmissionResult {
   success: boolean;
@@ -58,22 +59,30 @@ export class SubmissionService {
       hasAssessments: !!globalState.assessments
     });
 
-    // Only CHATA ID is required
+    // Check CHATA ID
     if (!globalState.chataId) {
       console.error('❌ Missing CHATA ID');
+      alert(ALERT_MESSAGES.INVALID_DATA);
+      return false;
+    }
+
+    // Check required clinician fields
+    if (!globalState.clinician?.name?.trim() || 
+        !globalState.clinician?.email?.trim() || 
+        !globalState.clinician?.clinicName?.trim()) {
+      console.error('❌ Missing required clinician information');
+      alert('Please fill in all required clinician fields (Name, Email, and Clinic Name) before submitting.');
       return false;
     }
 
     // Log clinician data for debugging
-    if (globalState.clinician) {
-      const { name, email, clinicName } = globalState.clinician;
-      console.log('👤 Clinician data present:', {
-        name: name || '(empty)',
-        email: email || '(empty)',
-        clinicName: clinicName || '(empty)',
-        rawData: globalState.clinician
-      });
-    }
+    const { name, email, clinicName } = globalState.clinician;
+    console.log('👤 Clinician data present:', {
+      name: name || '(empty)',
+      email: email || '(empty)',
+      clinicName: clinicName || '(empty)',
+      rawData: globalState.clinician
+    });
 
     return true;
   }
