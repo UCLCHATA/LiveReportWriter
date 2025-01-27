@@ -7,6 +7,231 @@ R3 Assessment Platform is a comprehensive clinical assessment and report generat
 1. **Web Application**: A React-based frontend for clinicians to input assessment data across multiple domains including sensory processing, social communication, behavior, and developmental milestones.
 2. **Report Generation System**: An automated system using Google Apps Script and Anthropic's Claude 3.5 Sonnet to generate detailed clinical reports from assessment data.
 
+## Getting Started 🚀
+
+Welcome to the R3 Assessment Platform! This guide will help you get up and running quickly.
+
+### What Does This Platform Do? 
+
+The R3 Assessment Platform helps clinicians:
+- Create comprehensive developmental assessments
+- Generate professional reports automatically
+- Track client progress over time
+- Visualize assessment data beautifully
+
+Think of it as your intelligent assistant that handles the heavy lifting of report writing, letting you focus on what matters most - your clinical work with children and families.
+
+### Who Is This For?
+
+- Clinical Psychologists
+- Occupational Therapists
+- Speech and Language Therapists
+- Developmental Pediatricians
+- Any clinician working with developmental assessments
+
+### Key Features for Clinicians
+
+1. **Smart Form Filling** 📝
+   - User-friendly assessment forms
+   - Auto-saving as you type
+   - Helpful prompts and guidance
+   - Flexible data entry
+
+2. **Automated Report Generation** 📄
+   - Professional reports in minutes
+   - Consistent formatting
+   - Evidence-based language
+   - Parent-friendly explanations
+
+3. **Visual Progress Tracking** 📊
+   - Beautiful radar graphs
+   - Development timelines
+   - Progress visualization
+   - Easy-to-share formats
+
+4. **Time-Saving Automation** ⚡
+   - Focus on clinical work
+   - Reduce administrative time
+   - Consistent documentation
+   - Quick turnaround times
+
+## Quick Start Guide 🏃‍♀️
+
+### 1. First Time Setup (15 minutes)
+
+1. **Account Setup**:
+   ```bash
+   # Get your accounts ready:
+   ✓ Google Workspace account
+   ✓ Sheety API access
+   ✓ Anthropic Claude API key
+   ```
+
+2. **Installation**:
+   ```bash
+   # Clone and install (copy-paste these commands)
+   git clone [your-repo-url]
+   cd R3
+   npm install
+   ```
+
+3. **Configuration**:
+   - Copy `.env.example` to `.env`
+   - Add your API keys
+   - Set up Google Apps Script (detailed below)
+
+### 2. Daily Usage (2-minute workflow)
+
+1. **Start a New Assessment**:
+   - Click "Create Report"
+   - Fill in client details
+   - Choose assessment domains
+
+2. **Complete the Assessment**:
+   - Work through each section
+   - Save automatically as you go
+   - Add clinical observations
+
+3. **Generate Report**:
+   - Click "Generate Report"
+   - Review automatically
+   - Download or share
+
+### 3. Common Tasks
+
+#### Creating a New Report 📝
+```plaintext
+Create Report → Fill Details → Complete Assessment → Generate
+```
+
+#### Updating Existing Reports 🔄
+```plaintext
+Open Report → Make Changes → Save → Regenerate
+```
+
+#### Sharing with Parents 📧
+```plaintext
+Generate Report → Review → Set Permissions → Share Link
+```
+
+## Understanding the System 🧠
+
+Think of the R3 Platform as having three main parts:
+
+1. **The Form** (What you see and use)
+   - Like a smart questionnaire
+   - Helps collect all needed information
+   - Guides you through the assessment
+
+2. **The Brain** (What happens behind the scenes)
+   - Processes your input
+   - Generates professional content
+   - Ensures clinical accuracy
+
+3. **The Output** (What you get)
+   - Professional reports
+   - Visual summaries
+   - Parent-friendly explanations
+
+### How It All Works Together
+
+```plaintext
+Your Input → Smart Processing → Professional Output
+(Assessment)  (AI & Automation)  (Reports & Visuals)
+```
+
+## Best Practices for Clinicians 💡
+
+### Making the Most of Your Assessment Time
+
+1. **Before the Assessment**:
+   - Review the assessment domains
+   - Prepare your workspace
+   - Have client details ready
+   - Check your internet connection
+
+2. **During Data Entry**:
+   - Use clear, objective language
+   - Be specific in observations
+   - Include relevant examples
+   - Save regularly (though auto-save is on)
+
+3. **Writing Clinical Observations**:
+   ```plaintext
+   Good Example:
+   "Child demonstrated joint attention 3 times during 15-minute play, 
+   specifically by pointing to toys and checking adult's gaze"
+
+   Instead of:
+   "Good joint attention skills"
+   ```
+
+### Tips for Better Reports
+
+1. **Quality Observations** 📝
+   - Use specific examples
+   - Include frequency data
+   - Note context
+   - Document responses
+
+2. **Professional Language** 🎯
+   - Be objective
+   - Use clinical terms correctly
+   - Avoid assumptions
+   - Stay evidence-based
+
+3. **Parent-Friendly Content** 👥
+   - Explain clinical terms
+   - Use practical examples
+   - Focus on strengths
+   - Include actionable strategies
+
+### Time-Saving Workflows
+
+1. **Assessment Preparation**:
+   ```plaintext
+   Morning: Review upcoming assessments
+   Pre-session: Open forms and templates
+   Post-session: Complete while fresh
+   End of day: Review and finalize
+   ```
+
+2. **Quick Keys and Shortcuts**:
+   - Tab: Move between fields
+   - Ctrl+S: Manual save
+   - Ctrl+Space: Expand text field
+   - Esc: Close current popup
+
+3. **Efficient Documentation**:
+   - Use built-in templates
+   - Copy common phrases
+   - Save frequent responses
+   - Utilize auto-complete
+
+### Quality Assurance Tips
+
+1. **Before Generating**:
+   ```plaintext
+   ✓ All required fields complete
+   ✓ Observations are specific
+   ✓ Examples are included
+   ✓ Recommendations are clear
+   ```
+
+2. **Review Process**:
+   ```plaintext
+   1. Check clinical accuracy
+   2. Verify all sections
+   3. Review formatting
+   4. Confirm recommendations
+   ```
+
+3. **Final Checks**:
+   - Professional language
+   - Consistent terminology
+   - Clear structure
+   - Actionable recommendations
+
 ## Tech Stack & Dependencies
 
 ### Core Technologies
@@ -79,13 +304,88 @@ R3 Assessment Platform is a comprehensive clinical assessment and report generat
 - **Template System**: Google Docs with placeholder-based content injection
 - **Email Notifications**: Automated via Google Apps Script
 
+#### Key Components
+
+1. **Configuration Management**
+
+   - Centralized CONFIG object for system settings
+   - Spreadsheet and document IDs
+   - Column mappings for data extraction
+   - API configuration and model settings
+2. **Placeholder System**
+
+   - Direct placeholders for immediate data (names, dates)
+   - Content placeholders for LLM-generated sections
+   - Bullet-point handling for structured lists
+   - Formatting rules for consistent styling
+3. **Processing Pipeline**
+
+   - Concurrent processing protection via LockService
+   - Chunked content generation (4 chunks max)
+   - Progressive status updates
+   - Document cleanup on failure
+   - Automatic retry for failed sections
+4. **Error Handling & Logging**
+
+   - Comprehensive error logging
+   - Status tracking in spreadsheet
+   - Error reports with context
+   - Email notifications for failures
+   - Automatic cleanup of failed documents
+5. **Security & Data Management**
+
+   - 5-minute processing locks per CHATA_ID
+   - 29-day data retention policy
+   - Secure document sharing settings
+   - Automated cleanup of sensitive data
+
+#### Triggers & Automation
+
+1. **onChange Trigger**
+
+   - Monitors new/edited assessment entries
+   - Validates required fields
+   - Initiates report generation
+   - Handles duplicate entries
+2. **Time-Based Triggers**
+
+   - processPendingReports (every 5 minutes)
+   - cleanupOldData (daily at 1 AM)
+   - Automatic retry for failed reports
+
+#### Integration Points
+
+1. **Claude API Integration**
+
+   - System prompt with clinical guidelines
+   - Chunked content generation
+   - Error handling and retries
+   - Response validation and processing
+2. **Google Drive Management**
+
+   - Template copying and naming
+   - Permission setting
+   - Cleanup of failed documents
+   - Organized folder structure
+3. **Google Sheets Integration**
+
+   - Status tracking and updates
+   - Data extraction and validation
+   - Error logging and reporting
+   - Cleanup tracking
+4. **Email Notifications**
+
+   - Success notifications with document links
+   - Error notifications with context
+   - Clinician-specific routing
+   - Customized message content
+
 ## Required Accounts & Services
 
 ### 1. Google Workspace
 
 - **Purpose**: Spreadsheet storage, Apps Script runtime, document management
 - **Account Type**: Google Workspace Business Standard or higher
-- **Cost**: Starting at £9.80/user/month
 - **Setup Required**:
   - Google Sheets access
   - Google Drive folder structure
@@ -122,6 +422,291 @@ R3 Assessment Platform is a comprehensive clinical assessment and report generat
   - GitHub Pages configuration
   - Deployment workflow setup
 
+## Apps Script Setup & Configuration
+
+### Initial Setup
+
+1. **Script Project Creation**
+
+   - Create new Apps Script project in Google Drive
+   - Set project name and description
+   - Enable required Google Services:
+     - Google Sheets API
+     - Google Drive API
+     - Gmail API
+2. **Script Properties**
+
+   - Set ANTHROPIC_API_KEY in script properties
+   - Configure other sensitive data if needed
+   - Test API key validation
+3. **Trigger Setup**
+
+   - Configure onChange trigger for R3_Form sheet
+   - Set up time-based trigger for processPendingReports
+   - Configure daily cleanup trigger
+   - Verify trigger permissions
+
+### Configuration Requirements
+
+1. **Google Sheets Structure**
+
+   - R3_Form sheet with specified columns
+   - Proper column headers matching CONFIG
+   - Data validation rules
+   - Protected ranges if needed
+2. **Google Drive Structure**
+
+   - Template document in specified location
+   - Output folder for generated reports
+   - Logs folder for error reports
+   - Proper folder permissions
+3. **Template Document**
+
+   - Correct placeholder format: {{PLACEHOLDER}}
+   - Required placeholders present
+   - Consistent formatting
+   - No broken references
+
+### Security Configuration
+
+1. **Document Sharing**
+
+   - Default to "Anyone with link can view"
+   - Automated permission setting
+   - Domain restrictions if needed
+   - Version history enabled
+2. **Data Protection**
+
+   - 29-day data retention policy
+   - Automated data cleanup
+   - Protected ranges in spreadsheet
+   - Audit logging enabled
+3. **Access Control**
+
+   - Script project sharing settings
+   - Trigger ownership
+   - API key management
+   - Error reporting access
+
+### Monitoring & Maintenance
+
+1. **Error Monitoring**
+
+   - Review error logs daily
+   - Check execution logs
+   - Monitor API usage
+   - Track failed reports
+2. **Performance Tracking**
+
+   - Monitor execution times
+   - Track API response times
+   - Check concurrent processing
+   - Review resource usage
+3. **Regular Maintenance**
+
+   - Verify trigger health
+   - Check data cleanup execution
+   - Update API keys if needed
+   - Review security settings
+
+## Troubleshooting & Common Issues
+
+### Report Generation Issues
+
+1. **Processing Stuck at "Processing" Status**
+
+   - Check if lock is stuck (over 5 minutes old)
+   - Verify trigger execution logs
+   - Check for concurrent processing conflicts
+   - Reset status if needed
+2. **Missing Content in Reports**
+
+   - Verify placeholder format in template
+   - Check content generation logs
+   - Validate form data completeness
+   - Review Claude API responses
+3. **Formatting Issues**
+
+   - Check template formatting
+   - Verify content cleanup rules
+   - Review document modification logs
+   - Check for conflicting styles
+
+### API Integration Issues
+
+1. **Claude API Errors**
+
+   - Verify API key validity
+   - Check rate limits
+   - Review prompt formatting
+   - Monitor response validation
+2. **Google Services Errors**
+
+   - Check service enablement
+   - Verify permissions
+   - Review quota usage
+   - Check for service interruptions
+
+### Data Management Issues
+
+1. **Duplicate Processing**
+
+   - Check locking mechanism
+   - Review status tracking
+   - Verify trigger execution
+   - Check for manual interventions
+2. **Data Cleanup Issues**
+
+   - Verify cleanup trigger execution
+   - Check cleanup logs
+   - Review retention policy application
+   - Monitor cleanup notifications
+
+### Performance Issues
+
+1. **Slow Processing**
+
+   - Check chunk size configuration
+   - Monitor API response times
+   - Review concurrent processing
+   - Check resource utilization
+2. **Timeout Errors**
+
+   - Adjust chunk sizes
+   - Review processing timeouts
+   - Check for large data sets
+   - Monitor execution times
+
+### Common Error Messages
+
+1. **"Could not acquire lock"**
+
+   - Wait for current process to complete
+   - Check for stuck locks
+   - Verify CHATA_ID format
+   - Review concurrent operations
+2. **"Missing required data"**
+
+   - Check form completeness
+   - Verify column mappings
+   - Review data validation
+   - Check for format issues
+3. **"API request failed"**
+
+   - Verify API key
+   - Check rate limits
+   - Review request format
+   - Monitor API status
+
+### Recovery Procedures
+
+1. **Stuck Process Recovery**
+
+   - Clear processing status
+   - Release stuck locks
+   - Archive failed document
+   - Restart processing
+2. **Data Corruption Recovery**
+
+   - Restore from backup
+   - Review audit logs
+   - Fix data inconsistencies
+   - Update status tracking
+3. **Failed Report Recovery**
+
+   - Archive failed document
+   - Reset processing status
+   - Clear error states
+   - Reinitiate generation
+
+## Common Questions & Quick Solutions 🔧
+
+### "Help! My Report Isn't Generating"
+
+1. **Quick Checks**:
+   - ✓ Check your internet connection
+   - ✓ Verify all required fields are filled
+   - ✓ Ensure you're logged in
+   - ✓ Check if another report is processing
+
+2. **Simple Fixes**:
+   ```plaintext
+   1. Wait 5 minutes
+   2. Refresh the page
+   3. Try generating again
+   ```
+
+3. **Still Not Working?**
+   - Look for any red error messages
+   - Check the "Status" column in your sheet
+   - Contact support if needed
+
+### "The Report Content Looks Wrong"
+
+1. **Common Causes**:
+   - Missing assessment data
+   - Incomplete sections
+   - Formatting issues
+   - Template problems
+
+2. **Quick Fixes**:
+   ```plaintext
+   1. Review your assessment data
+   2. Check for missing sections
+   3. Try regenerating the report
+   4. Use the "Review" feature
+   ```
+
+### "I Need to Make Changes"
+
+1. **To Edit Assessment Data**:
+   ```plaintext
+   Open Form → Make Changes → Save → Regenerate Report
+   ```
+
+2. **To Edit the Report Directly**:
+   ```plaintext
+   Open Report → Make Changes → Save → Share Updated Version
+   ```
+
+### "The System Seems Slow"
+
+1. **Quick Performance Tips**:
+   - Work on one section at a time
+   - Save regularly
+   - Clear your browser cache
+   - Use Chrome or Edge for best performance
+
+2. **If Still Slow**:
+   ```plaintext
+   1. Check your internet speed
+   2. Close unused browser tabs
+   3. Wait for any processing to complete
+   4. Contact support if persistent
+   ```
+
+### Need More Help? 🤝
+
+1. **Check Resources**:
+   - Review this documentation
+   - Check our FAQ section
+   - Watch tutorial videos
+   - Join our community forum
+
+2. **Contact Support**:
+   - Email: support@r3platform.com
+   - Response time: Within 24 hours
+   - Include your CHATA_ID for faster help
+
+3. **Quick Support Checklist**:
+   ```plaintext
+   When asking for help, please include:
+   ✓ What you were trying to do
+   ✓ What actually happened
+   ✓ Any error messages
+   ✓ Your CHATA_ID
+   ```
+
 ## Workflow
 
 ### 1. Assessment Data Collection
@@ -137,14 +722,60 @@ R3 Assessment Platform is a comprehensive clinical assessment and report generat
 
 ### 2. Report Generation Process
 
-1. Google Apps Script detects new row in spreadsheet
-2. Extracts assessment data and prepares for processing
-3. Calls Claude API with structured prompt and assessment data
-4. Processes LLM response and extracts content for each section
-5. Creates copy of report template
-6. Populates template with generated content
-7. Saves completed report to Google Drive
-8. Sends email notification to clinician
+1. **Trigger & Initial Processing**
+
+   - onChange trigger detects new/modified row
+   - Validates CHATA_ID format and required fields
+   - Checks for duplicate processing
+   - Acquires processing lock for CHATA_ID
+2. **Data Preparation**
+
+   - Extracts form data from spreadsheet
+   - Validates all required fields
+   - Processes scores and observations
+   - Prepares data structure for API
+3. **Content Generation**
+
+   - Splits placeholders into 4 maximum chunks
+   - Processes each chunk with Claude API
+   - Validates responses and extracts content
+   - Handles technical vs parent-friendly sections
+4. **Document Creation**
+
+   - Creates copy of template document
+   - Sets document name with CHATA_ID and timestamp
+   - Configures initial permissions
+   - Prepares for content insertion
+5. **Content Population**
+
+   - Processes direct placeholders (names, dates)
+   - Replaces content placeholders with generated text
+   - Applies consistent formatting
+   - Handles special formats (bullets, lists)
+6. **Quality Control**
+
+   - Validates all placeholders were replaced
+   - Highlights missing or failed content
+   - Checks formatting consistency
+   - Verifies document structure
+7. **Finalization**
+
+   - Sets final document permissions
+   - Updates status in spreadsheet
+   - Generates document URL
+   - Cleans up temporary data
+8. **Notification**
+
+   - Sends email to clinician
+   - Includes document link
+   - Provides editing instructions
+   - Notes any partial completions
+9. **Cleanup & Logging**
+
+   - Releases processing lock
+   - Updates processing logs
+   - Records completion status
+   - Handles any cleanup tasks
 
 ### 3. Report Review & Delivery
 
@@ -152,6 +783,117 @@ R3 Assessment Platform is a comprehensive clinical assessment and report generat
 2. Reviews generated report
 3. Makes any necessary adjustments
 4. Finalizes report for client delivery
+
+## Placeholder System & Content Generation
+
+### Placeholder Types
+
+1. **Direct Placeholders**
+
+   - Basic information replacement
+   - Examples: {{Child_Name}}, {{FirstName}}, {{Age}}
+   - Processed directly from form data
+   - Case-sensitive matching
+   - Multiple occurrence handling
+2. **Content Placeholders**
+
+   - LLM-generated content sections
+   - Format: {{[A-Z][0-9]{3}}} (e.g., {{T001}}, {{C001}})
+   - Type prefixes:
+     - T: Technical sections
+     - C: Clinical/Parent-friendly sections
+     - R: Recommendations
+     - P: Profile sections
+3. **Bullet Point Placeholders**
+
+   - Special handling for lists
+   - Suffix: -Bullets (e.g., {{C020-Bullets}})
+   - Consistent formatting
+   - Proper indentation
+
+### Content Generation Rules
+
+1. **Technical Sections (T-series)**
+
+   - Professional clinical language
+   - Formal assessment terminology
+   - Evidence-based descriptions
+   - Structured analysis format
+2. **Clinical Sections (C-series)**
+
+   - Parent-friendly language
+   - Everyday examples
+   - Clear explanations
+   - Supportive tone
+3. **Recommendation Sections (R-series)**
+
+   - Actionable suggestions
+   - Practical implementation
+   - Resource references
+   - Support strategies
+
+### Chunking Strategy
+
+1. **Chunk Organization**
+
+   - Maximum 4 chunks per report
+   - Technical sections prioritized
+   - Related content grouped
+   - Balanced chunk sizes
+2. **Processing Order**
+
+   - Technical sections first
+   - Clinical sections second
+   - Recommendations last
+   - Status updates between chunks
+3. **Error Handling**
+
+   - Per-chunk validation
+   - Partial completion support
+   - Retry mechanisms
+   - Error highlighting
+
+### Content Validation
+
+1. **Structure Validation**
+
+   - Format checking
+   - Tag completeness
+   - Content boundaries
+   - Section integrity
+2. **Content Quality**
+
+   - Word count requirements
+   - Formatting consistency
+   - Language appropriateness
+   - Clinical accuracy
+3. **Response Processing**
+
+   - Tag extraction
+   - Content cleaning
+   - Format standardization
+   - Error detection
+
+### Formatting Rules
+
+1. **Text Formatting**
+
+   - Font: Arial
+   - Size: 11pt
+   - Consistent spacing
+   - Paragraph alignment
+2. **Special Elements**
+
+   - Bullet point standardization
+   - List formatting
+   - Heading styles
+   - Spacing rules
+3. **Visual Indicators**
+
+   - Yellow highlighting for review
+   - Red highlighting for errors
+   - Consistent styling
+   - Clear visual hierarchy
 
 ## Technical Components
 
@@ -882,7 +1624,7 @@ DATA_PROCESSING = {
     sensory_profile: {
       score_interpretation: true,
       pattern_analysis: true,
-      impact_assessment: true
+      impact_assessment: true,
     },
     social_communication: {
       skill_evaluation: true,
@@ -1195,12 +1937,6 @@ FEEDBACK MECHANISMS:
    - Error rates
    - API efficiency
    - Resource usage
-
-4. User Experience:
-   - Interface usability
-   - Workflow efficiency
-   - Feature effectiveness
-   - Output satisfaction
 ```
 
 ##### Performance Monitoring
@@ -1328,37 +2064,6 @@ MONITORING METRICS:
    - Add clinical insights
    - Enhance recommendations
    - Finalize report
-
-## Apps Script Configuration
-
-### Required Script Properties
-
-- `ANTHROPIC_API_KEY`: Claude API key
-- `SPREADSHEET_ID`: ID of the main spreadsheet
-- `LOGS_FOLDER_ID`: ID of the folder for storing logs
-
-### Spreadsheet Structure
-
-1. **R3_Form Sheet**:
-
-   - Primary data collection sheet
-   - Contains all assessment data
-   - Tracks report generation status
-2. **Placeholders_Map Sheet**:
-
-   - Maps template placeholders to content requirements
-   - Defines writing instructions for each section
-3. **API_Logs Sheet**:
-
-   - Tracks all API operations
-   - Records errors and processing status
-
-### Template System
-
-- Located in Google Drive
-- Uses `{{PLACEHOLDER}}` syntax
-- Supports both technical and parent-friendly sections
-- Includes dynamic image insertion for charts and timelines
 
 ## Development Setup
 
