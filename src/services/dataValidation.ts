@@ -16,13 +16,14 @@ export const SHEETY_HEADERS = {
     // Assessment Form Headers
     FORM: {
         clinicalObservations: 'clinicalObservations',
-        sensoryProfile: 'sensoryProfile',
-        socialCommunication: 'socialCommunication',
-        behaviorInterests: 'behaviorInterests',
-        milestoneTimelineData: 'milestoneTimelineData',
-        assessmentLogData: 'assessmentLogData',
-        status: 'status',
-        submissionDate: 'submissionDate'
+        recommendations: 'supportRecommendations',
+        differentialDiagnosis: 'differentialDiagnosis',
+        supportAreas: 'prioritySupportAreas',
+        strengths: 'strengthsAbilities',
+        ascStatus: 'ascStatus',
+        adhdStatus: 'adhdStatus',
+        additionalRemarks: 'additionalRemarks',
+        referrals: 'referrals'
     },
     
     // Sensory Profile Headers

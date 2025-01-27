@@ -260,8 +260,20 @@ function prepareAssessmentLogData(assessmentLog: any) {
     };
 }
 
-// Format form data (truncate to 100 chars)
-function prepareFormData(formData: any) {
+// Format form data
+interface FormDataType {
+    clinicalObservations?: string;
+    recommendations?: string;
+    differentialDiagnosis?: string;
+    priorityAreas?: string;
+    strengths?: string;
+    ascStatus?: string;
+    adhdStatus?: string;
+    remarks?: string;
+    referrals?: Record<string, boolean>;
+}
+
+function prepareFormData(formData: FormDataType) {
     // Format referrals into a comma-separated string
     const referralLabels = {
         speech: 'Speech & Language',
@@ -284,14 +296,14 @@ function prepareFormData(formData: any) {
     console.log('📝 Formatted referrals string:', formattedReferrals);
 
     return {
-        [SHEETY_HEADERS.FORM.clinicalObservations]: (formData?.clinicalObservations || '').substring(0, 100),
-        [SHEETY_HEADERS.FORM.recommendations]: (formData?.recommendations || '').substring(0, 100),
-        [SHEETY_HEADERS.FORM.differentialDiagnosis]: (formData?.differentialDiagnosis || '').substring(0, 100),
-        [SHEETY_HEADERS.FORM.supportAreas]: (formData?.priorityAreas || '').substring(0, 100),
-        [SHEETY_HEADERS.FORM.strengths]: (formData?.strengths || '').substring(0, 100),
+        [SHEETY_HEADERS.FORM.clinicalObservations]: formData?.clinicalObservations || '',
+        [SHEETY_HEADERS.FORM.recommendations]: formData?.recommendations || '',
+        [SHEETY_HEADERS.FORM.differentialDiagnosis]: formData?.differentialDiagnosis || '',
+        [SHEETY_HEADERS.FORM.supportAreas]: formData?.priorityAreas || '',
+        [SHEETY_HEADERS.FORM.strengths]: formData?.strengths || '',
         [SHEETY_HEADERS.FORM.ascStatus]: formData?.ascStatus || '',
         [SHEETY_HEADERS.FORM.adhdStatus]: formData?.adhdStatus || '',
-        [SHEETY_HEADERS.FORM.additionalRemarks]: (formData?.remarks || '').substring(0, 100),
+        [SHEETY_HEADERS.FORM.additionalRemarks]: formData?.remarks || '',
         [SHEETY_HEADERS.FORM.referrals]: formattedReferrals || ''  // Use the header constant and ensure empty string fallback
     };
 }
